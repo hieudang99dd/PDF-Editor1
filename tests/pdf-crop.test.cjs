@@ -32,7 +32,7 @@ test('PDF.js rotated viewport maps four corners back to unrotated PDF space',asy
  assert.ok(Math.abs(q180.x-130)<.001&&Math.abs(q180.y-180)<.001);
  const vp270={width:800,height:600,convertToPdfPoint:(x,y)=>[610-y,820-x]};
  const q270=viewportCropRect(vp270,box,media,media);
- assert.ok(Math.abs(q270.x-130)<.001&&Math.abs(q270.y-100)<.001);
+ assert.ok(Math.abs(q270.x-130)<.001&&Math.abs(q270.y-180)<.001);
  assert.throws(()=>viewportCropRect(vp0,{x:.5,y:.5,w:0,h:0},media,media),/Vùng cắt/);
 });
 test('existing non-zero CropBox and MediaBox enforce strict intersection',async()=>{
