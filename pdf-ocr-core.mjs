@@ -14,6 +14,18 @@ export function parsePages(value, count) {
 export function boundedScale(width, height, dpi = 180) {
   return Math.min(dpi / 72, 4096 / Math.max(width, height), Math.sqrt(8000000 / (width * height)));
 }
+// A scan may contain only a QR or document identifier in its text layer.
+// Do not classify the entire scanned page as native text based on one glyph.
+export function preserveNativeTextLayer(layer, containsRaster = false) {
+  const items = (layer?.items || []).filter(i => typeof i?.str === 'string' && i.str.trim());
+  const characters = items.reduce((n,i) => n + i.str.trim().length,0);
+  if (!characters) return false;
+  if (!containsRaster) return true; // a genuine vector-only one-line PDF remains native
+  const baselines = new Set(items
+    .filter(i=>Array.isArray(i.transform) && Number.isFinite(i.transform[5]))
+    .map(i=>Math.round(i.transform[5]/5)));
+  return characters >= 90 && baselines.size >= 3;
+}
 export function normalizeItems(items, width, height) {
   return items.filter(item => typeof item.text === 'string' && item.poly?.length === 4 &&
     item.poly.every(p => p.length === 2 && p.every(Number.isFinite)))

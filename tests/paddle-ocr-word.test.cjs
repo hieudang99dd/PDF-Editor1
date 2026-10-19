@@ -60,3 +60,11 @@ test('PDF whitespace and split Vietnamese combining marks survive line reconstru
  const body=flowBlocks([item('Dòng đầu của đoạn văn',10,450,80),item('dòng tiếp theo trong cùng đoạn.',10,300,98)],[],500);
  assert.equal(body.blocks.length,1);assert.equal(body.blocks[0].lines.length,2);
 });
+
+test('scan-only DOCX export refuses to silently publish a full-page image as editable Word',async()=>{
+ const {validateEditablePages}=await import('../pdf-ocr-word.mjs');
+ assert.throws(()=>validateEditablePages([{number:1,items:[],tables:[],background:new Uint8Array([137,80,78,71])}]),/mới chỉ có ảnh scan/);
+ assert.throws(()=>validateEditablePages([{number:2,native:false,items:[{text:'BM-10-09-24110381'}],tables:[],background:new Uint8Array([1])}]),/quá ít chữ/);
+ assert.equal(validateEditablePages([{number:1,items:[{text:'Biên bản làm việc được tái tạo thành đoạn văn đầy đủ và có thể chỉnh sửa.'}],tables:[]}]),true);
+ assert.equal(validateEditablePages([{number:1,items:[],tables:[{cells:[{items:[{text:'Phạm Tâm'}]},{items:[{text:'Tổ phó'}]}]}]}]),true);
+});

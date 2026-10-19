@@ -68,7 +68,7 @@ export async function exportEditableWord(documentPdf, sourceResults, pdfjs, JSZi
       clearTextFromBackground(canvas, items, populated);
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error('Không dựng được hình nền trang Word.');
-      pages.push({ number, width: canvas.width, height: canvas.height, pointWidth: original.width, pointHeight: original.height,
+      pages.push({ number, native: Boolean(result.native), width: canvas.width, height: canvas.height, pointWidth: original.width, pointHeight: original.height,
         items: [...remaining, ...returned], tables: populated, background: new Uint8Array(await blob.arrayBuffer()) });
       tableCount += populated.length;
     } finally { canvas.width = canvas.height = 1; }

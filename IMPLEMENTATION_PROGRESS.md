@@ -467,3 +467,9 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Browser thực tế đã kiểm PDF ký RSA P12/PEM vẫn xem được, khóa ghi/ký tiếp, tải lại byte-perfect; DOCX thử nghiệm được tiếp nhận + tải lại đúng byte nhưng không xem/ký; PNG được chuyển thành PDF 1 trang; PDF chưa ký giữ ký tay/ký số và xuất bình thường. OpenSSL xác thực CMS ByteRange không thay đổi với PDF ký; phát hiện sửa bytes, dữ liệu biểu mẫu/trang gốc giữ nguyên.
 - Đã bỏ bộ lọc phần mở rộng cho đầu vào và giới hạn cứng 200MB; không bảo đảm RAM vô hạn. Tệp Word/Excel/CAD chỉ tiếp nhận và tải lại; trước khi ký phải có PDF chuyển đổi tương ứng, không giả lập bộ đọc/ký chưa có.
 - Build vendor `digital.mjs` hiện có **nondeterministic/minifier hash drift** so với artifact ghim; CI xác minh SHA bản phát hành, chạy rebuild và kiểm thử chức năng/mật mã + CI site thật thay vì báo sai rằng byte build luôn tái lập. Cần rà tiếp nguyên nhân minifier drift riêng, không liên quan chữ ký đầu vào.
+
+### 2026-10-19 — Sửa đầu ra Word chỉ chứa ảnh scan
+
+- Kiểm tra file `BBLV_Approved_ocr.docx` (2 trang): hai bitmap scan đặt trong header, 0 bảng Word và chỉ có mã tài liệu ở vài đoạn; không phải Word OCR có thể sửa. Đã tái tạo ví dụ `BBLV_Tai_tao_Bang_Text_Chinh_sua.docx` độc lập với 2 trang, 2 bảng nội dung Word thật, chữ Việt có thể sửa và logo/chữ ký/QR là ảnh độc lập.
+- Sửa chức năng bỏ qua native: chỉ vì có mã tài liệu trên PDF scan không còn được bỏ OCR toàn trang; nếu trang có ảnh và text layer mỏng thì chuyển sang PaddleOCR / Tesseract. Bổ sung kiểm tra nội dung editable trước xuất DOCX để ngăn tạo Word chỉ có bitmap.
+- Giữ nguyên engine docx 9.6.1, font Unicode và PDFium; bộ test bổ sung nhận diện scan có mã, kiểm chặn file Word sai. Vẫn cần PDF scan gốc để đo độ chính xác cell segmentation cho tài liệu thực tế.

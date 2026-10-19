@@ -68,3 +68,10 @@ PDF có lớp chữ sai ToUnicode/VNI/TCVN3 không tự sửa bằng đổi font
 - Mẫu văn bản hành chính: PDF.js thực sự tách từ/dấu cách, tiêu đề hai bên, chữ Việt và số tiền. Xuất Word và bản đổi font sang Liberation Serif; LibreOffice/PyMuPDF kiểm tra hiển thị hai font khác nhau, khoảng trắng và số liệu. Kiểm tra nền mẫu toàn chữ không còn pixel mực để bắt lỗi dấu/nét ma.
 - Render và xem toàn bộ trang PNG bằng quy trình tài liệu; không dùng kiểm tra XML thay cho kiểm tra hình ảnh. CI `ocr-word.yml` tái dựng thư viện ghim và giữ bằng chứng browser/render.
 - Chưa có PDF/DOCX gốc của ảnh người dùng báo lỗi; mẫu tổng hợp kiểm chứng nguyên nhân chung, không chứng minh tài liệu đó đã chuyển đúng hoàn toàn.
+
+### OCR → Word: xử lý PDF scan có mã tài liệu dạng lớp chữ (2026-10-19)
+
+- Từ file người dùng `BBLV_Approved_ocr.docx`: có **hai ảnh nguyên trang** trong header, không có bảng Word, chỉ còn vài đoạn mã văn bản. Đây là kết quả sai, không đạt mục tiêu Word tái tạo.
+- Nguyên nhân đường mã được xác định: tùy chọn bỏ qua trang native trước đây bỏ cả trang chỉ vì **một chuỗi chữ duy nhất**, thường mã tài liệu/QR của ảnh scan. Bổ sung `preserveNativeTextLayer()`: yêu cầu lớp chữ có ít nhất 90 ký tự, thuộc ≥3 baseline nếu trang có ảnh; trường hợp PDF không có ảnh vẫn giữ trang native ngắn.
+- Bổ sung `validateEditablePages()` trước khi đóng gói DOCX: từ chối xuất chỉ có ảnh scan, hoặc trang scan OCR nhận quá ít chữ mà không có bảng, hiển thị hướng dẫn chạy lại OCR. Không báo thành công giả.
+- Lưu ý đây là **chặn xuất lỗi và sửa phân loại trang**; nhận diện chuẩn bảng/ô, phân tách logo/chữ ký/QR khỏi nền cần thêm kiểm thử trên PDF scan gốc. File Word mẫu được tái tạo độc lập từ ảnh scan và hai bảng Word thật, không dùng ảnh nguyên trang thay chữ.

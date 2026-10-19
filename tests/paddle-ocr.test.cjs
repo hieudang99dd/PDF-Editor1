@@ -31,3 +31,16 @@ test('same-origin runtime assets match reviewed hashes',()=>{
  const manifest=JSON.parse(fs.readFileSync(path.join(root,'vendor/paddleocr/manifest.json')));
  for(const [file,{sha256}] of Object.entries(manifest.files))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'vendor/paddleocr',file))).digest('hex'),sha256,file);
 });
+
+test('native PDF skip respects short scan headers and real native paragraphs',async()=>{
+ const {preserveNativeTextLayer}=await import('../pdf-ocr-core.mjs');
+ const one={items:[{str:'BM-10-09-24110381',transform:[1,0,0,1,20,790]}]};
+ assert.equal(preserveNativeTextLayer(one,true),false,'Document code inside scanned page must not disable OCR');
+ assert.equal(preserveNativeTextLayer(one,false),true,'Pure vector one-line PDF remains native');
+ const meaningful={items:[
+   {str:'Tài liệu có nội dung Word thực sự đầy đủ, dòng thứ nhất.',transform:[1,0,0,1,20,700]},
+   {str:'Dòng thứ hai của biên bản đã chứa nhiều đoạn văn bản chính.',transform:[1,0,0,1,20,650]},
+   {str:'Dòng thứ ba và các mục văn bản cần được giữ nguyên.',transform:[1,0,0,1,20,600]}
+ ]};
+ assert.equal(preserveNativeTextLayer(meaningful,true),true);
+});

@@ -1,4 +1,4 @@
-import { parsePages, boundedScale, normalizeItems, exportSearchablePdf } from './pdf-ocr-core.mjs';
+import { parsePages, boundedScale, normalizeItems, preserveNativeTextLayer, exportSearchablePdf } from './pdf-ocr-core.mjs';
 const $ = id => document.getElementById(id);
 const pdfjs = window.pdfjsLib;
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.min.js', import.meta.url).href;
@@ -208,7 +208,25 @@ $('run').addEventListener('click', async () => {
       const page = await documentPdf.getPage(number);
       const text = await page.getTextContent();
       if (token !== generation) return;
-      if ($('skip').checked && text.items.some(item => item.str?.trim())) {
+      // An existing short footer/QR text does not mean a page full of scan
+      // pixels has a usable text layer. Only inspect image operators for
+      // sparse native text; dense vector text avoids the extra render work.
+      let keepNative = preserveNativeTextLayer(text, true);
+      if (!keepNative && text.items.some(item => item.str?.trim())) {
+        const ops = await page.getOperatorList();
+        if (token !== generation) return;
+        const images = new Set([
+          pdfjs.OPS.paintImageXObject,
+          pdfjs.OPS.paintJpegXObject,
+          pdfjs.OPS.paintInlineImageXObject,
+          pdfjs.OPS.paintImageXObjectRepeat,
+          pdfjs.OPS.paintInlineImageXObjectGroup,
+          pdfjs.OPS.paintImageMaskXObject
+        ].filter(Number.isInteger));
+        const hasRaster = ops.fnArray.some(fn => images.has(fn));
+        keepNative = preserveNativeTextLayer(text, hasRaster);
+      }
+      if ($('skip').checked && keepNative) {
         results.set(number, { native: true, text: text.items.map(i => i.str || '').join(' ') });
       } else {
         const base = page.getViewport({ scale: 1 });

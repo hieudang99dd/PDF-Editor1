@@ -96,8 +96,21 @@ async function embedFonts(bytes, JSZip, fonts) {
   zip.file('word/settings.xml', settings.replace('</w:settings>', '<w:embedTrueTypeFonts/><w:saveSubsetFonts w:val="false"/><w:doNotEmbedSystemFonts w:val="false"/></w:settings>'));
   return zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 }
+export function validateEditablePages(pages) {
+  for (const page of pages) {
+    const body = (page.items || []).map(item => item.text || '');
+    const cells = (page.tables || []).flatMap(table => table.cells || []).flatMap(cell => (cell.items || []).map(item => item.text || ''));
+    const nonempty = [...body,...cells].join(' ').replace(/\\s+/g,' ').trim();
+    if (!nonempty) throw new Error(`Trang ${page.number || '?'} mới chỉ có ảnh scan, chưa có chữ. Hãy chạy OCR trang đó trước khi xuất Word.`);
+    if (!page.native && nonempty.length < 40 && !(page.tables || []).length) {
+      throw new Error(`Trang ${page.number || '?'} mới nhận được quá ít chữ (${nonempty.length} ký tự). Hãy kiểm tra OCR toàn trang và bảng trước khi xuất Word.`);
+    }
+  }
+  return true;
+}
 export async function createEditableDocx(pages, { JSZip, fonts, measureText, title = 'OCR PDF' }) {
   if (!pages.length) throw new Error('Chưa có trang để xuất Word.');
+  validateEditablePages(pages);
   const sections = pages.map(page => {
     const physicalScale = Math.min(1, 1584 / Math.max(page.pointWidth, page.pointHeight));
     const width = page.pointWidth * physicalScale, height = page.pointHeight * physicalScale, unit = width / page.width;
