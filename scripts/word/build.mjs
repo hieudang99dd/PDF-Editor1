@@ -16,7 +16,7 @@ for (const name of (await readdir(fileURLToPath(new URL('node_modules/', import.
     notices.push(`${name} ${pkg.version} (${pkg.license || 'see license'})\n${await readFile(new URL(file, base), 'utf8')}`);
   }
 }
-await writeFile(dir + 'THIRD_PARTY_NOTICES.txt', notices.join('\n\n--------------------\n\n'));
+await writeFile(dir + 'THIRD_PARTY_NOTICES.txt', notices.join('\n\n--------------------\n\n').replace(/\r\n/g, '\n'));
 const sha256 = createHash('sha256').update(await readFile(dir + 'docx.mjs')).digest('hex');
 await writeFile(dir + 'manifest.json', JSON.stringify({ name: 'docx', version: '9.6.1', source: 'https://github.com/dolanmiu/docx', license: 'MIT', sha256 }, null, 2) + '\n');
 console.log('Built docx 9.6.1 browser module:', sha256);
