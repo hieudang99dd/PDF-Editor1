@@ -264,3 +264,9 @@ Với mỗi file đầu ra: mở bằng **Chrome PDF viewer** và **một trình
 - [x] Tích hợp dolanmiu/docx 9.6.1 cùng origin, đoạn văn và bảng thật thay TextBox từng dòng.
 - [x] Giữ dấu cách native, không ghép qua cột; sửa nền sót dấu/nét; nhúng đủ font Việt và Word compatibility 15.
 - [x] Mẫu hành chính, đổi font và kiểm tra nền không còn mực; tiếp tục cần PDF/DOCX gốc để đối chiếu đúng hồ sơ người dùng.
+
+### 2026-10-19 — Browser signatures
+
+- [x] Ký tay Signature Pad, nhập tên Việt, ảnh PNG/JPEG/WebP, cắt alpha và tùy chọn trong nền trắng; chọn vị trí, kích thước, nhiều trang và Apply/Export riêng.
+- [x] Tích hợp @signpdf/node-forge cho chứng thư RSA P12/PFX/PEM; kiểm tra khóa/hạn/KeyUsage, Worker cùng origin và metadata Việt.
+- [x] Kiểm chứng chữ ký bằng OpenSSL và phát hiện sửa dữ liệu; CropBox/Rotate 0/90/180/270; ghi rõ giới hạn CA/TSA/LTV, Token/remote và ký nối tiếp tại `docs/SIGNATURES.md`.

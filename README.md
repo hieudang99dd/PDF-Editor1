@@ -13,6 +13,7 @@ Bộ công cụ PDF EDITOR: sửa văn bản gốc, biên tập trang, chuyển 
 | Trình sửa PDF EDITOR dự phòng | `text-editor-hdv.html` | `organizer.js/css`, `text-editor-shell.js/css`, `pdf-native-*.mjs`, `pdf-text-layout.js` |
 | Xóa vector theo vùng độc lập | `region-eraser.html` | `region-eraser.js/css`, `pdf-region-geometry.mjs`, `pdf-region-client/worker/native.mjs` |
 | Kiểm tra chất lượng PDF | `pdfium-preflight.html` | `pdfium-preflight-core.mjs`, `pdfium-preflight-worker.mjs` |
+| Ký PDF | `sign.html` | Ký tay/nhập tên/ảnh; ký số RSA P12/PFX/PEM trong Worker cục bộ |
 | OCR trên trình duyệt | `ocr.html` (Studio OCR chuyển về cùng route) | PaddleOCR.js Worker + kiểm tra dấu Việt bằng Tesseract tùy chọn |
 | Xử lý Office/OCR bằng PC (dự phòng) | `backend/` | FastAPI localhost; chỉ cần chạy cho các thao tác có ghi chú cần PC |
 

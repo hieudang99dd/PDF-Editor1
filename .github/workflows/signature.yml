@@ -1,0 +1,48 @@
+name: Browser signature and cryptographic verification
+on:
+  push:
+    branches: [master, 'codex/signature']
+    paths: ['pdf-sign*', 'sign.html', 'index.html', 'hvd-ui-v2.js', 'cit-advanced-ui.js', 'scripts/signature/**', 'vendor/signature/**', 'tests/signature*', '.github/workflows/signature.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  signatures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/signature/package-lock.json
+      - name: Rebuild pinned same-origin signing engines
+        working-directory: scripts/signature
+        run: npm ci --no-audit --no-fund && npm run build && git diff --exit-code -- ../../vendor/signature/
+      - name: Install browser and independent PDF verifier
+        working-directory: scripts/paddleocr
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Regression and ephemeral test certificates
+        run: |
+          node --check pdf-sign.mjs
+          node --check pdf-sign-worker.mjs
+          node --test tests/*.test.cjs
+          node scripts/signature/make-fixtures.mjs
+      - name: Real browser drawing placement signing and downloads
+        env:
+          NODE_PATH: ${{ github.workspace }}/scripts/paddleocr/node_modules
+        run: node tests/signature-browser.cjs
+      - name: Independent geometry and OpenSSL verification
+        run: python3 scripts/signature/verify.py test-results/signature
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signature-browser-and-openssl-evidence
+          path: |
+            test-results/signature/*.pdf
+            test-results/signature/*.png
+            test-results/signature/*.json

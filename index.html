@@ -134,7 +134,7 @@ const T=[
 ['Điền biểu mẫu PDF','Nhập vào các trường của biểu mẫu','Chỉnh sửa','▤','organize','.pdf'],
 ['Chia sẻ PDF','Tạo liên kết chia sẻ tài liệu','Chỉnh sửa','↗','qr','.pdf'],
 ['PDF sang QR','Tạo mã QR để tải và chia sẻ tài liệu','Chỉnh sửa','QR','qr','.pdf'],
-['Ký tên vào PDF','Vẽ hoặc nhập chữ ký rồi chèn','Ký & Bảo vệ','✍','sign','.pdf'],
+['Ký tên vào PDF','Ký tay, ảnh chữ ký và ký số bằng chứng thư','Ký & Bảo vệ','✍','signature-route','.pdf'],
 ['Yêu cầu chữ ký','Gửi tài liệu cho người khác ký','Ký & Bảo vệ','✉','mail','.pdf'],
 ['Mở khóa PDF','Gỡ mật khẩu khỏi tệp','Ký & Bảo vệ','🔓','pass','.pdf'],
 ['Bảo vệ PDF','Đặt mật khẩu cho tệp','Ký & Bảo vệ','🔒','pass2','.pdf'],
@@ -168,7 +168,7 @@ function home(){const q=$('#q').value.trim().toLowerCase();
  let h='';for(const c of Object.keys(C)){if(cat!='Tất cả'&&cat!=c)continue;
   const l=T.map((t,i)=>[t,i]).filter(([t])=>t[2]==c&&(t[0]+t[1]).toLowerCase().includes(q));if(!l.length)continue;
   h+=`<h2 class="cat">${c}</h2><div class="grid">`+l.map(([t,i])=>{
-   const isSim = !(t[4].startsWith('cit-') || t[4].startsWith('pdfium-') || ['paddle-ocr-route', 'merge', 'range', 'rot', 'organize', 'region-eraser-route', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'sign', 'flatten'].includes(t[4]) || ['Giảm dung lượng PDF','Chuyển đổi PDF','PDF OCR','PDF sang Word','PDF sang TXT','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF'].includes(t[0]));
+   const isSim = !(t[4].startsWith('cit-') || t[4].startsWith('pdfium-') || ['paddle-ocr-route', 'merge', 'range', 'rot', 'organize', 'region-eraser-route', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'signature-route', 'flatten'].includes(t[4]) || ['Giảm dung lượng PDF','Chuyển đổi PDF','PDF OCR','PDF sang Word','PDF sang TXT','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF'].includes(t[0]));
    const needsPC = ['PDF sang Word','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF'].includes(t[0]);
    const hybrid = t[0] === 'Chuyển đổi PDF';
    const badge = isSim ? `<span style="font-size:10px; background:var(--line); color:var(--mute); padding:2px 6px; border-radius:4px; align-self:center">Sắp ra mắt</span>` :
@@ -200,6 +200,7 @@ const OPT={
  none:''};
 function openTool(i, restore=false){
  if(!Number.isInteger(i)||!T[i])return;
+ if(T[i]?.[4]==='signature-route'){location.href='./sign.html';return;}
  if(T[i]?.[4]==='paddle-ocr-route'){location.href='./ocr.html';return;}
  if(T[i]?.[4]==='cit-text-route'){location.href='./text-editor.html';return;}
  if(T[i]?.[4]==='region-eraser-route'){location.href='./region-eraser.html';return;}
@@ -638,7 +639,7 @@ async function run(){
   return;
  }
 
- if(!['paddle-ocr-route', 'merge', 'range', 'rot', 'organize', 'qr', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'sign', 'flatten'].includes(k)) {
+ if(!['paddle-ocr-route', 'merge', 'range', 'rot', 'organize', 'qr', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'signature-route', 'flatten'].includes(k)) {
   $('#out').innerHTML=`<div class="res"><b>Tính năng sắp ra mắt</b><p style="margin:4px 0 0;font-size:13px;color:var(--mute)">Công cụ này đang được phát triển và sẽ sớm có mặt. Xin cảm ơn!</p></div>`;
   b.disabled=false;
   return;
@@ -738,7 +739,7 @@ if(window.pdfjsLib){
 <script src="Sortable.min.js"></script>
 <script src="pdf-local-tools.js?v=20261016-ux3"></script>
 <script src="cit-advanced-core.js?v=20261015-cit-4"></script>
-<script src="cit-advanced-ui.js?v=20261016-ux3"></script>
+<script src="cit-advanced-ui.js?v=20261019-sign1"></script>
 <script>if(!window.Sortable){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"><\/script>');}</script>
 <script src="jszip.min.js"></script>
 <script>if(!window.JSZip){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"><\/script>');}</script>

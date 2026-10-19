@@ -13,6 +13,7 @@ Ngày cập nhật: 2026-10-16. Tài liệu này là điểm tham chiếu chung 
 | PDF tools | `cit-advanced-core.js`, `cit-advanced-ui.js`, `pdf-lib.min.js`, `pdf.min.js` | Core tách UI adapter; API browser |
 | Kiểm tra | `pdfium-preflight-core.mjs`, `pdfium-preflight-worker.mjs`, `pdfium-preflight.html` | Module thuần dữ liệu và Worker có vòng đời riêng |
 | OCR và Word | `ocr.html`, `pdf-ocr*.mjs/css`, `vendor/paddleocr/`, `vendor/docx/`, `scripts/word/` | OCR Worker, sửa kết quả, PDF/TXT/DOCX; chữ/bảng Word chỉnh sửa được và font Việt nhúng |
+| Chữ ký | `sign.html`, `pdf-sign*.mjs/css`, `scripts/signature/`, `vendor/signature/` | Ký tay/ảnh/tên và ký số P12/PFX/PEM cục bộ; kiểm chứng OpenSSL |
 | PC engine | `backend/` | OCR/Office/TIFF qua localhost |
 | Thử nghiệm hồi quy | `tests/`, `.github/workflows/` | Kiểm thử chức năng trước khi merge |
 | Bản quyền | `LICENSE`, `NOTICE.md`, `fonts/*OFL*`, `vendor/*LICENSE*` | Thông tin nguồn và quyền sử dụng |

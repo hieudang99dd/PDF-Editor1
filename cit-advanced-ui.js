@@ -39,7 +39,7 @@
   const flatten=T.find(t=>t[0]==='Làm phẳng PDF');
   if(flatten)flatten[1]='Làm phẳng trường biểu mẫu; không khẳng định xử lý mọi chú thích';
   const sig=T.find(t=>t[0]==='Ký tên vào PDF');
-  if(sig)sig[1]='Chèn chữ ký dạng hình ảnh; không phải chữ ký số';
+  if(sig)sig[1]='Ký tay, ảnh chữ ký và ký số bằng chứng thư trong trình duyệt';
   const attr='style="max-width:130px;padding:8px;border-radius:6px;border:1px solid var(--line);background:var(--bg)"';
   OPT['cit-crop']=[
     '<label>Lề trái (mm)<input id="cit-left" type="number" value="5" min="0" max="500" step="0.1" '+attr+'></label>',

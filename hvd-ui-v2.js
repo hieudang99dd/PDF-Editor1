@@ -26,7 +26,7 @@ const browser=new Set([
 const cards=[
  ['text','Sửa Text','Sửa Text PDF gốc','Chỉnh sửa trực tiếp chữ gốc trong không gian riêng bằng PDFium WASM.','T',['Chỉnh sửa văn bản PDF']],
  ['edit','Biên tập','Chỉnh sửa & chú thích','Thêm chữ, ảnh, highlight và chú thích; không phải sửa Text gốc.','✎',['Chỉnh sửa PDF']],
- ['sign','Biên tập','Chèn chữ ký','Chữ ký dạng ảnh, không phải chữ ký số.','✍',['Ký tên vào PDF']],
+ ['sign','Biên tập','Chèn chữ ký','Ký tay, tải ảnh, nhập tên hoặc ký số bằng chứng thư.','✍',['Ký tên vào PDF']],
  ['stamp','Biên tập','Đánh số & đóng dấu','Đánh số trang, Bates và watermark.','#',['Đánh số trang','Đánh số Bates','Watermark PDF']],
  ['pages','Tổ chức','Quản lý trang PDF','Sắp xếp, tách, xóa, trích, xoay và chèn trang.','▦',['Sắp xếp PDF','Cắt PDF','Xóa trang PDF','Trích xuất trang','Xoay PDF','Đảo thứ tự trang PDF','Trích trang lẻ','Trích trang chẵn','Chèn trang trắng PDF','Xoay PDF góc tùy chỉnh']],
  ['merge','Tổ chức','Ghép PDF','Ghép nối hoặc ghép xen kẽ.','⊕',['Ghép PDF','Ghép PDF xen kẽ']],

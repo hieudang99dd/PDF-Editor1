@@ -71,3 +71,7 @@ Vietnamese refinement uses Tesseract.js 6.0.1 / tesseract.js-core 6.0.0 and [tes
 ## Editable Word export (2026-10-19)
 
 [dolanmiu/docx](https://github.com/dolanmiu/docx), version 9.6.1, MIT. Browser bundle in `vendor/docx/docx.mjs`; license and dependency notices retained alongside it. Reproducible source and lockfile in `scripts/word/`. The application's geometric paragraph reconstruction/table detection is separate from docx, which generates the OOXML document. No Python pdf2docx engine is bundled.
+
+## Browser signature tools (2026-10-19)
+
+Signature Pad 5.1.4 ([szimek/signature_pad](https://github.com/szimek/signature_pad), MIT), @signpdf/signpdf + signer-p12 + placeholder-pdf-lib 3.3.0 ([vbuch/node-signpdf](https://github.com/vbuch/node-signpdf), MIT), node-forge 1.4.0 ([digitalbazaar/forge](https://github.com/digitalbazaar/forge), used under BSD-3-Clause), pdf-lib 1.17.1 (MIT). Browser source/lockfile/build: `scripts/signature/`; generated bundles, hashes and complete dependency licenses: `vendor/signature/`. Application placement and certificate validation adapters are separate from these upstream libraries.

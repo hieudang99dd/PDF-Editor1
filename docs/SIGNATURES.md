@@ -1,0 +1,48 @@
+# Chèn chữ ký và ký số PDF
+
+Tính năng độc lập tại `sign.html`, mở từ thẻ **Chèn chữ ký** trên trang chủ. Giao diện tiếng Việt, xử lý trong trình duyệt; không gọi dịch vụ ký cloud hoặc gửi tài liệu/chứng thư/mật khẩu ra ngoài.
+
+## Đã tích hợp
+
+| Cách ký | Thực hiện | Giới hạn |
+| --- | --- | --- |
+| Ký tay | Signature Pad 5.1.4: nội suy Bézier, nét thay đổi theo vận tốc, chuột/bút/cảm ứng, lùi/xóa nét, chọn màu/độ dày | Đây là hình hiển thị; không chứa chứng thực mật mã |
+| Nhập tên | Canvas và Noto Sans hỗ trợ dấu Việt, chữ nghiêng/thường, cắt phần nền thừa | Hình chữ ký nhập tên, không phục hồi nét tay |
+| Ảnh chữ ký/con dấu | PNG/JPEG/WebP, giữ alpha, tùy chọn làm trong nền trắng, tự cắt vùng trong suốt | Không xác thực nguồn gốc ảnh; không nhận SVG tùy ý |
+| Chứng thư P12/PFX | @signpdf 3.3.0 + node-forge 1.4.0: RSA >=2048, SHA-256, CMS/PKCS#7 detached trong PDF | Cần chứng thư/khóa của người ký; chưa hỗ trợ ECDSA |
+| PEM | PEM chứa chứng thư và khóa riêng RSA, khóa có thể mã hóa bằng mật khẩu | Không dùng được khi chỉ có chứng thư công khai |
+
+Người dùng được đặt nhiều chữ ký khác nhau, chọn trang, kéo/đổi kích thước bằng chuột, đổi chiều rộng mm, lặp trên mọi trang, xóa khung; phím mũi tên dịch khung, Shift tăng bước, Delete xóa. **Áp dụng và xem trước** tạo bản nháp hiển thị; **Xuất PDF** thực hiện ký số nếu bật rồi tải kết quả. Thay đổi vị trí, lựa chọn chứng thư hoặc metadata sẽ khóa xuất cho đến khi áp dụng lại. Liên kết tải vẫn còn trong trang; chỉnh lại nội dung sẽ thu hồi kết quả cũ.
+
+## Nguồn GitHub và khả năng tái dựng
+
+- https://github.com/szimek/signature_pad — MIT, 5.1.4.
+- https://github.com/vbuch/node-signpdf — MIT, bộ @signpdf/signpdf, signer-p12, placeholder-pdf-lib 3.3.0. Tích hợp placeholder dựa trên pdf-lib thay vì sửa chuỗi PDF bằng thuật toán plain.
+- https://github.com/digitalbazaar/forge — BSD-3-Clause/GPL-2.0, node-forge 1.4.0; dùng theo BSD cho PKCS#12/PEM, ASN.1, RSA và CMS.
+- https://github.com/Hopding/pdf-lib — MIT, 1.17.1; vẽ ảnh trực tiếp, giữ nội dung trang dạng PDF.
+
+Tái dựng: `cd scripts/signature && npm ci && npm run build`. Lockfile ghim toàn bộ dependency; bundle browser/manifest SHA-256 và giấy phép nằm tại `vendor/signature/`. Bundle ký số được tải khi mở Worker, không sửa bundle Studio. Các repo bổ sung như zgapdfsigner/BentoPDF đã được đối chiếu; không tự gọi proxy/AIA/TSA của các dự án đó và không tuyên bố đã tích hợp mọi engine trên GitHub.
+
+## Mật mã và dữ liệu
+
+Worker `pdf-sign-worker.mjs` mở chứng thư, đối chiếu khóa riêng với chứng thư RSA, hạn hiệu lực và KeyUsage nếu có. P12 được chuẩn hóa trong bộ nhớ để hỗ trợ cả keyBag và encrypted keyBag trước khi gọi upstream P12Signer. Toàn bộ chuỗi chứng thư có sẵn trong tệp được đóng gói; không tự tải chứng thư AIA. Metadata tên/lý do/địa điểm dùng chuỗi UTF-16 để không mất dấu Việt.
+
+Không log hoặc lưu khóa/mật khẩu trong localStorage/IndexedDB/server. Worker kết thúc sau mỗi tác vụ; dữ liệu chứng thư truyền được xóa trong Worker. Ô mật khẩu được xóa sau khi xuất; Làm mới xóa tệp/ảnh/chứng thư và kết quả phiên. Đây không phải cam kết xóa an toàn toàn bộ bản sao trong bộ nhớ của trình duyệt hoặc hệ điều hành.
+
+## Giới hạn cần phân biệt
+
+- Chữ ký mật mã hợp lệ không đồng nghĩa chứng thư được CA tin cậy. Chứng thư tự ký có thể báo chưa tin cậy. Chưa kiểm tra chuỗi CA, OCSP/CRL hoặc chứng thực pháp lý; không tuyên bố PAdES LT/LTA.
+- Chưa có TSA/timestamp tin cậy, LTV, ECDSA, PKCS#11 USB Token, HSM, SmartCA/remote signing, hoặc dịch vụ yêu cầu nhiều người ký. Những loại này cần adapter/phần mềm/API và tài khoản nhà cung cấp; không có nút giả lập.
+- Chặn PDF có chữ ký số trước khi rewrite, kể cả signature dictionary trong object stream. Chưa hỗ trợ incremental multi-sign/countersign, chứng nhận DocMDP, ký tiếp mà giữ chữ ký trước.
+- PDF bảo vệ/mật khẩu chưa có luồng mở khóa trong công cụ này. Chưa tự động điền trường ký có sẵn; tạo trường ký mới ẩn và cho phép hình hiển thị riêng trên một/nhiều trang.
+- Hình ký vẽ trực tiếp lên trang không phải đối tượng riêng để trình đọc PDF kéo lại sau xuất; sửa vị trí trong phiên trước khi xuất. Không raster hóa toàn bộ trang.
+- Giới hạn PDF 200 MB, ảnh/chứng thư 10 MB, ảnh tối đa 16 MP; tài liệu/chuỗi chứng thư quá lớn có thể vượt bộ nhớ hoặc vùng trống chữ ký (32 KB).
+
+## Kiểm định
+
+- Node: hình học giới hạn khung, alpha matting/crop, phát hiện signature nén, hash và route tài sản.
+- Chromium thật: vẽ nét upstream, kéo/resize/lặp nhiều trang, Apply/Export và tải PDF, P12/PEM, sai mật khẩu, hết hạn, chặn PDF đã ký, nhập tên Việt, tải ảnh, viewport mobile và không gọi HTTP ngoài origin.
+- PyMuPDF độc lập: bốn trang xoay/cắt khác nhau, vị trí ảnh khớp tọa độ xem trước, chữ gốc/CropBox/Rotate không đổi; render và kiểm tra ảnh từng trang.
+- OpenSSL độc lập: xác minh CMS detached trên đúng ByteRange của toàn PDF, kiểm tra metadata Việt; sửa dữ liệu phải xác minh thất bại. Dùng `-noverify` để tách kiểm tra chữ ký khỏi tin cậy CA; không báo chứng thư tự ký là chứng thư tin cậy.
+- Chứng thư QA được sinh tạm trong `test-results/signature/`, không commit; CI chỉ tải PDF/PNG/JSON kiểm chứng, không tải khóa/chứng thư riêng.
+- Workflow: `.github/workflows/signature.yml`. Chưa có chứng thư thật của người dùng hoặc kiểm thử Microsoft Acrobat/USB Token trên Windows.
