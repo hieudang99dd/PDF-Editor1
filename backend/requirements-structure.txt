@@ -1,0 +1,5 @@
+# Optional server-side PP-StructureV3; install after requirements.txt
+-r requirements.txt
+paddleocr>=3.4,<4
+# Install PaddlePaddle compatible with the hosting CPU/GPU platform separately.
+# Consult https://www.paddlepaddle.org.cn/install/quick for platform-specific wheels.
