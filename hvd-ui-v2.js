@@ -12,7 +12,7 @@ q.placeholder='Tìm: sửa Text, ghép PDF, xóa trang, OCR, chồng bản vẽ�
 const categories=['Tất cả','Sửa Text','Biên tập','Tổ chức','Chuyển đổi','Nâng cao'];
 const local=new Set(['Chuyển đổi tệp','PDF sang Word','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF']);
 const browser=new Set([
-'PDF OCR','Chuyển đổi tệp',
+'PDF OCR',
 'Chỉnh sửa văn bản PDF','Chỉnh sửa PDF','Xóa vector theo vùng','Ký tên vào PDF','Đánh số trang','Đánh số Bates','Watermark PDF',
 'Sắp xếp PDF','Cắt PDF','Xóa trang PDF','Trích xuất trang','Xoay PDF','Đảo thứ tự trang PDF',
 'Trích trang lẻ','Trích trang chẵn','Chèn trang trắng PDF','Xoay PDF góc tùy chỉnh','Ghép PDF',
