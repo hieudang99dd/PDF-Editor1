@@ -21,7 +21,7 @@ function mock(data){
 }
 test('Text editing remains a separate native tool routed to its existing page',()=>{
  assert.match(html,/\['Chỉnh sửa văn bản PDF','[^']+','Chỉnh sửa','T','cit-text-route','\.pdf'\]/);
- assert.match(html,/if\(T\[i\]\?\.\[4\]==='cit-text-route'\)\{location\.href='\.\/text-editor\.html'/);
+ assert.match(html,/if\(T\[i\]\?\.\[4\]==='cit-text-route'/);
  const h=mock([['Chỉnh sửa văn bản PDF','Text','Chỉnh sửa','T','cit-text-route','.pdf'],['Chỉnh sửa PDF','Other','Chỉnh sửa','✎','organize','.pdf']]);
  assert.match(h.html(),/Chỉnh sửa Text — công cụ độc lập/);
  assert.match(h.html(),/Sửa Text PDF gốc/);
@@ -64,7 +64,7 @@ test('CIT route and editor engine stay unmodified',()=>{
  assert.match(cit,/for\(const t of tools\)if\(!existing\.has\(t\[0\]\)\)T\.push\(t\)/);
  assert.match(cit,/home\(\);\s*\}\)\(\);/);
  assert.doesNotMatch(ui,/T\.push\(|T\[[^\]]+\]\s*=/);
- assert.match(html,/hvd-ui-v2\.js\?v=20261019-legacyfix2/);
+ assert.match(html,/hvd-ui-v2\.js\?v=20261019-unified1/);
  assert.match(html,/hvd-ui-v2\.css\?v=20261016-dao1/);
 });
 test('catalog icon and featured text tile use explicit centered, responsive layout',()=>{
@@ -98,7 +98,7 @@ test('conversion groups show one unified tile and preserve OCR separately',()=>{
  assert.match(rendered,/class="catalog-status">Cần ứng dụng PC<\/span>/);
  assert.doesNotMatch(rendered,/PDF sang ảnh|Ảnh sang PDF|Văn bản & Office/);
  assert.match(rendered,/Nhận dạng văn bản OCR/);
- assert.match(html,/universal-route[^\n]*convert\.html/);
+ assert.match(html,/universal-route/);
 });
 
 test('PDF metadata card removed without impacting independent advanced tools',()=>{
@@ -128,5 +128,5 @@ test('standalone merge PDF card removed; merging remains available via page mana
  assert.match(h.html(),/Ghép, sắp xếp, tách, xóa, trích xuất, xoay và chèn trang/);
  assert.doesNotMatch(h.html(),/>Ghép PDF<\/b>|>Ghép PDF<\/strong>/);
  assert.doesNotMatch(h.html(),/data-group-key="merge"/);
- assert.match(html,/if\(T\[i\]\?\.\[4\]==='pages-route'/);
+ assert.match(html,/pages-route/);
 });

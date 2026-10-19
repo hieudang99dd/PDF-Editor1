@@ -5,7 +5,20 @@
 (() => {
   'use strict';
   const home = new URL('../index.html', window.location.href).href;
-  const goHome = () => { window.location.assign(home); };
+  const goHome = () => {
+    if(window.self!==window.top)window.parent.postMessage({type:'pdf-editor:navigate',route:'home'},window.location.origin);
+    else window.location.assign(home);
+  };
+  if(window.self!==window.top){
+    document.addEventListener('click',event=>{
+      const a=event.target.closest?.('a[href]');
+      if(!a||a.target==='_blank'||a.hasAttribute('download'))return;
+      const dest=new URL(a.href,window.location.href);
+      if(dest.origin===window.location.origin&&/\/index\.html$/.test(dest.pathname)){
+        event.preventDefault();event.stopImmediatePropagation();goHome();
+      }
+    },true);
+  }
 
   // Original CIT's Vite editor maps this action to import.meta.env.BASE_URL,
   // which points into cit-native/ and NOT to the parent HVD homepage. Install

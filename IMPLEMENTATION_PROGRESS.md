@@ -533,3 +533,11 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - `index.html` chuyển hướng trực tiếp ngay ở phần head cho các nhóm chuyên dụng: Cắt lề `crop.html`, Quản lý trang `pages.html`, OCR `ocr.html`, Chuyển đổi `convert.html`, Sửa Text và các công cụ riêng. Giữ mã 0 cho Nén PDF chạy trong trang chủ.
 - Asset danh mục được đổi version thành `hvd-ui-v2.js?v=20261019-legacyfix2`.
 - Thêm kiểm thử Chromium với chính đường dẫn cũ có `utm_source` và `#hvd-tool=28`; phải tới màn hình cắt lề có Review trước khi xuất, không mở workspace cũ.
+
+
+### 2026-10-19 — PDF-Editor1 là giao diện cuối duy nhất
+- Thêm `pdf-editor-unified.js/css` và khu `#unified-ws` trong `index.html`; toàn bộ công cụ chuyên sâu mở bằng iframe cùng origin trong một shell PDF EDITOR, dùng một nav chung.
+- Phân giải các hash cũ (`#hvd-tool=28` cắt lề…) thành `#workspace=crop` trong trang chính; đồng bộ nút trình duyệt Back/Forward.
+- Khi iframe, `pdf-editor-workspace.js` không dựng thanh menu trùng; liên kết về trang chủ/công cụ gửi sự kiện nội bộ có kiểm tra origin tới shell. Sửa tương tự `studio/hvd-hub.js`.
+- Không xóa PDF.js/PDFium/PP-Structure hoặc trang runtime vì đang là dependency. Đã nghỉ dùng các UI độc lập ở mức luồng chính; giữ làm compatibility entrypoints. OCR PP-StructureV3 và Office vẫn cần backend riêng.
+- Bổ sung test link cũ, chuyển tab và về danh mục trong Chromium.

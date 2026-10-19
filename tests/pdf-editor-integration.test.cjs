@@ -25,7 +25,7 @@ test('the PDF EDITOR homepage is a single entry point for the updated workflows'
  for(const part of ["'crop-route'","'paddle-ocr-route'","'pages-route'","'universal-route'","'signature-route'","'region-eraser-route'"]){
   assert.ok(home.includes(part),'Missing route '+part);
  }
- assert.match(home,/hvd-ui-v2\.js\?v=20261019-legacyfix2/);
+ assert.match(home,/hvd-ui-v2\.js\?v=20261019-unified1/);
  const head=home.split('</head>')[0];
  assert.match(head,/#hvd-tool=/);
  assert.match(head,/28:'crop\.html'/);

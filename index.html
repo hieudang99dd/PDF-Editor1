@@ -5,20 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PDF EDITOR – Công cụ PDF và trình chỉnh sửa văn bản</title>
 <script>
-/* Legacy numeric links: redirect before the historic workspace renders. */
+/* Legacy links now open within the ONE PDF EDITOR workspace. */
 (() => {
  const hit=/^#hvd-tool=([0-9]+)$/.exec(location.hash);
  if(!hit)return;
- const path=({
-  1:'convert.html',2:'ocr.html',4:'convert.html',5:'convert.html',6:'convert.html',
-  7:'convert.html',8:'convert.html',9:'convert.html',10:'convert.html',11:'convert.html',
-  12:'convert.html',13:'convert.html',
-  14:'pages.html',15:'pages.html',16:'pages.html',17:'pages.html',
-  18:'pages.html',19:'pages.html',20:'pages.html',
-  21:'text-editor.html',23:'region-eraser.html',25:'pdfium-preflight.html',
-  28:'crop.html',34:'sign.html'
+ const route=({
+  1:'convert',2:'ocr',4:'convert',5:'convert',6:'convert',
+  7:'convert',8:'convert',9:'convert',10:'convert',11:'convert',
+  12:'convert',13:'convert',14:'pages',15:'pages',16:'pages',
+  17:'pages',18:'pages',19:'pages',20:'pages',
+  21:'text',23:'region',25:'inspect',28:'crop',34:'sign'
  })[hit[1]];
- if(path)location.replace(new URL('./'+path,location.href).href);
+ if(route)history.replaceState(null,'',location.pathname+location.search+'#workspace='+route);
 })();
 </script>
 <style>
@@ -72,6 +70,7 @@ footer{padding:24px 5vw;color:var(--mute);font-size:13px;text-align:center}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <link rel="stylesheet" href="hvd-ui-v2.css?v=20261016-dao1">
+<link rel="stylesheet" href="pdf-editor-unified.css?v=20261019-unified1">
 <style>
 .hvd-workspace-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
 .hvd-workspace-nav .back{margin:0;padding:10px 0;font-weight:650}
@@ -112,6 +111,25 @@ footer{padding:24px 5vw;color:var(--mute);font-size:13px;text-align:center}
   <h1 id="wt"></h1><p class="d" id="wd"></p>
   <p id="ws-status" class="hvd-workspace-status" role="status" aria-live="polite">Chọn tệp để bắt đầu.</p>
   <div id="stage"></div>
+</main>
+<main id="unified-ws" hidden aria-label="Không gian làm việc PDF EDITOR">
+ <div class="unified-toolbar">
+  <button id="unified-home" class="unified-home" type="button">← Tất cả công cụ</button>
+  <div class="unified-meta"><strong id="unified-title">PDF EDITOR</strong><small>Không gian làm việc thống nhất</small></div>
+  <nav class="unified-routes" aria-label="Các công cụ PDF EDITOR">
+   <button type="button" data-pdf-route="text">Sửa Text</button>
+   <button type="button" data-pdf-route="pages">Quản lý trang</button>
+   <button type="button" data-pdf-route="crop">Cắt lề</button>
+   <button type="button" data-pdf-route="convert">Chuyển đổi</button>
+   <button type="button" data-pdf-route="ocr">OCR</button>
+   <button type="button" data-pdf-route="sign">Chữ ký</button>
+   <button type="button" data-pdf-route="region">Xóa vector</button>
+   <button type="button" data-pdf-route="inspect">Kiểm tra PDF</button>
+  </nav>
+  <button class="unified-reload" id="unified-reload" type="button">↻ Đặt lại công cụ</button>
+ </div>
+ <div class="unified-note">Các thuật toán PDF được giữ nguyên. Chuyển công cụ có thể làm mất thay đổi chưa xuất; PDF scan/Office nâng cao vẫn cần engine tương ứng.</div>
+ <div class="unified-framebox"><span id="unified-loading" role="status" aria-live="polite"></span><iframe id="unified-frame" title="Công cụ PDF EDITOR" loading="eager" referrerpolicy="same-origin"></iframe></div>
 </main>
 <div id="toast" role="status"></div>
 <script>
@@ -218,14 +236,14 @@ const OPT={
  none:''};
 function openTool(i, restore=false){
  if(!Number.isInteger(i)||!T[i])return;
- if(T[i]?.[4]==='universal-route' || (T[i]?.[2]==='Chuyển đổi' && T[i]?.[4]!=='paddle-ocr-route')){location.href='./convert.html';return;}
- if(T[i]?.[4]==='pages-route' || ['Sắp xếp PDF','Ghép PDF','Cắt PDF','Xoay PDF','Xóa trang PDF','Trích xuất trang'].includes(T[i]?.[0])){location.href='./pages.html';return;}
- if(T[i]?.[4]==='crop-route'){location.href='./crop.html';return;}
- if(T[i]?.[4]==='signature-route'){location.href='./sign.html';return;}
- if(T[i]?.[4]==='paddle-ocr-route'){location.href='./ocr.html';return;}
- if(T[i]?.[4]==='cit-text-route'){location.href='./text-editor.html';return;}
- if(T[i]?.[4]==='region-eraser-route'){location.href='./region-eraser.html';return;}
- if(T[i]?.[4]==='pdfium-inspect-route'){location.href='./pdfium-preflight.html';return;}
+ if(T[i]?.[4]==='universal-route' || (T[i]?.[2]==='Chuyển đổi' && T[i]?.[4]!=='paddle-ocr-route')){window.PDFEditorUnified.open('convert');return;}
+ if(T[i]?.[4]==='pages-route' || ['Sắp xếp PDF','Ghép PDF','Cắt PDF','Xoay PDF','Xóa trang PDF','Trích xuất trang'].includes(T[i]?.[0])){window.PDFEditorUnified.open('pages');return;}
+ if(T[i]?.[4]==='crop-route'){window.PDFEditorUnified.open('crop');return;}
+ if(T[i]?.[4]==='signature-route'){window.PDFEditorUnified.open('sign');return;}
+ if(T[i]?.[4]==='paddle-ocr-route'){window.PDFEditorUnified.open('ocr');return;}
+ if(T[i]?.[4]==='cit-text-route'){window.PDFEditorUnified.open('text');return;}
+ if(T[i]?.[4]==='region-eraser-route'){window.PDFEditorUnified.open('region');return;}
+ if(T[i]?.[4]==='pdfium-inspect-route'){window.PDFEditorUnified.open('inspect');return;}
  const keptFiles=restore&&tool===T[i]?[...files]:[];
  tool=T[i];files=keptFiles;$('#home').style.display='none';$('#ws').style.display='block';scrollTo(0,0);
  $('#wt').textContent=tool[0];$('#wd').textContent=tool[1];render();
@@ -674,6 +692,7 @@ function showCatalog(){
  $('#ws').style.display='none';$('#home').style.display='block';home();
 }
 function back(){
+ if(window.PDFEditorUnified?.isOpen()){window.PDFEditorUnified.close();return;}
  if($('#ws').style.display!=='none'&&$('#go')?.disabled){
   toast('Đang xử lý PDF. Vui lòng chờ hoàn tất trước khi rời tác vụ.');return;
  }
@@ -694,6 +713,8 @@ function resetWorkspace(clearFiles=false){
  $('#ws-status').textContent=clearFiles?'Có thể tải tài liệu mới vào công cụ hiện tại.':'Đã làm mới tác vụ. Bạn có thể chỉnh tùy chọn và thực hiện lại.';
 }
 window.addEventListener('popstate',()=>{
+ if(location.hash.startsWith('#workspace=')){window.PDFEditorUnified?.restore();return;}
+ if(window.PDFEditorUnified?.isOpen())window.PDFEditorUnified.restore();
  const match=location.hash.match(/^#hvd-tool=([0-9]+)$/);
  const idx=match?Number(match[1]):-1;
  if(idx>=0&&T[idx]&&!['cit-text-route','pdfium-inspect-route','region-eraser-route'].includes(T[idx][4])){
@@ -701,6 +722,7 @@ window.addEventListener('popstate',()=>{
  }else showCatalog();
 });
 window.addEventListener('DOMContentLoaded',()=>{
+ if(location.hash.startsWith('#workspace=')){window.PDFEditorUnified?.restore();return;}
  const match=location.hash.match(/^#hvd-tool=([0-9]+)$/);
  if(match){
   const idx=Number(match[1]);
@@ -740,7 +762,8 @@ document.addEventListener('click',e=>{
 });
 $('#q').oninput=home;home();
 </script>
-<script src="hvd-ui-v2.js?v=20261019-legacyfix2"></script>
+<script src="hvd-ui-v2.js?v=20261019-unified1"></script>
+<script src="pdf-editor-unified.js?v=20261019-unified1" defer></script>
 <script src="pdf-lib.min.js"></script>
 <script>if(!window.PDFLib){document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');}</script>
 <script src="pdf.min.js"></script>

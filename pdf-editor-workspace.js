@@ -5,6 +5,23 @@
  'use strict';
  const current=window.location.pathname.split('/').pop().toLowerCase();
  if(current==='index.html'||!current||document.getElementById('pdfeditor-workspace-nav'))return;
+ if(window.self!==window.top){
+  const supported={'index.html':'home','text-editor.html':'text','pages.html':'pages',
+   'crop.html':'crop','convert.html':'convert','ocr.html':'ocr','sign.html':'sign',
+   'region-eraser.html':'region','pdfium-preflight.html':'inspect'};
+  document.addEventListener('click',event=>{
+   const link=event.target.closest?.('a[href]');
+   if(!link||link.hasAttribute('download')||link.target==='_blank')return;
+   const uri=new URL(link.href,location.href);
+   if(uri.origin!==location.origin)return;
+   const route=supported[uri.pathname.split('/').pop()];
+   if(!route)return;
+   event.preventDefault();event.stopImmediatePropagation();
+   window.parent.postMessage({type:'pdf-editor:navigate',route},location.origin);
+  },true);
+  return;
+ }
+
  const tools=[
   ['index.html','Tất cả công cụ'],
   ['text-editor.html','Sửa Text'],

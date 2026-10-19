@@ -61,11 +61,19 @@ async function sample(label){
    // The original link #hvd-tool=28 must open the new reviewed crop editor.
    await page.goto(address+'index.html?v=20261019-suite1&utm_source=chatgpt.com#hvd-tool=28',
      {waitUntil:'domcontentloaded'});
-   await page.waitForURL('**/crop.html',{timeout:15000});
-   assert.equal(new URL(page.url()).hash,'');
-   assert.equal(await page.locator('#crop-rectangle').count(),1);
-   assert.equal(await page.locator('#review').count(),1);
-   await page.locator('#pdfeditor-workspace-nav').waitFor({state:'visible'});
+   await page.waitForURL('**/index.html?*#workspace=crop',{timeout:15000});
+   assert.equal(new URL(page.url()).hash,'#workspace=crop');
+   const cropFrame=page.frameLocator('#unified-frame');
+   await cropFrame.locator('#crop-rectangle').waitFor({state:'attached'});
+   assert.equal(await cropFrame.locator('#review').count(),1);
+   await page.locator('#unified-ws').waitFor({state:'visible'});
+   assert.equal(await page.locator('#home').isVisible(),false);
+   await page.locator('[data-pdf-route=pages]').click();
+   await page.waitForURL('**/#workspace=pages');
+   await page.frameLocator('#unified-frame').locator('#files').waitFor({state:'attached'});
+   await page.locator('#unified-home').click();
+   await page.waitForURL('**/index.html?*');
+   assert.equal(await page.locator('#unified-ws').isHidden(),true);
    await page.goto(address,{waitUntil:'domcontentloaded'});
    // The dedicated merge card was removed at user request; page manager retains merge.
    // Test binary download + in-place reset with the still-supported numbering tool.

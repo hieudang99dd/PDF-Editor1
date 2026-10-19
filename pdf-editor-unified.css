@@ -1,0 +1,19 @@
+/* Unified PDF EDITOR shell: one page, dedicated original PDF engines isolated in iframe. */
+#unified-ws[hidden]{display:none!important}
+#unified-ws{min-height:calc(100dvh - 68px);display:flex;flex-direction:column;background:#eef3f7;color:#1a304a}
+#unified-ws .unified-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border-bottom:1px solid #d4e0ea;padding:9px clamp(12px,2.4vw,32px)}
+#unified-ws .unified-home{border:1px solid #b8d5d0;background:#e6f5f1;color:#08766d;font-weight:700;border-radius:8px;padding:8px 12px}
+#unified-ws .unified-meta{display:flex;flex-direction:column;gap:0;min-width:155px}
+#unified-ws .unified-meta strong{font-size:14px}#unified-ws .unified-meta small{font-size:11px;color:#5f7484}
+#unified-ws .unified-routes{display:flex;flex:1;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:thin;white-space:nowrap;min-width:0}
+#unified-ws .unified-routes button{display:inline-flex;white-space:nowrap;flex:none;padding:7px 11px;font-weight:650;font-size:12px;border-radius:7px;background:transparent;border:1px solid transparent;color:#4b5d74;min-height:34px}
+#unified-ws .unified-routes button:hover{color:#08796e;background:#e6f5f0}
+#unified-ws .unified-routes button[aria-pressed=true]{color:#08796e;background:#dbf0e9;border-color:#a7d9d0}
+#unified-ws .unified-reload{border:1px solid #d4e0ea;color:#506681;border-radius:8px;background:#fff;padding:7px 10px;font-size:12px}
+#unified-ws .unified-note{font-size:11px;color:#567088;background:#e9f1f8;padding:5px 20px;border-bottom:1px solid #d4e0ea}
+#unified-ws .unified-framebox{flex:1;position:relative;min-height:660px;height:calc(100dvh - 180px);background:#fff}
+#unified-frame{display:block;width:100%;height:100%;border:0;background:#fff}
+#unified-loading{position:absolute;z-index:2;right:18px;top:12px;background:#203c51de;color:#fff;border-radius:7px;padding:6px 12px;font-size:12px;pointer-events:none}
+#unified-loading:empty{display:none}
+@media(max-width:760px){#unified-ws .unified-toolbar{gap:7px}.unified-meta{order:0}.unified-routes{order:3;flex-basis:100%!important}.unified-framebox{height:calc(100dvh - 230px)!important;min-height:540px!important}}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) #unified-ws{background:#101b2a;color:#e8f0f9}:root:not([data-theme=light]) #unified-ws .unified-toolbar{background:#172538;border-color:#39506b}:root:not([data-theme=light]) #unified-ws .unified-note{background:#18283c;color:#afc6d5}}

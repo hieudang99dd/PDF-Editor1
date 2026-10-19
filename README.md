@@ -81,3 +81,8 @@ Giao diện `index.html` là điểm vào chung; các thuật toán chuyên sâu
 - **Các công cụ khác:** Nén PDF, sửa Text, ký PDF, xóa vector theo vùng giữ nguyên runtime.
 
 Luồng sử dụng: mở `index.html` → chọn công cụ → xử lý → kiểm tra/áp dụng → xuất khi tác vụ hỗ trợ. Không tự chuyển file giữa các công cụ (để bảo vệ dữ liệu). Thay đổi này chỉ đồng bộ giao diện và điều hướng, **không** tuyên bố bổ sung thuật toán PDF mới.
+
+
+## PDF EDITOR — giao diện chủ duy nhất
+Website cuối: https://hieudang99dd.github.io/PDF-Editor1/index.html
+Từ 2026-10-19, trang `index.html` chứa `#unified-ws` với thanh công cụ và iframe cùng nguồn. Các engine độc lập (`pages.html`, `crop.html`, `ocr.html`, `convert.html`, `sign.html`, `studio/edit-pdf-text.html`, `region-eraser.html`) được tải vào iframe, không còn là điểm điều hướng mặc định. Các URL cũ và file engine được giữ để tương thích; KHÔNG xóa engine hoặc dữ liệu bản quyền. `pdf-editor-unified.js/css` là frontend duy nhất điều khiển điều hướng. Khi chuyển giữa các engine, dữ liệu chưa xuất có thể mất nên phải xác nhận. File không tự chuyển giữa công cụ.
