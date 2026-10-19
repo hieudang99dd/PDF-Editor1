@@ -94,7 +94,7 @@ async function main(){
   await page.goto('http://127.0.0.1:'+server.address().port+'/PDF-Editor1/index.html',{waitUntil:'load'});
   await page.waitForFunction(()=>typeof window.openTool==='function'&&window.PDFLib?.PDFDocument);
   await page.evaluate(()=>{
-    const selected=window.T.findIndex(x=>x[0]==='Giảm dung lượng PDF');
+    const selected=T.findIndex(x=>x[0]==='Giảm dung lượng PDF');
     if(selected<0)throw Error('Missing homepage compressor');
     window.openTool(selected);
   });
