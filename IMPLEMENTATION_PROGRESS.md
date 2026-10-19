@@ -398,3 +398,8 @@ GitHub Pages chỉ chạy frontend tĩnh. Office/Tesseract/LibreOffice chạy na
 - Added page ranges, DPI controls, skip-native-text, progress/cancel/retry, editable per-line results, confidence polygons and PDF/TXT export. Searchable PDF retains original page contents, uses invisible embedded Unicode text, and maps coordinates through PDF.js viewport.
 - Local real browser acceptance passed on synthetic Vietnamese scan, cancel/retry, native/out-of-range pages, correction/export and zero changed rendered pixels. Independent PyMuPDF confirmed Unicode extraction and unchanged pixels. Regression initially 218 pass / 2 skip; final validation recorded by CI.
 - Added pinned rebuild script, vendor manifest/licenses, browser acceptance workflow and `docs/OCR_BROWSER.md`. Large/cropped/rotated coordinate math has unit coverage; no claim of perfect OCR on all engineering drawings. Final deployment requires successful runtime build and Pages verification.
+
+### Publication verified — 2026-10-19
+
+- Runtime release commit: `18a7f08b1fa5a2185cf8d639c9d1dedcc449b8d5`. OCR acceptance workflow `39186660834` and master recheck `39186818446`: success. GitHub Pages run `39186817973`: build/deploy/report success.
+- Live website Chromium acceptance at `https://hieudang99dd.github.io/PDF-Editor1/ocr.html`: passed homepage/Studio navigation, Vietnamese scan OCR, cancel/retry, editing, PDF/TXT downloads, native/out-of-range page preservation, unchanged rendering and same-origin assets. Local 218 Node tests passed (2 skipped); 3 Python branding tests passed.
