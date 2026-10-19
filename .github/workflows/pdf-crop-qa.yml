@@ -1,0 +1,42 @@
+name: PDF EDITOR crop preview and export QA
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'crop.html'
+      - 'pdf-crop*'
+      - 'hvd-ui-v2.js'
+      - 'index.html'
+      - 'tests/pdf-crop*'
+      - '.github/workflows/pdf-crop-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  crop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check full source syntax
+        run: |
+          node --check pdf-crop.mjs
+          node --check pdf-crop-core.mjs
+          node --check tests/pdf-crop-browser.cjs
+      - name: PDF geometry and UI regression
+        run: node --test tests/pdf-crop.test.cjs tests/home-layout.test.cjs
+      - name: Install Chromium for real PDF acceptance
+        run: |
+          npm install --no-save playwright@1.57.0
+          npx playwright install --with-deps chromium
+      - name: Browser test — apply, inspect, approve and download
+        run: node tests/pdf-crop-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pdf-crop-review-evidence
+          path: test-results/crop/
+          if-no-files-found: ignore
