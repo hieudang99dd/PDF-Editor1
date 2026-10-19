@@ -112,12 +112,12 @@ async def universal_convert(file: UploadFile = File(...), target: str = Form(...
             doc = fitz.open()
             try:
                 page = doc.new_page()
-                from PIL import ImageFont
-                # Use fitz builtin fonts; Vietnamese characters outside builtin font range require font setup.
-                try:
-                    page.insert_textbox(fitz.Rect(40, 40, 555, 800), value, fontsize=11)
-                except Exception as exc:
-                    raise HTTPException(422, "TXT chứa ký tự không hỗ trợ, hãy chuyển bằng LibreOffice") from exc
+                # PDF base fonts lack Vietnamese glyphs; require an installed Unicode font.
+                font_path = next((p for p in ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf", "C:/Windows/Fonts/arial.ttf"] if Path(p).exists()), None)
+                if not font_path:
+                    raise HTTPException(503, "Chưa có font Unicode trên máy xử lý TXT → PDF")
+                page.insert_font(fontname="UnicodeText", fontfile=font_path)
+                page.insert_textbox(fitz.Rect(40, 40, 555, 800), value, fontsize=11, fontname="UnicodeText")
                 return _response(doc.tobytes(), "pdf", stem)
             finally:
                 doc.close()
