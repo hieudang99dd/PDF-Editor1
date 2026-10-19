@@ -1,0 +1,62 @@
+name: PDF EDITOR live PDF compression QA
+on:
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pdf-compress-live-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+jobs:
+  check-live:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master')
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Chromium and PDF verification
+        run: |
+          npm install --no-save playwright@1.57.0
+          npx playwright install --with-deps chromium
+          python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Wait for PDF EDITOR compressor deployment
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request,urlopen
+          import time
+          for i in range(25):
+              try:
+                  url='https://hieudang99dd.github.io/PDF-Editor1/compress.html?check='+str(i)
+                  with urlopen(Request(url,headers={'Cache-Control':'no-cache'}),timeout=20) as response:
+                      page=response.read().decode('utf-8')
+                  if 'pdf-compress-page.mjs?v=20261019-compress1' in page:
+                      print('PASS: deployed PDF EDITOR compress UI found')
+                      break
+              except Exception as error:
+                  print('Pages waiting:',str(error))
+              time.sleep(6)
+          else:
+              raise SystemExit('GitHub Pages has not deployed the compression UI')
+          PY
+      - name: Compress image-heavy CAD/vector PDF on live GitHub Pages
+        env:
+          COMPRESS_BASE_URL: https://hieudang99dd.github.io/PDF-Editor1
+        run: node tests/pdf-compress-browser.cjs
+      - name: Independently validate live PDF geometry and selectable text
+        run: python3 scripts/verify_compress.py test-results/compress
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-compress-acceptance
+          path: |
+            test-results/compress/*.png
+            test-results/compress/*.pdf
+          if-no-files-found: ignore
