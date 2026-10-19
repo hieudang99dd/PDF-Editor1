@@ -78,6 +78,50 @@ async function fixture(){
   await page.locator('#locked').waitFor({state:'visible',timeout:30000});
   assert.equal(await page.locator('#apply').isDisabled(),true);
   assert.equal(await page.locator('#export').isDisabled(),true);
+  // Main PDF EDITOR: click the catalog card. The crop engine must appear with
+  // one integrated toolbar and retain real Apply -> Review -> Export gates.
+  await page.goto(base.replace('/crop.html','/index.html'),{waitUntil:'domcontentloaded'});
+  await page.locator('button.catalog-tile').filter({hasText:'Cắt lề PDF'}).first().click();
+  await page.waitForFunction(()=>location.hash==='#workspace=crop');
+  assert.equal(await page.locator('#unified-ws').isVisible(),true);
+  assert.equal(await page.locator('#crop-host-export').isDisabled(),true);
+  const crop=page.frameLocator('#unified-frame');
+  await crop.locator('#file').waitFor({state:'attached'});
+  assert.equal(await crop.locator('html').evaluate(el=>el.classList.contains('pdf-editor-embed')),true);
+  assert.equal(await crop.locator('header.header').isVisible(),false,'old duplicate header must be hidden');
+  await crop.locator('#file').setInputFiles({name:'pages.pdf',mimeType:'application/pdf',buffer:source});
+  await page.waitForFunction(()=>!document.querySelector('#crop-host-apply').disabled,{timeout:30000});
+  const layout=await crop.locator('main').evaluate(el=>{
+    const left=el.querySelector('.control-panel').getBoundingClientRect();
+    const right=el.querySelector('.crop-workspace').getBoundingClientRect();
+    return {x:left.x,y:left.y,rx:right.x,ry:right.y};
+  });
+  assert.ok(layout.rx>layout.x+100&&Math.abs(layout.ry-layout.y)<5,
+    'embedded PDF workspace must use sidebar and right-hand preview '+JSON.stringify(layout));
+  await crop.locator('#scope').selectOption('all');
+  const integratedPage=await crop.locator('#stage').boundingBox();
+  await page.mouse.move(integratedPage.x+integratedPage.width*.12,integratedPage.y+integratedPage.height*.13);
+  await page.mouse.down();
+  await page.mouse.move(integratedPage.x+integratedPage.width*.88,integratedPage.y+integratedPage.height*.86,{steps:7});
+  await page.mouse.up();
+  await page.locator('#crop-host-apply').click();
+  await crop.locator('#review').waitFor({state:'visible',timeout:30000});
+  await crop.locator('#approved').waitFor({state:'visible'});
+  await page.waitForFunction(()=>!document.querySelector('#crop-host-review').disabled,{timeout:30000});
+  assert.equal(await page.locator('#crop-host-export').isDisabled(),true,'must not export before reviewing');
+  await crop.locator('#approved').check();
+  await page.waitForFunction(()=>!document.querySelector('#crop-host-export').disabled,{timeout:30000});
+  const [hostDownload]=await Promise.all([page.waitForEvent('download'),page.locator('#crop-host-export').click()]);
+  const integratedBytes=fs.readFileSync(await hostDownload.path());
+  const integratedPdf=await PDFLib.PDFDocument.load(integratedBytes);
+  assert.equal(integratedPdf.getPageCount(),2);
+  assert.ok(integratedPdf.getPage(0).getCropBox().width<550);
+  assert.equal(new URL(page.url()).hash,'#workspace=crop','export stays in the main PDF Editor');
+  await crop.locator('#reset').click();
+  await page.waitForFunction(()=>document.querySelector('#crop-host-export').disabled,{timeout:30000});
+  await page.screenshot({path:path.join(root,'test-results/crop/unified-crop-workspace.png'),fullPage:true});
+  assert.deepEqual(errors,[],'integrated workflow must not throw JS exceptions');
+  console.log('PASS: unified PDF Editor embedded crop, one header, native PDF export gated by review.');
   console.log('PASS: actual PDF crop visual review, two rotated pages, explicit export approval, invalidation and signed PDF lock.');
  }finally{
   await browser.close();await new Promise(resolve=>server.close(resolve));
