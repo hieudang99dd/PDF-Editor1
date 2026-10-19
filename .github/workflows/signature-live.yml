@@ -2,7 +2,7 @@ name: PDF EDITOR live signature release acceptance
 on:
   push:
     branches: [master]
-    paths: ['.github/workflows/signature-live.yml']
+    paths: ['.github/workflows/signature-live.yml', 'sign.html', 'pdf-sign*.mjs', 'pdf-sign.css', 'tests/signature-browser.cjs', 'tests/signature.test.cjs']
   workflow_run:
     workflows: ["pages build and deployment"]
     types: [completed]
@@ -35,6 +35,30 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Independent PDF validator
         run: python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Wait until public Pages serves this revision's sign.html
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen, Request
+          import re,time
+          expected=Path('sign.html').read_text()
+          matcher=re.search(r'pdf-sign\.mjs\?v=([\w-]+)',expected)
+          assert matcher, 'Missing signed document runtime version'
+          token=matcher.group(1)
+          url='https://hieudang99dd.github.io/PDF-Editor1/sign.html'
+          for attempt in range(42):
+              try:
+                  with urlopen(Request(url+f'?qa={attempt}',headers={'Cache-Control':'no-cache'}),timeout=30) as r:
+                      deployed=r.read().decode('utf-8')
+                  if f'pdf-sign.mjs?v={token}' in deployed and ('download-source' in deployed)==('download-source' in expected):
+                      print('PASS: deployed signing UI matches reviewed current bundle',token)
+                      break
+              except Exception as error:
+                  print('Waiting for Pages deployment:',str(error))
+              time.sleep(5)
+          else:
+              raise SystemExit('Site did not publish expected reviewed signing UI before QA')
+          PY
       - name: Verify live release exposes browser sign route
         run: |
           python3 - <<'PY'
