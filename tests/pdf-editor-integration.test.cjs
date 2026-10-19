@@ -28,9 +28,9 @@ test('the PDF EDITOR homepage is a single entry point for the updated workflows'
  assert.match(home,/hvd-ui-v2\.js\?v=20261019-unified1/);
  const head=home.split('</head>')[0];
  assert.match(head,/#hvd-tool=/);
- assert.match(head,/28:'crop\.html'/);
- assert.match(head,/14:'pages\.html'/);
- assert.match(head,/location\.replace\(new URL/);
+ assert.match(head,/28:'crop'/);
+ assert.match(head,/14:'pages'/);
+ assert.match(head,/history\.replaceState/);
  assert.match(ui,/\['pages','Tổ chức','Quản lý trang PDF'/);
  assert.match(ui,/\['crop','Tổ chức','Cắt lề PDF'/);
  assert.match(ui,/\['convert','Chuyển đổi','Chuyển đổi định dạng tệp'/);

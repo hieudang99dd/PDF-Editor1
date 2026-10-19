@@ -14,7 +14,7 @@ test('signature detection rejects an actual compressed signature dictionary',asy
 test('signing routes and pinned vendors are complete and local',()=>{
  const root=path.resolve(__dirname,'..');const m=JSON.parse(fs.readFileSync(path.join(root,'vendor/signature/manifest.json')));const crypto=require('node:crypto');
  for(const [file,hash]of Object.entries(m.sha256))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'vendor/signature',file))).digest('hex'),hash);
- assert.match(fs.readFileSync(path.join(root,'index.html'),'utf8'),/location.href='\.\/sign.html'/);
+ assert.match(fs.readFileSync(path.join(root,'index.html'),'utf8'),/window.PDFEditorUnified.open\('sign'\)/);
 });
 
 test('signed PDFs are accepted for viewing, but never rewritten',async()=>{

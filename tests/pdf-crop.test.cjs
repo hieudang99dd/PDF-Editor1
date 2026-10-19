@@ -82,7 +82,7 @@ test('homepage routes to crop editor with mandatory apply-review-export controls
  const ui=fs.readFileSync(path.join(root,'pdf-crop.mjs'),'utf8');
  const css=fs.readFileSync(path.join(root,'pdf-crop.css'),'utf8');
  assert.match(home,/crop-route/);
- assert.match(home,/location\.href='\.\/crop\.html'/);
+ assert.match(home,/window\.PDFEditorUnified\.open\('crop'\)/);
  for(const id of ['file','source-canvas','crop-rectangle','scope','range','apply','review','change-log','before-canvas','after-canvas','approved','export']){
   assert.match(html,new RegExp('id="'+id+'"'));
  }

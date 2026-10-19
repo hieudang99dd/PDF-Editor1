@@ -69,7 +69,7 @@ async function sample(label){
    await page.locator('#unified-ws').waitFor({state:'visible'});
    assert.equal(await page.locator('#home').isVisible(),false);
    await page.locator('[data-pdf-route=pages]').click();
-   await page.waitForURL('**/#workspace=pages');
+   await page.waitForFunction(()=>location.hash==='#workspace=pages');
    await page.frameLocator('#unified-frame').locator('#files').waitFor({state:'attached'});
    await page.locator('#unified-home').click();
    await page.waitForURL('**/index.html?*');

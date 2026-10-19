@@ -73,7 +73,7 @@ test('page management has dedicated grid, thumbnail scroll, preview, apply/expor
  const js=fs.readFileSync(path.join(__dirname,'../pdf-pages.mjs'),'utf8');
  const css=fs.readFileSync(path.join(__dirname,'../pdf-pages.css'),'utf8');
  const home=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
- assert.match(home,/Quản lý trang PDF/);assert.match(home,/location.href='\.\/pages\.html'/);
+ assert.match(home,/Quản lý trang PDF/);assert.match(home,/window.PDFEditorUnified.open\('pages'\)/);
  for(const id of ['grid','preview-canvas','apply','export','selected-export','toggle-split','layout','range','size','jump','jump-btn']){
   assert.match(html,new RegExp('id="'+id+'"'));
  }
