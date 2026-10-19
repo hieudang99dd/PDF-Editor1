@@ -67,3 +67,9 @@ Không log hoặc lưu khóa/mật khẩu trong localStorage/IndexedDB/server. W
 
 - Nút chọn tệp **không lọc phần mở rộng**, bao gồm PDF đã ký số và các tệp Word/Excel/CAD/khác. Loại chưa có bộ đọc vẫn được giữ nguyên byte trong phiên và có nút **Tải bản gốc**, nhưng không có xem trước hoặc khả năng ký/chỉnh nội dung.
 - Chỉ PDF (bao gồm PDF ký số ở chế độ xem) và PNG/JPG/WebP (chuyển thành PDF) là loại đang được hiển thị/xử lý. Không quảng cáo rằng bất kỳ tệp nào cũng có thể ký số.
+
+### Kết quả nghiệm thu website cho tải tệp mở rộng
+
+- [Run CI mã nguồn](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39197983245), [Run Chromium website thật](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39197983272), [GitHub Pages](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39197982974): **SUCCESS** ngày 2026-10-19.
+- Browser xác minh PDF ký số được tải lên/xem/tải bản gốc byte-identical, không có ghi đè; DOCX mẫu không hiển thị thành PDF nhưng được tiếp nhận và tải lại đúng dữ liệu; PNG chuyển thành PDF hợp lệ; PDF thường tiếp tục ký và OpenSSL vẫn xác nhận CMS.
+- Cần xây dựng engine chuyển đổi riêng cho DOCX/XLSX/DWG nếu muốn **xem và ký trực tiếp** các định dạng đó. Đây là hạng mục khác với việc bỏ hạn chế file picker.
