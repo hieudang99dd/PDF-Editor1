@@ -129,7 +129,7 @@ const T=[
 ['Kiểm tra chất lượng PDF','Kiểm tra cấu trúc, phông chữ và rủi ro trước khi chỉnh sửa bằng bộ máy PDF chuyên sâu','Chỉnh sửa','✓','pdfium-inspect-route','.pdf'],
 ['Trình đọc PDF','Xem và duyệt nhanh tài liệu','Chỉnh sửa','👁','organize','.pdf'],
 ['Đánh số trang','Thêm số trang vào chân trang','Chỉnh sửa','#','pnum','.pdf'],
-['Cắt lề PDF','Cắt bớt viền trang','Chỉnh sửa','⌗','organize','.pdf'],
+['Cắt lề PDF','Chọn vùng cắt, áp dụng và kiểm tra trước/sau rồi xuất PDF giữ vector','Chỉnh sửa','⌗','crop-route','.pdf'],
 ['Biên tập lại (che thông tin)','Che vĩnh viễn nội dung nhạy cảm','Chỉnh sửa','█','organize','.pdf'],
 ['Watermark PDF','Chèn chữ mờ lên mọi trang','Chỉnh sửa','◍','wm','.pdf'],
 ['Điền biểu mẫu PDF','Nhập vào các trường của biểu mẫu','Chỉnh sửa','▤','organize','.pdf'],
@@ -203,6 +203,7 @@ function openTool(i, restore=false){
  if(!Number.isInteger(i)||!T[i])return;
  if(T[i]?.[4]==='universal-route' || (T[i]?.[2]==='Chuyển đổi' && T[i]?.[4]!=='paddle-ocr-route')){location.href='./convert.html';return;}
  if(T[i]?.[4]==='pages-route' || ['Sắp xếp PDF','Ghép PDF','Cắt PDF','Xoay PDF','Xóa trang PDF','Trích xuất trang'].includes(T[i]?.[0])){location.href='./pages.html';return;}
+ if(T[i]?.[4]==='crop-route'){location.href='./crop.html';return;}
  if(T[i]?.[4]==='signature-route'){location.href='./sign.html';return;}
  if(T[i]?.[4]==='paddle-ocr-route'){location.href='./ocr.html';return;}
  if(T[i]?.[4]==='cit-text-route'){location.href='./text-editor.html';return;}
@@ -722,7 +723,7 @@ document.addEventListener('click',e=>{
 });
 $('#q').oninput=home;home();
 </script>
-<script src="hvd-ui-v2.js?v=20261019-no-merge5"></script>
+<script src="hvd-ui-v2.js?v=20261019-crop6"></script>
 <script src="pdf-lib.min.js"></script>
 <script>if(!window.PDFLib){document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');}</script>
 <script src="pdf.min.js"></script>
