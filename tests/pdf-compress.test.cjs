@@ -50,7 +50,8 @@ test('unsupported/non-PDF and invalid presets are rejected',async()=>{
  const {compressPdfBytes}=await load();
  await assert.rejects(()=>compressPdfBytes(new TextEncoder().encode('not a PDF'),{PDFLib}),/không phải PDF/);
  const doc=await PDFLib.PDFDocument.create();doc.addPage();
- await assert.rejects(()=>compressPdfBytes(new Uint8Array(await doc.save()),{PDFLib,mode:'unknown'}),/không hợp lệ/);
+ const validBytes=new Uint8Array(await doc.save());
+ await assert.rejects(()=>compressPdfBytes(validBytes,{PDFLib,mode:'unknown'}),/không hợp lệ/);
 });
 test('standalone, legacy routes and homepage are connected to the same algorithm',()=>{
  assert.match(page,/pdf-compress-page\.mjs\?v=/);
