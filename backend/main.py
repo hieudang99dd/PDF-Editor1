@@ -23,6 +23,8 @@ ALLOWED_ORIGINS = [
 app = FastAPI(title="PDF HDV Local Engine", version="0.2.0")
 from structure_ocr import router as structure_ocr_router
 app.include_router(structure_ocr_router)
+from universal_convert import router as universal_convert_router
+app.include_router(universal_convert_router)
 app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS,
                    allow_credentials=False, allow_methods=["GET", "POST"], allow_headers=["*"])
 
