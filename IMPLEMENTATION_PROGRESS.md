@@ -506,3 +506,14 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - [Pages deploy 39216880185](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39216880185): **SUCCESS**. Link thao tác `https://hieudang99dd.github.io/PDF-Editor1/pages.html`. Bản cache assets `20261019-pages2`.
 - Các thuật toán đã được triển khai là PDF.js thumbnail, PDF-LIB copy pages + rotation + verify và JSZip split. Stirling-PDF, PDFsam, PDF Arranger và các chức năng n-up, booklet, split theo bookmark/size vẫn là tài liệu tham khảo/backlog, **không được báo đã tích hợp nguyên repo**.
 - Giới hạn: `pdf-lib.copyPages` không bảo đảm giữ metadata nâng cao (bookmarks, XFA, outline, named destinations); phải dùng hồ sơ thực tế A0/A1, 100–1000 trang để nghiệm thu toàn diện.
+
+
+### Cắt lề PDF — thao tác trực quan + duyệt trước khi xuất (2026-10-19)
+
+- Thêm công cụ độc lập `crop.html`, giao diện `pdf-crop.css`, controller `pdf-crop.mjs`, lõi `pdf-crop-core.mjs`; trang chủ `index.html` và danh mục `hvd-ui-v2.js` mở trực tiếp công cụ này.
+- Dùng PDF.js để render và chuyển **4 góc** từ tọa độ trang nhìn (kể cả /Rotate 0/90/180/270) về PDF user space. Dùng `pdf-lib.setCropBox` cắt hiển thị không raster nội dung vector/chữ. Giới hạn trong MediaBox/CropBox hiện tại, kiểm tra kích thước và số trang đầu ra.
+- Kéo tạo vùng, kéo di chuyển, 8 điểm/cạnh; dò lề tự động có padding để hạn chế bỏ sót nét; chọn 1/tất cả/khoảng trang. PDF đã ký số ở chế độ chỉ đọc (không viết lại).
+- **Áp dụng & kiểm tra** tạo PDF kết quả thực bằng pdf-lib, mở lại qua PDF.js và hiển thị ảnh trước/sau. Nhật ký ghi danh sách trang, thay đổi kích thước/lề theo mm. Phải tick xác nhận mới cho **Xuất PDF**; chỉnh vùng làm vô hiệu hóa bản review và khóa xuất ngay lập tức.
+- Kiểm thử `tests/pdf-crop.test.cjs` + Playwright Chromium `tests/pdf-crop-browser.cjs`. GitHub Actions [crop QA 39225574091](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39225574091): **SUCCESS**; [Pages build 39225572827](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39225572827): **SUCCESS**, commit `a68ef36ab`.
+- Phạm vi nghiệm thu: 2 trang vector khác hướng, vùng cắt, duyệt/tải kết quả, bảo toàn MediaBox & page count, chặn xuất khi chưa review hoặc sau thay đổi, khóa PDF ký số. Chưa nghiệm thu diện rộng A0/A1, nhiều lớp CAD, XFA hoặc in nhiều máy in.
+- Giới hạn quan trọng: CropBox **không xóa dữ liệu ngoài vùng cắt**, không thay thế công cụ xóa bảo mật. Tham khảo `docs/PDF_CROP_REVIEW.md`.
