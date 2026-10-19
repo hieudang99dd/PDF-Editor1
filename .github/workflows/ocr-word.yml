@@ -1,0 +1,49 @@
+name: OCR editable Word acceptance
+on:
+  push:
+    branches: [master, 'codex/ocr-word']
+    paths:
+      - 'pdf-ocr*'
+      - 'ocr.html'
+      - 'tests/paddle-ocr*'
+      - 'scripts/paddleocr/verify_word.py'
+      - '.github/workflows/ocr-word.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  word:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/paddleocr/package-lock.json
+      - name: Install browser QA dependencies
+        working-directory: scripts/paddleocr
+        run: npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
+      - name: Install independent Word renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreoffice-writer fonts-noto-core
+          python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Static and unit regression
+        run: |
+          node --check pdf-ocr-word.mjs
+          node --check pdf-ocr-word-layout.mjs
+          node --check pdf-ocr-word-client.mjs
+          node --test tests/*.test.cjs
+      - name: Actual OCR and PDF TXT DOCX downloads
+        env:
+          NODE_PATH: ${{ github.workspace }}/scripts/paddleocr/node_modules
+        run: node tests/paddle-ocr-browser.cjs
+      - name: Verify editable tables and render Word independently
+        run: python3 scripts/paddleocr/verify_word.py test-results/paddle-ocr/editable.docx test-results/paddle-ocr/source.pdf
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ocr-word-browser-and-render-evidence
+          path: test-results/paddle-ocr/

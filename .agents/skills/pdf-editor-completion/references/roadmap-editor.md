@@ -253,3 +253,8 @@ Với mỗi file đầu ra: mở bằng **Chrome PDF viewer** và **một trình
 - [x] OCR riêng tại `ocr.html`, route trang chủ/Studio đồng bộ; không yêu cầu engine PC.
 - [x] PaddleOCR Worker + Tesseract kiểm tra dấu Việt tùy chọn, chọn trang, sửa dòng, hủy/chạy lại và xuất PDF tìm kiếm/TXT; tài sản cùng origin.
 - [x] Kiểm thử browser thật và PyMuPDF độc lập trên mẫu scan; xem `docs/OCR_BROWSER.md` về giới hạn và quy trình build/QA.
+
+### 2026-10-19 — Editable OCR Word
+
+- [x] DOCX sửa chữ/bảng có đường kẻ, giữ phân trang/vị trí, gộp ô chữ nhật, font Noto Sans tiếng Việt nhúng.
+- [x] OCR bảng scan từng ô và kiểm thử ZIP/font/Word renderer; xem `docs/OCR_BROWSER.md` và workflow `ocr-word.yml`.

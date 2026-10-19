@@ -12,7 +12,7 @@ function controls() {
   $('run').disabled = busy || !documentPdf;
   $('cancel').disabled = !busy;
   const ready = !busy && results.size > 0;
-  $('pdf').disabled = !ready; $('txt').disabled = !ready;
+  $('pdf').disabled = !ready; $('txt').disabled = !ready; $('word').disabled = !ready;
 }
 function stop() {
   generation++;
@@ -76,6 +76,50 @@ async function refineVietnamese(canvas, items, token) {
     } finally { crop.width = crop.height = 1; }
   }
 }
+async function refineTableCells(canvas, items, token) {
+  if (!vietnameseWorker || token !== generation) return;
+  const { findTables } = await import('./pdf-ocr-word-client.mjs');
+  const { bounds } = await import('./pdf-ocr-word-layout.mjs');
+  if (token !== generation) return;
+  const inside = (item, table) => {
+    const b = bounds(item), x = (b.x + b.right) / 2, y = (b.y + b.bottom) / 2;
+    return x > table.x && x < table.right && y > table.y && y < table.bottom;
+  };
+  const tables = findTables(canvas).filter(t => items.filter(i => inside(i, t)).length >= 2);
+  if (!tables.length) return;
+  const replacement = [], successfulTables = new Set(), worker = vietnameseWorker;
+  await worker.setParameters({ tessedit_pageseg_mode: '6' });
+  try {
+    for (const [ti, table] of tables.entries()) for (const [ci, cell] of table.cells.entries()) {
+      if (token !== generation) return;
+      status(`Đang nhận dạng bảng ${ti + 1}/${tables.length} · Ô ${ci + 1}/${table.cells.length}…`);
+      const x = Math.ceil(cell.x + 4), y = Math.ceil(cell.y + 4);
+      const width = Math.floor(cell.right - 4) - x, height = Math.floor(cell.bottom - 4) - y;
+      if (width < 5 || height < 5) continue;
+      const crop = document.createElement('canvas'); crop.width = width + 20; crop.height = height + 20;
+      try {
+        const context = crop.getContext('2d'); context.fillStyle = 'white'; context.fillRect(0, 0, crop.width, crop.height);
+        context.drawImage(canvas, x, y, width, height, 10, 10, width, height);
+        const { data } = await worker.recognize(crop, {}, { blocks: true, text: true });
+        if (token !== generation) return;
+        const lines = (data.blocks || []).flatMap(b => b.paragraphs.flatMap(p => p.lines));
+        if (!lines.length && data.text.trim()) lines.push({ text: data.text, confidence: data.confidence, bbox: { x0: 10, y0: 10, x1: width + 10, y1: height + 10 } });
+        for (const line of lines) {
+          if (!line.text.trim()) continue;
+          const b = line.bbox, left = x - 10 + b.x0, top = y - 10 + b.y0, right = x - 10 + b.x1, bottom = y - 10 + b.y1;
+          successfulTables.add(table);
+          replacement.push({ text: line.text.trim().normalize('NFC'), score: line.confidence / 100,
+            fontSize: (b.y1 - b.y0) * 1.12, poly: [[left, top], [right, top], [right, bottom], [left, bottom]] });
+        }
+      } finally { crop.width = crop.height = 1; }
+    }
+    if (token === generation) {
+      const keep = items.filter(item => !tables.some(t => successfulTables.has(t) && inside(item, t)));
+      items.splice(0, items.length, ...keep, ...replacement);
+      items.sort((a, b) => bounds(a).y - bounds(b).y || bounds(a).x - bounds(b).x);
+    }
+  } finally { if (token === generation) await worker.setParameters({ tessedit_pageseg_mode: '7' }); }
+}
 function showLines() {
   const result = results.get(current);
   $('result-title').textContent = `Kết quả · Trang ${current}`;
@@ -125,7 +169,7 @@ $('file').addEventListener('change', async event => {
   const selected = event.target.files[0]; if (!selected) return;
   stop(); const token = generation; busy = true; controls();
   results.clear(); $('lines').replaceChildren(); $('boxes').replaceChildren();
-  $('pdf').disabled = $('txt').disabled = true;
+  $('pdf').disabled = $('txt').disabled = $('word').disabled = true;
   try {
     previewGeneration++; previewTask?.cancel();
     const previous = documentPdf; documentPdf = null;
@@ -180,6 +224,7 @@ $('run').addEventListener('click', async () => {
           if (token !== generation) return;
           const items = normalizeItems(raw.items, canvas.width, canvas.height);
           await refineVietnamese(canvas, items, token);
+          if ($('refine').checked && $('language').value === 'vi') await refineTableCells(canvas, items, token);
           if (token !== generation) return;
           results.set(number, { native: false, width: canvas.width, height: canvas.height, viewport, items });
         } finally { canvas.width = canvas.height = 1; }
@@ -209,6 +254,21 @@ $('txt').addEventListener('click', () => {
   const text = [...results].sort((a, b) => a[0] - b[0]).map(([n, r]) =>
     `--- Trang ${n} ---\n` + (r.native ? r.text : r.items.map(i => i.text).join('\n'))).join('\n\n');
   download(new Blob(['\uFEFF', text], { type: 'text/plain;charset=utf-8' }), 'txt');
+});
+$('word').addEventListener('click', async () => {
+  if (busy || !results.size) return;
+  const token = ++generation;
+  const snapshot = new Map([...results].map(([n, r]) => [n, { ...r, items: r.items?.map(i => ({ ...i, poly: i.poly.map(p => [...p]) })) }]));
+  busy = true; controls();
+  try {
+    const { exportEditableWord } = await import('./pdf-ocr-word-client.mjs');
+    const output = await exportEditableWord(documentPdf, snapshot, pdfjs, window.JSZip,
+      text => { if (token === generation) status(text); }, () => token !== generation);
+    if (token !== generation) return;
+    download(new Blob([output.bytes], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), 'docx');
+    status(`Đã xuất Word: ${output.pages} trang, ${output.tables} bảng chỉnh sửa được. Font tiếng Việt đã được nhúng.`);
+  } catch (error) { if (token === generation) status('Không xuất được Word: ' + error.message, true); }
+  finally { if (token === generation) { busy = false; controls(); } }
 });
 $('pdf').addEventListener('click', async () => {
   if (busy || !results.size) return;

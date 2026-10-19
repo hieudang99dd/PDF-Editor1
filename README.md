@@ -31,7 +31,7 @@ Bộ công cụ PDF EDITOR: sửa văn bản gốc, biên tập trang, chuyển 
 - [Thông tin nguồn/giấy phép](NOTICE.md).
 - [Engine Office/OCR cục bộ](backend/README.md).
 
-OCR: xem [quy trình, engine và giới hạn](docs/OCR_BROWSER.md).
+OCR có thể xuất PDF tìm kiếm được, TXT và Word (.docx) có chữ/bảng chỉnh sửa được, nhúng font tiếng Việt. Xem [quy trình, engine và giới hạn](docs/OCR_BROWSER.md).
 
 ## Kiểm thử
 

@@ -403,3 +403,11 @@ GitHub Pages chỉ chạy frontend tĩnh. Office/Tesseract/LibreOffice chạy na
 
 - Runtime release commit: `18a7f08b1fa5a2185cf8d639c9d1dedcc449b8d5`. OCR acceptance workflow `39186660834` and master recheck `39186818446`: success. GitHub Pages run `39186817973`: build/deploy/report success.
 - Live website Chromium acceptance at `https://hieudang99dd.github.io/PDF-Editor1/ocr.html`: passed homepage/Studio navigation, Vietnamese scan OCR, cancel/retry, editing, PDF/TXT downloads, native/out-of-range page preservation, unchanged rendering and same-origin assets. Local 218 Node tests passed (2 skipped); 3 Python branding tests passed.
+
+## 2026-10-19 — Editable Word from OCR with Vietnamese font embedding
+
+- Added the dedicated DOCX export button, OOXML writer and independent layout module. Preserve page sizes/orientations, editable positioned text and real ruled Word tables with rectangular horizontal/vertical merges; retain non-text graphics as a masked background.
+- Added per-cell Vietnamese recognition to reduce line-rule characters and cross-column concatenation on scanned tables. Existing recognized text remains editable before DOCX export; native pages use PDF text geometry.
+- Embed four Noto Sans fonts with reversible OOXML obfuscation, NFC Unicode and font relationships. This is a Vietnamese-capable replacement font, not recovery of an unknown scan font.
+- Browser QA covers a native table and the same table as a scan, Unicode corrections and PDF/TXT/DOCX downloads. Local LibreOffice render was inspected page by page; independent PyMuPDF verifies pagination, Vietnamese, a single-line title and retained graphics. Added geometry/merge/font tests and `.github/workflows/ocr-word.yml`.
+- Output is editable text boxes plus real tables; borderless/skewed/unclear tables and exact source font recovery are not claimed. Publication status is confirmed after CI/Pages.

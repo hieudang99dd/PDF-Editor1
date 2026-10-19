@@ -27,7 +27,7 @@ Tọa độ polygon từ canvas được đổi qua `viewport.convertToPdfPoint`
 - PyMuPDF độc lập đã xác nhận trích xuất được Unicode và ảnh trang trước/sau giống nhau trên mẫu xuất local.
 - Browser evidence lưu trong `test-results/paddle-ocr/` (không commit PDF/artifact), CI upload artifact `paddle-ocr-browser-evidence`.
 
-Mẫu tổng hợp không chứng minh độ chính xác cho mọi hồ sơ A0/A1, bảng dày, ảnh mờ hoặc chữ viết tay. Bản vẽ lớn nên OCR theo trang nhỏ hoặc chia tệp; giới hạn tải 200 MB. Chưa có chọn vùng bằng chuột, nhận dạng cấu trúc bảng hay chỉnh sửa nội dung scan trực tiếp.
+Mẫu tổng hợp không chứng minh độ chính xác cho mọi hồ sơ A0/A1, bảng dày, ảnh mờ hoặc chữ viết tay. Bản vẽ lớn nên OCR theo trang nhỏ hoặc chia tệp; giới hạn tải 200 MB. Chưa có chọn vùng bằng chuột hay chỉnh sửa ảnh scan trực tiếp; xuất Word và bảng có đường kẻ được mô tả bên dưới.
 
 ## Build và phát hành
 
@@ -38,3 +38,17 @@ node build.mjs
 ```
 
 Build tải model/ngôn ngữ chính thức, kiểm tra hash đã duyệt, tạo bundle main và sao nguyên worker/WASM. Workflow `.github/workflows/paddle-ocr.yml` chạy regression, browser acceptance rồi mới commit runtime được kiểm thử; từ chối ghi đè nếu nhánh đã tiến lên. Studio Text/PDFium không đổi thuật toán. Full publish script giữ redirect OCR riêng khi tạo lại Studio.
+
+## Xuất Word chỉnh sửa được (2026-10-19)
+
+Nút **Xuất Word sửa được (.docx)** xuất các trang đã xử lý, gồm cả trang được giữ chữ gốc. Các trang ngoài phạm vi chưa xử lý không được tự thêm vào Word. PDF tìm kiếm được vẫn giữ toàn bộ trang như trước.
+
+- `pdf-ocr-word-layout.mjs`: phát hiện đoạn kẻ ngang/dọc và thành phần liên thông, dựng ô, gộp ô chữ nhật ngang/dọc, gán chữ vào ô theo tọa độ. Với trang PDF có chữ, lấy chữ và hình học từ PDF.js thay vì OCR lại.
+- Khi bật kiểm tra tiếng Việt, bảng scan có đường kẻ được nhận dạng lại theo từng ô, cắt bỏ biên kẻ để giảm lỗi nhận đường kẻ thành ký tự và gộp chữ nhiều cột. Kết quả vẫn được sửa trong danh sách dòng trước khi xuất.
+- `pdf-ocr-word-client.mjs`: dựng ảnh trang, suy luận bảng, tách chữ khỏi phần đồ họa; giữ phần ảnh/đồ họa còn lại làm nền theo section, dưới các chữ và bảng để không che đường kẻ. Không dùng ảnh nguyên trang để thay cho toàn bộ chữ/bảng.
+- `pdf-ocr-word.mjs`: tạo OOXML DOCX bằng JSZip cùng origin; chữ thường là hộp văn bản chỉnh sửa được tại vị trí gốc, bảng là `w:tbl` với `gridSpan`/`vMerge`, hàng có chiều cao tối thiểu và được phép giãn khi sửa. Giữ kích thước/hướng từng trang bằng section; giấy lớn hơn giới hạn 22 inch của Word được thu tỷ lệ.
+- Nhúng đủ bốn font Noto Sans Regular/Bold/Italic/BoldItalic theo font relationships và `.odttf`. Kiểm tra giải mã ngược font phải khớp byte với TTF gốc. Dùng Unicode NFC; không chuyển sang mã VNI/TCVN3. Noto Sans là font thay thế hỗ trợ tiếng Việt, không giả nhận đã phục hồi font gốc của ảnh scan.
+
+**Giới hạn:** ưu tiên bố cục, không bảo đảm giống tuyệt đối PDF. Chữ sửa được trong hộp văn bản, không phải toàn bộ tài liệu liên tục tự dàn lại như văn bản soạn mới. Bảng không đường kẻ, đường kẻ đứt/mờ, bảng xoay/nghiêng lớn, đường bao CAD phức tạp, màu sắc/kiểu chữ gốc và OCR ảnh kém vẫn cần kiểm tra/chỉnh lại. Ô/phần chữ không được nhận dạng có thể còn trong nền ảnh. Nhúng font cần trình đọc Word hỗ trợ; không bảo đảm mọi trình xem web hiển thị như Word desktop.
+
+**QA:** mẫu bốn trang gồm trang scan chữ Việt và đồ họa, bảng native, bảng scan và trang ngoài phạm vi. Xuất Word ba trang, hai bảng thật có ô gộp, bốn font nhúng. Playwright kiểm tra tải DOCX, XML, chữ đã sửa và không thêm trang ngoài phạm vi. LibreOffice + PyMuPDF độc lập kiểm tra số/kích thước trang, tiếng Việt, tiêu đề không bị xuống dòng ngoài ý muốn và đồ họa giữ đúng vị trí. Đã render và xem từng trang PNG. Workflow `.github/workflows/ocr-word.yml` giữ artifact kiểm chứng.
