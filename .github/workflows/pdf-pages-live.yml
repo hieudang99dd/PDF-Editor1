@@ -1,0 +1,81 @@
+name: PDF EDITOR live page-management acceptance
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/pdf-pages-live.yml'
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pdf-pages-live-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+jobs:
+  verify-pages:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master')
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install independent PDF and Chromium acceptance dependencies
+        run: |
+          npm install --no-save playwright@1.57.0
+          npx playwright install --with-deps chromium
+          python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Wait for public page-manager code
+        run: |
+          python3 - <<'PY'
+          from urllib.request import Request,urlopen
+          from pathlib import Path
+          import re,time
+          expected=Path('pages.html').read_text()
+          match=re.search(r'pdf-pages\.mjs\?v=([a-zA-Z0-9-]+)',expected)
+          assert match,'Local page script revision not found'
+          token=match.group(1)
+          for i in range(36):
+              try:
+                  url='https://hieudang99dd.github.io/PDF-Editor1/pages.html?check='+str(i)
+                  with urlopen(Request(url,headers={'Cache-Control':'no-cache'}),timeout=25) as response:
+                      text=response.read().decode('utf-8')
+                  if 'pdf-pages.mjs?v='+token in text:
+                      print('PASS: published page-management UI version',token)
+                      break
+              except Exception as e:
+                  print('Waiting for GitHub Pages:',e)
+              time.sleep(6)
+          else:raise SystemExit('Page-management UI version did not deploy')
+          PY
+      - name: Run page organizer in published website
+        env:
+          PAGES_BASE_URL: https://hieudang99dd.github.io/PDF-Editor1
+        run: node tests/pdf-pages-browser.cjs
+      - name: Validate native text and vector content independently
+        run: |
+          python3 - <<'PY'
+          import fitz
+          doc=fitz.open('test-results/pages/organized.pdf')
+          assert len(doc)==6
+          texts=' '.join(page.get_text() for page in doc)
+          for needle in ['ALPHA PAGE 1','ALPHA PAGE 2','BRAVO PAGE 1']:
+              assert needle in texts,needle
+          assert all(len(p.get_drawings())>0 for p in doc)
+          print('PASS: real GitHub Pages exports native PDF text/vector/geometry')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-page-layout-evidence
+          path: |
+            test-results/pages/*.png
+            test-results/pages/*.pdf
+            test-results/pages/*.zip
+          if-no-files-found: ignore
