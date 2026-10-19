@@ -89,7 +89,7 @@ test('page manager does not require an Apply step to export',()=>{
  const html=fs.readFileSync(path.join(__dirname,'../pages.html'),'utf8');
  const script=fs.readFileSync(path.join(__dirname,'../pdf-pages.mjs'),'utf8');
  assert.match(html,/id="apply"[^>]*hidden/);
- assert.match(html,/id="export"[^>]*Xuất PDF/);
+ assert.match(html,/id="export"[^>]*>[^<]*Xuất PDF/);
  assert.match(script,/const bytes=await assemblePages\(pages,sources,PDFLib\)/);
  assert.doesNotMatch(script,/Nhấn Áp dụng & kiểm tra trước khi xuất PDF/);
 });
