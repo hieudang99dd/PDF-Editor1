@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cắt lề PDF — PDF Đạo Chích</title><meta name="description" content="Cắt lề PDF trực quan; kiểm tra trước/sau rồi mới xuất PDF giữ nguyên vector và chữ.">
+<link rel="stylesheet" href="./pdf-crop.css?v=20261019-crop1"></head>
+<body>
+<header class="header"><a href="./index.html">← PDF Đạo Chích</a><div><strong>Cắt lề PDF</strong><small>Giữ nguyên chữ, ảnh và vector — cắt vùng hiển thị CropBox</small></div>
+<div class="head-actions"><button id="apply" class="primary" type="button" disabled>✓ Áp dụng & kiểm tra</button><button id="export" class="primary" type="button" disabled>↓ Xuất PDF</button></div></header>
+<main>
+<section class="control-panel">
+<h1>Cắt lề theo vùng — có xem trước kết quả</h1>
+<p class="intro">Chọn một vùng bằng chuột, kéo cạnh/góc để chỉnh sửa, sau đó bấm <strong>Áp dụng & kiểm tra</strong>. Chỉ xuất khi bạn xác nhận đã xem kết quả.</p>
+<div class="file-row"><label class="file-button">＋ Chọn PDF <input id="file" type="file" accept=".pdf,application/pdf"></label><span id="file-name">Chưa chọn tệp PDF</span><span id="locked" class="warning" hidden>PDF có chữ ký số — chỉ xem, không được ghi lại</span></div>
+<div class="tool-row">
+<label>Trang để chỉnh sửa <select id="page" disabled></select></label>
+<label>Áp dụng vùng cắt <select id="scope" disabled><option value="one">Chỉ trang hiện tại</option><option value="all">Tất cả các trang</option><option value="range">Khoảng trang</option></select></label>
+<label id="range-wrap" hidden>Danh sách trang <input id="range" type="text" placeholder="1-3, 6, 9-11"></label>
+<label>Lề an toàn tự động <select id="padding"><option value="0.012">1,2%</option><option selected value="0.024">2,4%</option><option value="0.05">5%</option></select></label>
+</div>
+<div class="tool-row actions">
+<button id="auto" disabled>◎ Dò lề tự động</button><button id="reset" disabled>↺ Vùng trang đầy đủ</button>
+<button id="prev" disabled>‹ Trang trước</button><button id="next" disabled>Trang sau ›</button>
+<span id="dimensions" class="subtle"></span>
+</div>
+<p class="warning-note">Cắt lề không xóa nội dung khỏi tệp PDF và không bảo đảm loại bỏ dữ liệu nhạy cảm. Với bản vẽ CAD nhiều chi tiết mờ, hãy kiểm tra trước/sau thay vì tin hoàn toàn vào dò lề tự động.</p>
+</section>
+<section class="crop-workspace">
+<div class="section-heading"><h2>1. Chọn và chỉnh sửa vùng cắt</h2><span id="selection-summary">Mở một PDF để bắt đầu</span></div>
+<div id="stage-scroll" class="stage-scroll"><div id="stage" class="stage" aria-label="Kéo tạo vùng cắt; kéo các góc, cạnh hoặc bên trong để chỉnh" tabindex="0">
+<canvas id="source-canvas"></canvas>
+<div id="crop-rectangle" class="crop-rectangle" hidden><span class="crop-label">VÙNG GIỮ LẠI</span><i data-handle="nw"></i><i data-handle="n"></i><i data-handle="ne"></i><i data-handle="e"></i><i data-handle="se"></i><i data-handle="s"></i><i data-handle="sw"></i><i data-handle="w"></i></div>
+</div></div>
+<div class="legend"><span><i class="legend-box"></i> Phần bên trong đường bao được giữ lại</span><span>Chuột: vẽ vùng / di chuyển / kéo 8 điểm</span></div>
+</section>
+<section id="review" class="review" hidden aria-label="Kiểm tra kết quả trước khi xuất">
+<div class="section-heading"><h2>2. Kiểm tra trước / sau</h2><span id="review-count"></span></div>
+<div class="review-nav"><button id="review-prev">‹</button><label>Xem trang <select id="review-page"></select></label><button id="review-next">›</button></div>
+<div class="compare-grid">
+<article><h3>Trước khi cắt</h3><div class="compare-scroll"><canvas id="before-canvas"></canvas></div></article>
+<article><h3>Sau khi cắt — PDF kết quả thật</h3><div class="compare-scroll"><canvas id="after-canvas"></canvas></div></article>
+</div>
+<div class="review-data"><h3>Nhật ký thay đổi</h3><div id="change-log"></div></div>
+<label class="approval"><input id="approved" type="checkbox"> Tôi đã xem hình ảnh trước/sau và kiểm tra danh sách trang được thay đổi; đồng ý xuất PDF theo vùng cắt này.</label>
+<div class="review-actions"><button id="inspect" type="button">↗ Mở PDF kết quả để kiểm tra</button><button id="review-export" class="primary" disabled>↓ Xuất PDF đã kiểm tra</button></div>
+</section>
+<p id="status" role="status" aria-live="polite">Tệp được xử lý tại trình duyệt, không tải lên máy chủ.</p>
+</main>
+<script src="./pdf.min.js"></script><script src="./pdf-lib.min.js"></script>
+<script type="module" src="./pdf-crop.mjs?v=20261019-crop1"></script>
+</body></html>
