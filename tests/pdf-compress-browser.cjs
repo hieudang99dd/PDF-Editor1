@@ -89,6 +89,28 @@ async function main(){
   await page.screenshot({path:path.join(out,'02-safe.png'),fullPage:true});
   assert.deepEqual(faults,[]);
   console.log('PASS: PDF EDITOR compresses embedded JPEG, retains PDF pages/vectors, and exports without size increase.');
+
+  // The user-facing homepage tool must use the same engine as the standalone UI.
+  await page.goto('http://127.0.0.1:'+server.address().port+'/PDF-Editor1/index.html',{waitUntil:'load'});
+  await page.waitForFunction(()=>typeof window.openTool==='function'&&window.PDFLib?.PDFDocument);
+  await page.evaluate(()=>{
+    const selected=window.T.findIndex(x=>x[0]==='Giảm dung lượng PDF');
+    if(selected<0)throw Error('Missing homepage compressor');
+    window.openTool(selected);
+  });
+  await page.locator('#fi').setInputFiles({name:'Road-CAD-home.pdf',mimeType:'application/pdf',buffer:input});
+  await page.locator('input[name=lv][value=balanced]').check();
+  await page.locator('#go').click();
+  const homepageLink=page.locator('#out a[download]');
+  await homepageLink.waitFor({state:'visible',timeout:60000});
+  const homepageDownload=page.waitForEvent('download');
+  await homepageLink.click();
+  await(await homepageDownload).saveAs(path.join(out,'homepage.pdf'));
+  assert.ok(fs.statSync(path.join(out,'homepage.pdf')).size<=original.byteLength);
+  assert.match(await page.locator('#out').innerText(),/Ảnh đã tối ưu/);
+  await page.screenshot({path:path.join(out,'03-home-compression.png'),fullPage:true});
+  assert.deepEqual(faults,[]);
+  console.log('PASS: homepage compressor uses the shared engine with balanced quality and creates downloadable PDF.');
  }finally{
    await browser.close();
    await new Promise(r=>server.close(r));
