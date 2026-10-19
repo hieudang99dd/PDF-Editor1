@@ -1,4 +1,4 @@
-import {parsePageRange,movePageIds,cloneManifest,rotateDegrees,containsSignature,splitAtIndices,assemblePages} from './pdf-pages-core.mjs?v=20261019-pages1';
+import {parsePageRange,movePageIds,cloneManifest,rotateDegrees,containsSignature,splitAtIndices,assemblePages} from './pdf-pages-core.mjs?v=20261019-pages2';
 
 const el=id=>document.getElementById(id);
 const PDFLib=window.PDFLib;

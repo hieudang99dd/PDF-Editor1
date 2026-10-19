@@ -30,14 +30,16 @@ async function fixture(prefix,count){
  return Buffer.from(await doc.save({useObjectStreams:false}));
 }
 async function run(){
- await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const live=process.env.PAGES_BASE_URL?.replace(/\/$/,'') || '';
+ if(!live)await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const base=live || 'http://127.0.0.1:'+server.address().port+'/PDF-Editor1';
  const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
   const page=await browser.newPage({viewport:{width:1440,height:960},acceptDownloads:true});
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.status()>=400&&/\.m?js/.test(r.url()))errors.push('HTTP '+r.status()+' '+r.url())});
-  await page.goto('http://127.0.0.1:'+server.address().port+'/PDF-Editor1/pages.html');
+  await page.goto(base+'/pages.html');
   await page.waitForFunction(()=>window.PDFLib?.PDFDocument && window.pdfjsLib?.getDocument);
   const A=await fixture('ALPHA',3),B=await fixture('BRAVO',1);
   await page.locator('#files').setInputFiles([
@@ -119,7 +121,7 @@ async function run(){
   console.log('PASS: digitally signed original opens read-only and downloads byte-for-byte');
  }finally{
   await browser.close();
-  await new Promise(resolve=>server.close(resolve));
+  if(!live)await new Promise(resolve=>server.close(resolve));
  }
 }
 run().catch(e=>{console.error(e.stack);process.exitCode=1});
