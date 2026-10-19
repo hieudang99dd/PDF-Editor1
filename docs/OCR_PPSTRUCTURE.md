@@ -2,7 +2,7 @@
 
 ## Trạng thái
 
-Đã thêm API backend tùy chọn, **chưa kết nối nút OCR nâng cao trên GitHub Pages**. Chưa kiểm thử nhận dạng thực tế hoặc triển khai máy chủ. Không được ghi 'đã tích hợp hoàn chỉnh' khi chưa hoàn tất frontend, test và deployment.
+Đã thêm API backend tùy chọn, **đã nối nút OCR nâng cao trong `ocr.html` với backend localhost tùy chọn**. Chưa kiểm thử nhận dạng thực tế hoặc triển khai máy chủ. Không được ghi 'đã tích hợp hoàn chỉnh' khi chưa hoàn tất frontend, test và deployment.
 
 ## Cài đặt local
 
@@ -29,7 +29,7 @@ Gửi PDF/ảnh bằng `POST /api/ocr-structure` multipart `file`, `dpi=200`. K�
 ## Còn phải làm
 
 1. Cài môi trường Paddle thực tế, chạy test smoke với PDF scan Việt có bảng.
-2. Xây frontend lựa chọn engine và xử lý trạng thái, hủy tác vụ, xem trước.
+2. Hoàn thiện frontend: hiện có nút khởi chạy và hủy yêu cầu HTTP, nhưng chưa có xem trước kết quả và hủy inference phía server.
 3. Hợp nhất DOCX đa trang, bảo toàn cấu trúc hình ảnh/ô gộp, thêm xuất XLSX.
 4. Đo CER/WER và độ chính xác ô/bảng trên bộ dữ liệu thực tế.
 5. Chỉ phát hành tính năng khi có kết quả acceptance tests và xác minh an toàn.
