@@ -9,7 +9,11 @@ const {spawn}=require('node:child_process');const {chromium}=require('playwright
   browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE}:{}),args:['--no-sandbox'],...(proxy?{proxy:{server:proxy.protocol+'//'+proxy.host,username:decodeURIComponent(proxy.username),password:decodeURIComponent(proxy.password)}}:{})});
   const page=await browser.newPage({viewport:{width:1500,height:1100},acceptDownloads:true,ignoreHTTPSErrors:!!proxy});const errors=[],external=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().startsWith('http')&&!r.url().startsWith(base))external.push(r.url());});
-  await page.goto(base+'/index.html');await page.getByRole('button',{name:/Chèn chữ ký/}).click();await page.waitForURL('**/sign.html');
+  await page.goto(base+'/index.html');await page.getByRole('button',{name:/Chèn chữ ký/}).click();
+  await page.waitForFunction(()=>location.hash==='#workspace=sign');
+  await page.frameLocator('#unified-frame').locator('#file').waitFor({state:'attached'});
+  // Signing engine exercised directly, without changing its tested pointer coordinates.
+  await page.goto(base+'/sign.html');
   const pdf=await PDFLib.PDFDocument.create();for(let i=0;i<4;i++){const p=pdf.addPage([420,600]);p.setCropBox(30,40,360,520);p.setRotation(PDFLib.degrees(i*90));p.drawText('SIGNATURE TEST PAGE '+(i+1),{x:50,y:400,size:14});p.drawRectangle({x:60,y:200,width:60,height:40,color:PDFLib.rgb(.9,.5,.1)});}
   const field=pdf.getForm().createTextField('existing-field');field.setText('Preserve existing form');field.addToPage(pdf.getPage(0),{x:60,y:300,width:220,height:25});
   const source=await pdf.save();fs.writeFileSync(path.join(out,'source.pdf'),source);

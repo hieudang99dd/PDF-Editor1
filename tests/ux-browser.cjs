@@ -159,7 +159,10 @@ async function sample(label){
    // The new standalone route loads its own PDF, preview, zones and save workflow.
    await page.goto(address,{waitUntil:'domcontentloaded'});
    await page.locator('.tool').filter({hasText:'Xóa vector theo vùng'}).first().click();
-   await page.waitForURL('**/region-eraser.html');
+   await page.waitForFunction(()=>location.hash==='#workspace=region');
+   await page.frameLocator('#unified-frame').locator('#re-uploader').waitFor({state:'visible'});
+   // Validate engine internals directly after proving it is embedded in the unified shell.
+   await page.goto(address+'region-eraser.html',{waitUntil:'domcontentloaded'});
    await page.locator('#re-uploader').waitFor({state:'visible'});
    assert.ok(await page.locator('#re-dropzone').isVisible());
    await page.locator('#re-input').setInputFiles({
