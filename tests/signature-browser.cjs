@@ -51,6 +51,8 @@ const {spawn}=require('node:child_process');const {chromium}=require('playwright
   await page.locator('#download-source').click();
   await(await genericDownload).saveAs(path.join(out,'generic-preserved.docx'));
   assert.deepEqual(fs.readFileSync(path.join(out,'generic-preserved.docx')),Buffer.from('PK unsupported fixture'));
+  // Exit unsupported-file read-only mode before inspecting a separate certificate.
+  await page.locator('#reset').click();
   // Expired credentials never sign a document.
   await page.locator('#certificate').setInputFiles(path.join(out,'expired.p12'));await page.locator('#password').fill('test-password');await page.locator('#inspect').click();await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('hết hạn'));
   await page.locator('#reset').click();assert.equal(await page.locator('#certificate').inputValue(),'');
