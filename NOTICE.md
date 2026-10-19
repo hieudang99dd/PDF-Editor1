@@ -58,3 +58,12 @@ The browser-side algorithms in `cit-advanced-core.js` and their HVD UI adapter
 `bates-numbering-page.ts`, and `src/js/utils/pdf-operations.ts`.
 The code is integrated under the existing project's AGPL-3.0 license.
 Full feature matrix and limitations: `docs/PROCESSING_AND_QA.md`.
+
+## PaddleOCR browser OCR (2026-10-19)
+
+- Browser SDK: [PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR/tree/main/paddleocr-js), `@paddleocr/paddleocr-js` 0.4.2, Apache-2.0. The Apache license is retained in `vendor/paddleocr/LICENSE`.
+- ONNX models: PaddlePaddle official inference model distribution; model names, sizes and SHA-256 checksums are recorded in `vendor/paddleocr/manifest.json`.
+- Runtime dependencies: ONNX Runtime Web (MIT), OpenCV.js through `@techstark/opencv-js` (Apache-2.0), js-yaml (MIT), clipper-lib (BSL-1.0). Their notices remain in the generated bundles and `vendor/paddleocr/THIRD_PARTY_NOTICES.txt`.
+- PDF searchable-text integration is application code. OCR does not recover the original font from scanned images.
+
+Vietnamese refinement uses Tesseract.js 6.0.1 / tesseract.js-core 6.0.0 and [tessdata_fast](https://github.com/tesseract-ocr/tessdata_fast) `vie+eng` (Apache-2.0). Retained notices are bundled in `vendor/paddleocr/THIRD_PARTY_NOTICES.txt`.

@@ -247,3 +247,9 @@ Với mỗi file đầu ra: mở bằng **Chrome PDF viewer** và **một trình
 | Đặt/gỡ mật khẩu | Không với pdf-lib 1.17 | Cần thư viện khác (ví dụ qpdf-wasm); tạm gắn "Sắp ra mắt" |
 | Word/Excel/PPT ↔ PDF, PDF/A | Không đáng tin cậy | Gắn "Sắp ra mắt" |
 
+
+## 2026-10-19 — OCR browser implementation
+
+- [x] OCR riêng tại `ocr.html`, route trang chủ/Studio đồng bộ; không yêu cầu engine PC.
+- [x] PaddleOCR Worker + Tesseract kiểm tra dấu Việt tùy chọn, chọn trang, sửa dòng, hủy/chạy lại và xuất PDF tìm kiếm/TXT; tài sản cùng origin.
+- [x] Kiểm thử browser thật và PyMuPDF độc lập trên mẫu scan; xem `docs/OCR_BROWSER.md` về giới hạn và quy trình build/QA.

@@ -1,6 +1,6 @@
 # PDF EDITOR
 
-Bộ công cụ PDF EDITOR: sửa văn bản gốc, biên tập trang, chuyển đổi, kiểm tra chất lượng PDF và một số tác vụ Office/OCR qua engine PC tùy chọn. Trang chính triển khai bằng GitHub Pages, dữ liệu PDF trên các công cụ browser không tự tải lên dịch vụ cloud.
+Bộ công cụ PDF EDITOR: sửa văn bản gốc, biên tập trang, chuyển đổi, kiểm tra chất lượng PDF OCR trên trình duyệt và các tác vụ Office qua engine PC tùy chọn. Trang chính triển khai bằng GitHub Pages, dữ liệu PDF trên các công cụ browser không tự tải lên dịch vụ cloud.
 
 **Truy cập:** https://hieudang99dd.github.io/PDF-Editor-Hdv/
 
@@ -13,7 +13,8 @@ Bộ công cụ PDF EDITOR: sửa văn bản gốc, biên tập trang, chuyển 
 | Trình sửa PDF EDITOR dự phòng | `text-editor-hdv.html` | `organizer.js/css`, `text-editor-shell.js/css`, `pdf-native-*.mjs`, `pdf-text-layout.js` |
 | Xóa vector theo vùng độc lập | `region-eraser.html` | `region-eraser.js/css`, `pdf-region-geometry.mjs`, `pdf-region-client/worker/native.mjs` |
 | Kiểm tra chất lượng PDF | `pdfium-preflight.html` | `pdfium-preflight-core.mjs`, `pdfium-preflight-worker.mjs` |
-| Xử lý Office/OCR bằng PC | `backend/` | FastAPI localhost; chỉ cần chạy cho các thao tác có ghi chú cần PC |
+| OCR trên trình duyệt | `ocr.html` (Studio OCR chuyển về cùng route) | PaddleOCR.js Worker + kiểm tra dấu Việt bằng Tesseract tùy chọn |
+| Xử lý Office/OCR bằng PC (dự phòng) | `backend/` | FastAPI localhost; chỉ cần chạy cho các thao tác có ghi chú cần PC |
 
 **Không gộp cưỡng bức** core, UI adapter, worker, font, WASM hoặc các JavaScript chunk chỉ vì chúng có tên gần giống nhau: các thành phần có runtime và vòng đời riêng. `studio/` là **artifact của bản build đầy đủ**, không phải tệp rác. Tham chiếu mã nguồn ngoài, font và thông báo bản quyền nằm trong `NOTICE.md` và `LICENSE`.
 
@@ -29,6 +30,8 @@ Bộ công cụ PDF EDITOR: sửa văn bản gốc, biên tập trang, chuyển 
 - [Xóa vector theo vùng bằng PDFium: thuật toán, giao diện, giới hạn và kiểm thử](docs/REGION_ERASER.md).
 - [Thông tin nguồn/giấy phép](NOTICE.md).
 - [Engine Office/OCR cục bộ](backend/README.md).
+
+OCR: xem [quy trình, engine và giới hạn](docs/OCR_BROWSER.md).
 
 ## Kiểm thử
 

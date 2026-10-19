@@ -1,0 +1,62 @@
+name: PaddleOCR browser acceptance and runtime
+on:
+  push:
+    branches: [master, 'codex/paddle-ocr']
+    paths:
+      - 'pdf-ocr*'
+      - 'ocr.html'
+      - 'scripts/paddleocr/**'
+      - 'vendor/paddleocr/manifest.json'
+      - 'tests/paddle-ocr*'
+      - '.github/workflows/paddle-ocr.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: paddle-ocr-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ocr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/paddleocr/package-lock.json
+      - name: Install pinned SDK and build self-hosted runtime
+        working-directory: scripts/paddleocr
+        run: npm ci --no-audit --no-fund && node build.mjs
+      - name: Install Chromium
+        working-directory: scripts/paddleocr
+        run: npx playwright install --with-deps chromium
+      - name: Static and regression tests
+        run: |
+          node --check pdf-ocr.mjs
+          node --check pdf-ocr-core.mjs
+          node --test tests/*.test.cjs
+      - name: Real OCR and searchable PDF acceptance
+        env:
+          NODE_PATH: ${{ github.workspace }}/scripts/paddleocr/node_modules
+        run: node tests/paddle-ocr-browser.cjs
+      - name: Publish tested runtime without overwriting concurrent changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add vendor/paddleocr
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'build(ocr): publish validated PaddleOCR browser runtime'
+          git fetch origin "${GITHUB_REF_NAME}"
+          test "$(git rev-parse "origin/${GITHUB_REF_NAME}")" = "$(git rev-parse HEAD^)"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paddle-ocr-browser-evidence
+          path: test-results/paddle-ocr/

@@ -1,0 +1,67 @@
+{
+  "sdk": "@paddleocr/paddleocr-js@0.4.2",
+  "onnxruntime": "1.24.3",
+  "models": [
+    "PP-OCRv6_small_det",
+    "PP-OCRv6_small_rec"
+  ],
+  "vietnamese_refinement": "tesseract.js@6.0.1 / core@6.0.0 / tessdata_fast vie+eng",
+  "files": {
+    "LICENSE": {
+      "size": 11376,
+      "sha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e"
+    },
+    "THIRD_PARTY_NOTICES.txt": {
+      "size": 35390,
+      "sha256": "5eb951aea84b527fe301876cb2cb1b429182d11ea93cb4520eaee7888523b862"
+    },
+    "assets/worker-entry-C9UNuyOJ.js": {
+      "size": 11341486,
+      "sha256": "477db3f009c118823a5f9ebe15f1e96c1c464165715ba28a9884290f61addf52"
+    },
+    "det.tar": {
+      "size": 9891840,
+      "sha256": "d218f6fbf0f1c23d2161bd6ac7f5eaa6104fa89955c09290497e31008e2618e4"
+    },
+    "index.mjs": {
+      "size": 10486508,
+      "sha256": "bdcfee093f44155654bb975cc5d20f70d0924bad8348bd6f28443928046c889f"
+    },
+    "ort/ort-wasm-simd-threaded.jsep.mjs": {
+      "size": 46595,
+      "sha256": "9a99acd12acc495184c9ea4d458ac9424f8180aacfbc7b8371ed64f9351e4a81"
+    },
+    "ort/ort-wasm-simd-threaded.jsep.wasm": {
+      "size": 25014754,
+      "sha256": "2e0a3d0e3f6b7c13ecfaba38c13691fd19c9ed470e72f9d7d8416ca59ab6dbcd"
+    },
+    "rec.tar": {
+      "size": 21319680,
+      "sha256": "d267ab077a44a0eedb1ea8f8c542d263f211de8e9d7a029bf9fcfff7e5a88fb1"
+    },
+    "tesseract/lang/eng.traineddata": {
+      "size": 4113088,
+      "sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+    },
+    "tesseract/lang/vie.traineddata": {
+      "size": 531275,
+      "sha256": "79df64caf7bcfb2a27df5042ecb6121e196eada34da774956995747636d5bfa1"
+    },
+    "tesseract/tesseract-core-simd-lstm.wasm": {
+      "size": 2871377,
+      "sha256": "187d76742dfc0d8929f0b49a619f145bb6370730776c7bd0d3e20c6b2098808d"
+    },
+    "tesseract/tesseract-core-simd-lstm.wasm.js": {
+      "size": 3954569,
+      "sha256": "9d7c43fb206dc9f48475228b46bf35f888fa9e6259da2e67d5a75c77049f2dc7"
+    },
+    "tesseract/tesseract.mjs": {
+      "size": 63220,
+      "sha256": "da6267cfe5036ae718a59eece3b5744a4655b0b8faa9f16259362b783d74c9bb"
+    },
+    "tesseract/worker.min.js": {
+      "size": 111162,
+      "sha256": "38645599043239c0eb6db08a6504a92dcdc292200535f3e9339cd77c4443b842"
+    }
+  }
+}

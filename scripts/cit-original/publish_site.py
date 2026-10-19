@@ -63,6 +63,14 @@ shutil.copytree(upstream_dist, cit_dir)
 for name in ("hvd-hub.js", "hvd-hub.css", "hvd-mark.svg"):
     shutil.copy2(root / "scripts" / "cit-original" / name, cit_dir / name)
 brand_frontend(cit_dir)
+# Keep the canonical browser OCR workspace when rebuilding all Studio routes.
+ocr_redirect = root / "studio" / "ocr-pdf.html"
+if ocr_redirect.is_file():
+    shutil.copy2(ocr_redirect, cit_dir / "ocr-pdf.html")
+    compressed = ocr_redirect.with_suffix(".html.br")
+    if compressed.is_file():
+        shutil.copy2(compressed, cit_dir / "ocr-pdf.html.br")
+
 (dest / ".nojekyll").write_text("", encoding="utf-8")
 
 target = "./studio/edit-pdf-text.html"

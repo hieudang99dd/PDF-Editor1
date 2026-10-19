@@ -39,7 +39,8 @@ test('16 catalog definitions, original registry immutable, unsupported tools hid
  assert.deepEqual(data,h.saved);
  assert.match(h.html(),/Nén PDF/);
  assert.match(h.html(),/Quản lý trang PDF/);
- assert.match(h.html(),/Cần ứng dụng PC/);
+ assert.match(h.html(),/Nhận dạng chữ scan ngay trên trình duyệt/);
+ assert.doesNotMatch(h.html(),/Cần ứng dụng PC/);
  assert.doesNotMatch(h.html(),/PDF sang PDF\/A|Chia sẻ PDF|Chưa hỗ trợ/);
  h.click('[data-group-key]',{groupKey:'pages'});
  assert.match(h.html(),/data-target-tool="7"/);
@@ -63,7 +64,7 @@ test('CIT route and editor engine stay unmodified',()=>{
  assert.match(cit,/for\(const t of tools\)if\(!existing\.has\(t\[0\]\)\)T\.push\(t\)/);
  assert.match(cit,/home\(\);\s*\}\)\(\);/);
  assert.doesNotMatch(ui,/T\.push\(|T\[[^\]]+\]\s*=/);
- assert.match(html,/hvd-ui-v2\.js\?v=20261016-dao1/);
+ assert.match(html,/hvd-ui-v2\.js\?v=20261019-ocr1/);
  assert.match(html,/hvd-ui-v2\.css\?v=20261016-dao1/);
 });
 test('catalog icon and featured text tile use explicit centered, responsive layout',()=>{

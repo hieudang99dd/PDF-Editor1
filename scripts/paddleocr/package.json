@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@paddleocr/paddleocr-js": "0.4.2",
+    "esbuild": "0.25.12",
+    "onnxruntime-web": "1.24.3",
+    "playwright": "1.57.0",
+    "tesseract.js": "6.0.1",
+    "tesseract.js-core": "6.0.0"
+  }
+}

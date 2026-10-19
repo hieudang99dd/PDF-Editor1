@@ -390,3 +390,11 @@ GitHub Pages chỉ chạy frontend tĩnh. Office/Tesseract/LibreOffice chạy na
 - Đổi chữ trên biểu tượng nhãn hiệu từ “Đ” sang “P”; đổi phiên bản assets nhận diện `20261016-editor1` và Service Worker sang `pdf-editor-v14`, đồng thời xóa cache tên cũ khi kích hoạt.
 - Giữ URL đang phát hành `https://hieudang99dd.github.io/PDF-Editor1/`, không đổi tên repository, không thay đổi engine PDFium/cit-pdf, đường đi của tác vụ, `NOTICE.md` hoặc `LICENSE`.
 - Cập nhật smoke tests và CI mô phỏng sửa/xuất PDF để không hồi quy về thương hiệu trước. Các tài liệu nhật ký cũ có thể nhắc tên trước đây như ghi chép lịch sử.
+
+## 2026-10-19 — Browser OCR: PaddleOCR and Vietnamese refinement
+
+- Added `ocr.html`, `pdf-ocr.mjs/css`, `pdf-ocr-core.mjs`; homepage OCR and Studio OCR share this route instead of requiring localhost.
+- PaddleOCR.js 0.4.2 / PP-OCRv6 small runs in a dedicated Worker with same-origin model/WASM assets. Added default opt-in-visible Tesseract `vie+eng` refinement after real tests exposed missing Vietnamese tone characters in Paddle model dictionaries.
+- Added page ranges, DPI controls, skip-native-text, progress/cancel/retry, editable per-line results, confidence polygons and PDF/TXT export. Searchable PDF retains original page contents, uses invisible embedded Unicode text, and maps coordinates through PDF.js viewport.
+- Local real browser acceptance passed on synthetic Vietnamese scan, cancel/retry, native/out-of-range pages, correction/export and zero changed rendered pixels. Independent PyMuPDF confirmed Unicode extraction and unchanged pixels. Regression initially 218 pass / 2 skip; final validation recorded by CI.
+- Added pinned rebuild script, vendor manifest/licenses, browser acceptance workflow and `docs/OCR_BROWSER.md`. Large/cropped/rotated coordinate math has unit coverage; no claim of perfect OCR on all engineering drawings. Final deployment requires successful runtime build and Pages verification.

@@ -76,7 +76,7 @@ footer{padding:24px 5vw;color:var(--mute);font-size:13px;text-align:center}
 <main id="home">
   <section class="hero">
     <h1>Xử lý PDF dễ hơn, chỉ vài thao tác.</h1>
-    <p>Nén, chuyển đổi, ghép, chỉnh sửa và ký tài liệu. Các công cụ cơ bản chạy trên web; OCR và Office cần engine cục bộ trên PC.</p>
+    <p>Nén, chuyển đổi, ghép, chỉnh sửa và ký tài liệu. Các công cụ cơ bản chạy trên web; OCR chạy trên trình duyệt; chuyển đổi Office cần engine cục bộ trên PC.</p>
     <div class="search"><input id="q" type="search" placeholder="Tìm công cụ, ví dụ: nén, Word, ký…" aria-label="Tìm công cụ"></div>
   </section>
   <div class="wrap"><div class="chips" id="chips"></div><div id="tools"></div></div>
@@ -103,7 +103,7 @@ const $=s=>document.querySelector(s),C={'Nén':'#e8453c','Chuyển đổi':'#2f6
 const T=[
 ['Giảm dung lượng PDF','Giảm kích cỡ tệp mà vẫn giữ chất lượng','Nén','⇲','compress','.pdf'],
 ['Chuyển đổi PDF','Đổi PDF sang nhiều định dạng khác','Chuyển đổi','⇄','fmt','.pdf'],
-['PDF OCR','Nhận dạng chữ trên bản quét thành văn bản','Chuyển đổi','OCR','lang','.pdf'],
+['PDF OCR','Nhận dạng chữ trên bản quét thành văn bản','Chuyển đổi','OCR','paddle-ocr-route','.pdf'],
 ['PDF sang PDF/A','Chuẩn lưu trữ lâu dài','Chuyển đổi','A','none','.pdf'],
 ['PDF sang JPG','Tách mỗi trang thành ảnh JPG chất lượng cao','Chuyển đổi','JPG','pdf2jpg','.pdf'],
 ['PDF sang PNG','Tách mỗi trang thành ảnh PNG không nền mờ','Chuyển đổi','PNG','pdf2png','.pdf'],
@@ -168,8 +168,8 @@ function home(){const q=$('#q').value.trim().toLowerCase();
  let h='';for(const c of Object.keys(C)){if(cat!='Tất cả'&&cat!=c)continue;
   const l=T.map((t,i)=>[t,i]).filter(([t])=>t[2]==c&&(t[0]+t[1]).toLowerCase().includes(q));if(!l.length)continue;
   h+=`<h2 class="cat">${c}</h2><div class="grid">`+l.map(([t,i])=>{
-   const isSim = !(t[4].startsWith('cit-') || t[4].startsWith('pdfium-') || ['merge', 'range', 'rot', 'organize', 'region-eraser-route', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'sign', 'flatten'].includes(t[4]) || ['Giảm dung lượng PDF','Chuyển đổi PDF','PDF OCR','PDF sang Word','PDF sang TXT','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF'].includes(t[0]));
-   const needsPC = ['PDF OCR','PDF sang Word','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF'].includes(t[0]);
+   const isSim = !(t[4].startsWith('cit-') || t[4].startsWith('pdfium-') || ['paddle-ocr-route', 'merge', 'range', 'rot', 'organize', 'region-eraser-route', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'sign', 'flatten'].includes(t[4]) || ['Giảm dung lượng PDF','Chuyển đổi PDF','PDF OCR','PDF sang Word','PDF sang TXT','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF'].includes(t[0]));
+   const needsPC = ['PDF sang Word','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF'].includes(t[0]);
    const hybrid = t[0] === 'Chuyển đổi PDF';
    const badge = isSim ? `<span style="font-size:10px; background:var(--line); color:var(--mute); padding:2px 6px; border-radius:4px; align-self:center">Sắp ra mắt</span>` :
     needsPC ? `<span style="font-size:10px; background:var(--line); color:var(--mute); padding:2px 6px; border-radius:4px; align-self:center">Cần engine PC</span>` :
@@ -200,6 +200,7 @@ const OPT={
  none:''};
 function openTool(i, restore=false){
  if(!Number.isInteger(i)||!T[i])return;
+ if(T[i]?.[4]==='paddle-ocr-route'){location.href='./ocr.html';return;}
  if(T[i]?.[4]==='cit-text-route'){location.href='./text-editor.html';return;}
  if(T[i]?.[4]==='region-eraser-route'){location.href='./region-eraser.html';return;}
  if(T[i]?.[4]==='pdfium-inspect-route'){location.href='./pdfium-preflight.html';return;}
@@ -637,7 +638,7 @@ async function run(){
   return;
  }
 
- if(!['merge', 'range', 'rot', 'organize', 'qr', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'sign', 'flatten'].includes(k)) {
+ if(!['paddle-ocr-route', 'merge', 'range', 'rot', 'organize', 'qr', 'img', 'pdf2jpg', 'pdf2png', 'wm', 'pnum', 'sign', 'flatten'].includes(k)) {
   $('#out').innerHTML=`<div class="res"><b>Tính năng sắp ra mắt</b><p style="margin:4px 0 0;font-size:13px;color:var(--mute)">Công cụ này đang được phát triển và sẽ sớm có mặt. Xin cảm ơn!</p></div>`;
   b.disabled=false;
   return;
@@ -717,7 +718,7 @@ document.addEventListener('click',e=>{
 });
 $('#q').oninput=home;home();
 </script>
-<script src="hvd-ui-v2.js?v=20261016-dao1"></script>
+<script src="hvd-ui-v2.js?v=20261019-ocr1"></script>
 <script src="pdf-lib.min.js"></script>
 <script>if(!window.PDFLib){document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');}</script>
 <script src="pdf.min.js"></script>
