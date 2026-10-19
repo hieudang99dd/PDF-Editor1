@@ -30,6 +30,8 @@ async function clearReview(){
  el('approved').checked=false;el('approved').disabled=true;el('review').hidden=true;
  if(outputUrl){URL.revokeObjectURL(outputUrl);outputUrl=null}
  const doc=outputJs;outputJs=null;
+ // Immediately revoke export buttons before any asynchronous PDF.js cleanup.
+ updateControls();
  if(doc){try{await doc.destroy()}catch{}}
  updateControls();
 }
