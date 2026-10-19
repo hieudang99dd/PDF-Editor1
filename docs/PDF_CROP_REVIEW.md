@@ -34,3 +34,10 @@ Ngày 2026-10-19. Trang độc lập: `crop.html`. Khởi chạy từ thẻ **C�
 - CI: `.github/workflows/pdf-crop-qa.yml`; lưu ảnh so sánh vào artifact `pdf-crop-review-evidence` trên CI.
 
 Giới hạn QA: mặc dù unit có trang xoay + non-zero CropBox, cần thêm tài liệu sản xuất thực tế khổ A0/A1 có CAD linework mảnh, bảng ký, page geometry lạ, conformance.
+
+
+## 2026-10-19 — Một giao diện chính và kiểm soát trạng thái xuất
+- Truy cập chính: `index.html#workspace=crop`; thẻ danh mục dùng route ổn định `data-pdf-route="crop"`, bỏ phụ thuộc vào số thứ tự công cụ trong danh sách cũ.
+- Layout hai cột của `crop.html?embedded=1` được hiển thị trong shell, không lặp header. Thanh hành động Apply / Review / Export chỉ có ở shell khi nhúng.
+- Cầu nối `postMessage` cùng origin chuyển lệnh thao tác và trạng thái nút thực. Engine kiểm tra lệnh ở cả hai đầu; nút Xuất chỉ hoạt động khi kết quả đã review và checkbox được xác nhận. Mọi chỉnh sửa vùng chọn thu hồi phê duyệt ngay.
+- QA tự động: `tests/pdf-crop-browser.cjs` kiểm tra trực tiếp thẻ Cắt lề từ danh mục, bố cục sidebar/preview, tạo PDF đầu ra và khóa nút sau khi sửa lại.

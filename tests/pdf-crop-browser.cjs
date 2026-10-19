@@ -82,9 +82,7 @@ async function fixture(){
   // one integrated toolbar and retain real Apply -> Review -> Export gates.
   await page.goto(base.replace('/crop.html','/index.html'),{waitUntil:'domcontentloaded'});
   await page.locator('button.catalog-tile').filter({hasText:'Cắt lề PDF'}).first().click();
-  await page.waitForTimeout(500);
-  console.log('CROP_SHELL_DIAG',JSON.stringify({url:page.url(),errors,shell:await page.evaluate(()=>({hasApi:!!window.PDFEditorUnified,hidden:document.getElementById('unified-ws')?.hidden,hash:location.hash,bar:!!document.getElementById('unified-crop-bar')}))}));
-  await page.waitForFunction(()=>location.hash==='#workspace=crop',{timeout:10000});
+  await page.waitForFunction(()=>location.hash==='#workspace=crop',{timeout:15000});
   assert.equal(await page.locator('#unified-ws').isVisible(),true);
   assert.equal(await page.locator('#crop-host-export').isDisabled(),true);
   const crop=page.frameLocator('#unified-frame');

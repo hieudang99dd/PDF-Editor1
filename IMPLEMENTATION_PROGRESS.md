@@ -541,3 +541,11 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Khi iframe, `pdf-editor-workspace.js` không dựng thanh menu trùng; liên kết về trang chủ/công cụ gửi sự kiện nội bộ có kiểm tra origin tới shell. Sửa tương tự `studio/hvd-hub.js`.
 - Không xóa PDF.js/PDFium/PP-Structure hoặc trang runtime vì đang là dependency. Đã nghỉ dùng các UI độc lập ở mức luồng chính; giữ làm compatibility entrypoints. OCR PP-StructureV3 và Office vẫn cần backend riêng.
 - Bổ sung test link cũ, chuyển tab và về danh mục trong Chromium.
+
+
+### 2026-10-19 — Chuẩn hóa giao diện Cắt lề PDF ngay trong PDF-Editor1
+- Sửa tuyến thẻ trong `hvd-ui-v2.js`: dùng `data-pdf-route="crop"`, bắt click sớm trước bộ định tuyến cũ; không còn mở workspace `#hvd-tool=28`.
+- `index.html#workspace=crop` là URL làm việc chính: thanh chung trình bày 4 bước **Chọn vùng → Áp dụng → Review → Xuất**. Nút Xuất ở shell chỉ bật khi engine đã render kết quả và người dùng tick xác nhận.
+- `crop.html?embedded=1` không còn header riêng; bố cục thao tác trái, khung PDF phải, nhật ký và review trước/sau phía dưới. Tự cập nhật chiều cao iframe qua `ResizeObserver` và origin-validated message.
+- Bảo toàn thuật toán gốc trong `pdf-crop.mjs` (CropBox vector, đa trang, phát hiện PDF ký số, điều khiển điểm/cạnh); `crop.html` độc lập còn giữ làm đường dẫn tương thích, không là giao diện làm việc chính.
+- Kiểm thử PDF hai trang thật, lựa chọn vùng, review, phê duyệt, tải xuống từ nút trên trang chủ: **đạt**, GitHub Actions `39234617346`. Kiểm thử UX Chromium trên catalog: **đạt** `39234759206`. Xác nhận phát hành qua GitHub Pages theo workflow mới nhất.
