@@ -2,7 +2,7 @@ name: Browser signature and cryptographic verification
 on:
   push:
     branches: [master, 'codex/signature']
-    paths: ['pdf-sign*', 'sign.html', 'index.html', 'hvd-ui-v2.js', 'cit-advanced-ui.js', 'scripts/signature/**', 'vendor/signature/**', 'tests/signature*', '.github/workflows/signature.yml']
+    paths: ['pdf-sign*', 'sign.html', 'index.html', 'hvd-ui-v2.js', 'cit-advanced-ui.js', 'scripts/signature/**', 'vendor/signature/**', 'tests/signature*', 'tests/home-layout.test.cjs', '.github/workflows/signature.yml']
   workflow_dispatch:
 permissions:
   contents: read
