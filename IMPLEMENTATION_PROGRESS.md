@@ -527,3 +527,9 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Giữ thẻ Thuộc tính PDF và thẻ Ghép PDF riêng ngoài danh mục (ghép đã nằm trong Quản lý trang).
 - Cập nhật README từ website cũ sang `https://hieudang99dd.github.io/PDF-Editor1/index.html`; thêm kiểm thử định tuyến tại `tests/pdf-editor-integration.test.cjs`.
 - Không tuyên bố engine backend PP-StructureV3/Office đã chạy ngay trên web tĩnh; chúng vẫn tùy chọn hoặc cần chạy backend.
+
+### 2026-10-19 — Sửa liên kết giao diện cũ (#hvd-tool=28)
+- URL cũ `index.html?v=20261019-suite1#hvd-tool=28` mã hóa Cắt lề PDF bằng index 28, không phải URL mới của trình cắt lề.
+- `index.html` chuyển hướng trực tiếp ngay ở phần head cho các nhóm chuyên dụng: Cắt lề `crop.html`, Quản lý trang `pages.html`, OCR `ocr.html`, Chuyển đổi `convert.html`, Sửa Text và các công cụ riêng. Giữ mã 0 cho Nén PDF chạy trong trang chủ.
+- Asset danh mục được đổi version thành `hvd-ui-v2.js?v=20261019-legacyfix2`.
+- Thêm kiểm thử Chromium với chính đường dẫn cũ có `utm_source` và `#hvd-tool=28`; phải tới màn hình cắt lề có Review trước khi xuất, không mở workspace cũ.

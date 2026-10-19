@@ -58,6 +58,14 @@ async function sample(label){
    page.on('pageerror',e=>failures.push(e.message));
    let acceptDialogs=true;
    page.on('dialog',dialog=>acceptDialogs?dialog.accept():dialog.dismiss());
+   // The original link #hvd-tool=28 must open the new reviewed crop editor.
+   await page.goto(address+'index.html?v=20261019-suite1&utm_source=chatgpt.com#hvd-tool=28',
+     {waitUntil:'domcontentloaded'});
+   await page.waitForURL('**/crop.html',{timeout:15000});
+   assert.equal(new URL(page.url()).hash,'');
+   assert.equal(await page.locator('#crop-rectangle').count(),1);
+   assert.equal(await page.locator('#review').count(),1);
+   await page.locator('#pdfeditor-workspace-nav').waitFor({state:'visible'});
    await page.goto(address,{waitUntil:'domcontentloaded'});
    // The dedicated merge card was removed at user request; page manager retains merge.
    // Test binary download + in-place reset with the still-supported numbering tool.

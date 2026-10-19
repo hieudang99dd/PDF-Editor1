@@ -25,7 +25,12 @@ test('the PDF EDITOR homepage is a single entry point for the updated workflows'
  for(const part of ["'crop-route'","'paddle-ocr-route'","'pages-route'","'universal-route'","'signature-route'","'region-eraser-route'"]){
   assert.ok(home.includes(part),'Missing route '+part);
  }
- assert.match(home,/hvd-ui-v2\.js\?v=20261019-suite1/);
+ assert.match(home,/hvd-ui-v2\.js\?v=20261019-legacyfix2/);
+ const head=home.split('</head>')[0];
+ assert.match(head,/#hvd-tool=/);
+ assert.match(head,/28:'crop\.html'/);
+ assert.match(head,/14:'pages\.html'/);
+ assert.match(head,/location\.replace\(new URL/);
  assert.match(ui,/\['pages','Tổ chức','Quản lý trang PDF'/);
  assert.match(ui,/\['crop','Tổ chức','Cắt lề PDF'/);
  assert.match(ui,/\['convert','Chuyển đổi','Chuyển đổi định dạng tệp'/);

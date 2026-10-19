@@ -4,6 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>PDF EDITOR – Công cụ PDF và trình chỉnh sửa văn bản</title>
+<script>
+/* Legacy numeric links: redirect before the historic workspace renders. */
+(() => {
+ const hit=/^#hvd-tool=([0-9]+)$/.exec(location.hash);
+ if(!hit)return;
+ const path=({
+  1:'convert.html',2:'ocr.html',4:'convert.html',5:'convert.html',6:'convert.html',
+  7:'convert.html',8:'convert.html',9:'convert.html',10:'convert.html',11:'convert.html',
+  12:'convert.html',13:'convert.html',
+  14:'pages.html',15:'pages.html',16:'pages.html',17:'pages.html',
+  18:'pages.html',19:'pages.html',20:'pages.html',
+  21:'text-editor.html',23:'region-eraser.html',25:'pdfium-preflight.html',
+  28:'crop.html',34:'sign.html'
+ })[hit[1]];
+ if(path)location.replace(new URL('./'+path,location.href).href);
+})();
+</script>
 <style>
 :root{--bg:#f6f7fb;--card:#fff;--ink:#1a1f36;--mute:#667085;--line:#e1e5ee;--acc:#e8453c;--accs:#fdeceb;--navy:#1a1f36;--ok:#1f9d55;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1220;--card:#181c2f;--ink:#eceef8;--mute:#9aa1bd;--line:#2a3050;--acc:#ff6a61;--accs:#3a1f27;--navy:#090b16}}
@@ -723,7 +740,7 @@ document.addEventListener('click',e=>{
 });
 $('#q').oninput=home;home();
 </script>
-<script src="hvd-ui-v2.js?v=20261019-suite1"></script>
+<script src="hvd-ui-v2.js?v=20261019-legacyfix2"></script>
 <script src="pdf-lib.min.js"></script>
 <script>if(!window.PDFLib){document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');}</script>
 <script src="pdf.min.js"></script>
