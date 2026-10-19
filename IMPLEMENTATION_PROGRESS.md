@@ -411,3 +411,9 @@ GitHub Pages chỉ chạy frontend tĩnh. Office/Tesseract/LibreOffice chạy na
 - Embed four Noto Sans fonts with reversible OOXML obfuscation, NFC Unicode and font relationships. This is a Vietnamese-capable replacement font, not recovery of an unknown scan font.
 - Browser QA covers a native table and the same table as a scan, Unicode corrections and PDF/TXT/DOCX downloads. Local LibreOffice render was inspected page by page; independent PyMuPDF verifies pagination, Vietnamese, a single-line title and retained graphics. Added geometry/merge/font tests and `.github/workflows/ocr-word.yml`.
 - Output is editable text boxes plus real tables; borderless/skewed/unclear tables and exact source font recovery are not claimed. Publication status is confirmed after CI/Pages.
+
+### Editable Word publication verified — 2026-10-19
+
+- Release: `dfce85ab612d3bad8047720c0f5d2f51bbd7e3d8`. Word acceptance run `39190058047` (branch) and `39190219048` (master): success. Pages build/deployment `39190218655`: success.
+- Direct live browser acceptance passed on `https://hieudang99dd.github.io/PDF-Editor1/ocr.html`: PDF/TXT/DOCX download, corrected Unicode, three Word sections, two editable ruled tables (native and scan), four embedded fonts, original PDF rendering unchanged, page range respected and no external document upload.
+- Local Node regression: 222 passed, 2 skipped. Three rendered Word pages were inspected; independent font-byte, Unicode, pagination, graphic and visible table-border checks passed. Complex/source-specific layout and recognition limitations remain documented.
