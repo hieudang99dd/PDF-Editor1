@@ -46,3 +46,11 @@ Không log hoặc lưu khóa/mật khẩu trong localStorage/IndexedDB/server. W
 - OpenSSL độc lập: xác minh CMS detached trên đúng ByteRange của toàn PDF, kiểm tra metadata Việt; sửa dữ liệu phải xác minh thất bại. Dùng `-noverify` để tách kiểm tra chữ ký khỏi tin cậy CA; không báo chứng thư tự ký là chứng thư tin cậy.
 - Chứng thư QA được sinh tạm trong `test-results/signature/`, không commit; CI chỉ tải PDF/PNG/JSON kiểm chứng, không tải khóa/chứng thư riêng.
 - Workflow: `.github/workflows/signature.yml`. Chưa có chứng thư thật của người dùng hoặc kiểm thử Microsoft Acrobat/USB Token trên Windows.
+
+## Trạng thái phát hành — 2026-10-19
+
+- Nhánh phát triển `codex/signature` đã được fast-forward vào `master`, commit `fa7dfc4ad82e45b87b5e7739de6d2c2c6b85d86a`, không sửa lịch sử cũ.
+- Chạy thành công bộ kiểm thử mã nguồn/ký số/browser trên nhánh thử nghiệm ([39194936345](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39194936345)) và khi đưa lên `master` ([39195292511](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195292511)). GitHub Pages ([39195291882](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195291882)), Pages smoke ([39195292503](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195292503)) và UX Chrome ([39195292445](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195292445)) đều đạt.
+- Route công khai: [PDF EDITOR – Chữ ký](https://hieudang99dd.github.io/PDF-Editor1/sign.html).
+- Bổ sung workflow `.github/workflows/signature-live.yml` để nghiệm thu bằng Chromium và OpenSSL **trực tiếp trên GitHub Pages** sau triển khai; kết quả từng lượt phải tham khảo CI, không suy diễn chỉ từ kiểm thử local.
+- Chưa hỗ trợ ký số bằng USB Token/PKCS#11, SmartCA, HSM, TSA, OCSP/CRL hay ký nối tiếp trên tài liệu đã có chữ ký. Chưa nghiệm thu chứng thư thương mại thực tế trên Acrobat.

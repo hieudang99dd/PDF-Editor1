@@ -1,5 +1,8 @@
 name: PDF EDITOR live signature release acceptance
 on:
+  push:
+    branches: [master]
+    paths: ['.github/workflows/signature-live.yml']
   workflow_run:
     workflows: ["pages build and deployment"]
     types: [completed]
