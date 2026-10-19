@@ -498,3 +498,11 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Bắt buộc **Áp dụng & kiểm tra** trước khi **Xuất kết quả**. Copy PDF page content bằng pdf-lib, không raster toàn trang; kiểm số trang và MediaBox. PDF đã ký số chỉ cho tải lại bản gốc nguyên byte, không chỉnh/sắp xếp phá chữ ký.
 - Trang chủ thêm nút `Quản lý trang PDF` và dẫn các công cụ Sắp xếp / Ghép / Xoay / Xóa / Tách / Trích xuất vào chung một giao diện. Route Studio `organize-pdf.html` và `pdf-multi-tool.html` được chuyển về `../pages.html`, vẫn giữ mã nguồn organizer.js cho chỉnh sửa/ghi chú.
 - Nghiệm thu với `tests/pdf-pages.test.cjs`, `tests/pdf-pages-browser.cjs`, `.github/workflows/pdf-pages-qa.yml`: PDF nhiều nguồn, text, nét vector, khổ giấy/rotation, thumbnail, bố cục, mốc tách/ZIP, chữ ký số và nguyên-byte. Xem thêm `docs/PDF_PAGE_MANAGEMENT.md` về hạn chế bookmark, form, XFA, PDF tags và tài liệu pháp lý.
+
+### Nghiệm thu website quản lý trang PDF — 2026-10-19
+
+- [Page manager CI 39216815297](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39216815297): **SUCCESS** cho Chromium trang 4 + 2 nguồn PDF, nhập số trang, 3 chế độ dàn trang, xoay, chọn theo range, undo/redo, nhân đôi, split marker, trích xuất/xuất, bảo vệ chữ ký số.
+- [Browser live QA 39216880318](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39216880318): **SUCCESS**, kiểm trên trang công khai GitHub Pages với dữ liệu PDF thật do bộ test tạo. Kiểm tiếp ZIP gồm 2 PDF độc lập sau mốc tách; PyMuPDF xác nhận 6 trang và nội dung chữ, nét vector. Chữ ký số được tải lại đúng từng byte, không sửa.
+- [Pages deploy 39216880185](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39216880185): **SUCCESS**. Link thao tác `https://hieudang99dd.github.io/PDF-Editor1/pages.html`. Bản cache assets `20261019-pages2`.
+- Các thuật toán đã được triển khai là PDF.js thumbnail, PDF-LIB copy pages + rotation + verify và JSZip split. Stirling-PDF, PDFsam, PDF Arranger và các chức năng n-up, booklet, split theo bookmark/size vẫn là tài liệu tham khảo/backlog, **không được báo đã tích hợp nguyên repo**.
+- Giới hạn: `pdf-lib.copyPages` không bảo đảm giữ metadata nâng cao (bookmarks, XFA, outline, named destinations); phải dùng hồ sơ thực tế A0/A1, 100–1000 trang để nghiệm thu toàn diện.
