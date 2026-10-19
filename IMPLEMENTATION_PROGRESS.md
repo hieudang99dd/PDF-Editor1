@@ -459,3 +459,11 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 
 - Bỏ bộ lọc `accept` cố định của input. Tệp không phải PDF/ảnh vẫn được nhận vào phiên, hiển thị thông báo chưa thể xem/ký và cung cấp nút tải lại **đúng byte**, không đưa tệp nhị phân lạ vào PDF.js/PDFLib.
 - Test Chromium xác nhận DOCX thử nghiệm tiếp nhận và tải lại, mọi thao tác sửa/áp dụng vẫn bị khóa. Ký trực tiếp trên DOCX/CAD không được tuyên bố hỗ trợ. Chỉ PDF và ảnh đã hỗ trợ có thể sửa/ký theo thuật toán hiện hành.
+
+### Nghiệm thu tải mọi loại tệp và PDF đã ký — 2026-10-19
+
+- Release logic trên `master`: `f6319b775d4f91f02d104757668eada3728faafa`, bổ sung kiểm thử PNG `34566e9a5601b3ea4ce8db5e40ddd2a24b87548d` và sửa riêng kịch bản read-only `06c154c8f587227501d8aabd0673248dfce0793b`. Đổi cache-bust CSS, JS và import core của trang ký sang `20261019-upload3` tại `a389a4e3267751c80a80577091a1f58e123a0938`.
+- [CI mã nguồn và OpenSSL trên master](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39197983245): **SUCCESS**; [CI trực tiếp trên GitHub Pages](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39197983272): **SUCCESS**, [Pages deployment](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39197982974): **SUCCESS**.
+- Browser thực tế đã kiểm PDF ký RSA P12/PEM vẫn xem được, khóa ghi/ký tiếp, tải lại byte-perfect; DOCX thử nghiệm được tiếp nhận + tải lại đúng byte nhưng không xem/ký; PNG được chuyển thành PDF 1 trang; PDF chưa ký giữ ký tay/ký số và xuất bình thường. OpenSSL xác thực CMS ByteRange không thay đổi với PDF ký; phát hiện sửa bytes, dữ liệu biểu mẫu/trang gốc giữ nguyên.
+- Đã bỏ bộ lọc phần mở rộng cho đầu vào và giới hạn cứng 200MB; không bảo đảm RAM vô hạn. Tệp Word/Excel/CAD chỉ tiếp nhận và tải lại; trước khi ký phải có PDF chuyển đổi tương ứng, không giả lập bộ đọc/ký chưa có.
+- Build vendor `digital.mjs` hiện có **nondeterministic/minifier hash drift** so với artifact ghim; CI xác minh SHA bản phát hành, chạy rebuild và kiểm thử chức năng/mật mã + CI site thật thay vì báo sai rằng byte build luôn tái lập. Cần rà tiếp nguyên nhân minifier drift riêng, không liên quan chữ ký đầu vào.
