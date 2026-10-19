@@ -13,7 +13,7 @@ test('standalone text editor is reachable from homepage without organizer step',
  assert.match(home,/Chỉnh sửa văn bản PDF/);
  assert.doesNotMatch(home,/<button[^>]*id="shortcut-text"/, 'Editor must not appear as isolated global header control');
  assert.match(home,/\['Chỉnh sửa văn bản PDF'[^\n]+,'Chỉnh sửa','T','cit-text-route'/);
- assert.match(home,/location\.href=['"]\.\/text-editor\.html/);
+ assert.match(home,/window.PDFEditorUnified.open\('text'\)/);
  assert.match(home,/cit-text-route/);
 });
 test('Text tool redirects to the ORIGINAL compiled CIT frontend and keeps HVD fallback',()=>{

@@ -47,8 +47,8 @@ test('main UI opens optional native inspection without changing text editor rout
   const html = read('pdfium-preflight.html');
   const worker = read('pdfium-preflight-worker.mjs');
   assert.match(home, /'pdfium-inspect-route'/);
-  assert.match(home, /location\.href='\.\/pdfium-preflight\.html'/);
-  assert.match(home, /location\.href='\.\/text-editor\.html'/);
+  assert.match(home, /window.PDFEditorUnified.open\('inspect'\)/);
+  assert.match(home, /window.PDFEditorUnified.open\('text'\)/);
   assert.match(html, /pdfium-preflight-worker\.mjs/);
   assert.match(worker, /PdfEngine\.create\(\)/);
   assert.match(worker, /engine\.buildModel\(\)/);

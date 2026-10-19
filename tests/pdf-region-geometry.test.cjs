@@ -48,7 +48,7 @@ test('standalone eraser has independent route and no Organizer save/history coup
  assert.doesNotMatch(index,/src="pdf-region-ui\.js/);
  assert.match(index,/Xóa vector theo vùng/);
  assert.match(index,/region-eraser-route/);
- assert.match(index,/location\.href='\.\x2fregion-eraser\.html'/);
+ assert.match(index,/window.PDFEditorUnified.open\('region'\)/);
  assert.match(html,/id="re-uploader"/);
  assert.match(html,/id="re-overlay"/);
  assert.match(html,/region-eraser\.js/);
