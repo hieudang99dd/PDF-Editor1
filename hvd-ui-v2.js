@@ -18,7 +18,7 @@ const browser=new Set([
 'Trích trang lẻ','Trích trang chẵn','Chèn trang trắng PDF','Xoay PDF góc tùy chỉnh','Ghép PDF',
 'Ghép PDF xen kẽ','Giảm dung lượng PDF','Cắt lề PDF','PDF sang JPG','PDF sang PNG',
 'JPG sang PDF','PDF sang TXT','In nhiều trang N-up','Chồng 2 PDF (Overlay)',
-'Xem thuộc tính PDF','Sửa thuộc tính PDF','Xóa metadata cơ bản','Xóa chú thích PDF','Làm phẳng PDF'
+'Làm phẳng PDF'
 ]);
 /* Only entries with a known implemented route are exposed. The original T array
  * also contains incomplete tools sharing the same codes ("none"/"organize").
@@ -36,7 +36,6 @@ const cards=[
  ['ocr','Chuyển đổi','Nhận dạng văn bản OCR','Nhận dạng chữ scan ngay trên trình duyệt.','OCR',['PDF OCR']],
  ['region','Nâng cao','✂ Xóa vector theo vùng','Cắt thực các đoạn vector tại vùng tùy chọn, có vùng bảo vệ. Công cụ riêng, không phủ trắng.','✂',['Xóa vector theo vùng']],
  ['drawings','Nâng cao','Bố trí & chồng bản vẽ','N-up và chồng hai bản vẽ PDF, ưu tiên giữ vector.','▤',['In nhiều trang N-up','Chồng 2 PDF (Overlay)']],
- ['meta','Nâng cao','Thuộc tính PDF','Xem, sửa, xóa metadata cơ bản hoặc xóa chú thích.','ⓘ',['Xem thuộc tính PDF','Sửa thuộc tính PDF','Xóa metadata cơ bản','Xóa chú thích PDF']],
  ['flatten','Nâng cao','Làm phẳng biểu mẫu','Làm phẳng trường biểu mẫu, không khẳng định tất cả chú thích.','▭',['Làm phẳng PDF']]
 ];
 const esc=s=>String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
