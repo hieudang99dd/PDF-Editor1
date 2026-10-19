@@ -11,6 +11,7 @@ const {spawn}=require('node:child_process');const {chromium}=require('playwright
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.url().startsWith('http')&&!r.url().startsWith(base))external.push(r.url());});
   await page.goto(base+'/index.html');await page.getByRole('button',{name:/Chèn chữ ký/}).click();await page.waitForURL('**/sign.html');
   const pdf=await PDFLib.PDFDocument.create();for(let i=0;i<4;i++){const p=pdf.addPage([420,600]);p.setCropBox(30,40,360,520);p.setRotation(PDFLib.degrees(i*90));p.drawText('SIGNATURE TEST PAGE '+(i+1),{x:50,y:400,size:14});p.drawRectangle({x:60,y:200,width:60,height:40,color:PDFLib.rgb(.9,.5,.1)});}
+  const field=pdf.getForm().createTextField('existing-field');field.setText('Preserve existing form');field.addToPage(pdf.getPage(0),{x:60,y:300,width:220,height:25});
   const source=await pdf.save();fs.writeFileSync(path.join(out,'source.pdf'),source);
   await page.locator('#file').setInputFiles({name:'test.pdf',mimeType:'application/pdf',buffer:Buffer.from(source)});await page.waitForFunction(()=>document.querySelector('#filename').textContent==='test.pdf'&&!document.querySelector('#use').disabled);
   // Real pointer strokes through upstream Signature Pad.

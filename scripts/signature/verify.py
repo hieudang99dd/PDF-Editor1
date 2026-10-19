@@ -10,6 +10,7 @@ p=argparse.ArgumentParser();p.add_argument('directory',type=Path);a=p.parse_args
 placements=json.loads((out/'placements.json').read_text())
 with fitz.open(out/'source.pdf') as source,fitz.open(out/'visual.pdf') as doc:
     assert len(doc)==len(source)==4
+    assert any(w.field_name=='existing-field' and w.field_value=='Preserve existing form' for w in doc[0].widgets()), 'Existing form lost'
     for i,page in enumerate(doc):
         assert page.get_text()==source[i].get_text(), 'Original PDF text was modified'
         assert page.rotation==source[i].rotation and page.cropbox==source[i].cropbox
@@ -37,7 +38,8 @@ for name in ['signed','signed-pem']:
     tampered=subprocess.run(cmd,capture_output=True);assert tampered.returncode!=0,'Tampered bytes incorrectly verified'
     data.unlink();signature.unlink()
     with fitz.open(out/(name+'.pdf')) as doc:
-        widgets=list(doc[0].widgets());sig=next(w for w in widgets if w.field_type==fitz.PDF_WIDGET_TYPE_SIGNATURE)
+        widgets=list(doc[0].widgets());assert any(w.field_name=='existing-field' and w.field_value=='Preserve existing form' for w in widgets), 'Existing form lost after signing'
+        sig=next(w for w in widgets if w.field_type==fitz.PDF_WIDGET_TYPE_SIGNATURE)
         xref=int(doc.xref_get_key(sig.xref,'V')[1].split()[0]);assert doc.xref_get_key(xref,'Reason')[1]=='Phê duyệt hồ sơ kỹ thuật'
         assert doc.xref_get_key(xref,'Location')[1]=='Thành phố Hồ Chí Minh'
 report={'pages':4,'rotations':[0,90,180,270],'cropbox_geometry':True,'rsa_p12_and_pem_cms_valid':True,'tampering_rejected':True,'unicode_metadata':True,'certificate_trust_checked':False}
