@@ -1,0 +1,64 @@
+name: PDF EDITOR live signature release acceptance
+on:
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: signature-live-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+jobs:
+  released-signing:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master')
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: scripts/paddleocr/package-lock.json
+      - name: Install Chromium and pinned test dependencies
+        working-directory: scripts/paddleocr
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Independent PDF validator
+        run: python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Verify live release exposes browser sign route
+        run: |
+          python3 - <<'PY'
+          from urllib.request import urlopen,Request
+          url='https://hieudang99dd.github.io/PDF-Editor1/sign.html'
+          with urlopen(Request(url,headers={'Cache-Control':'no-cache'}),timeout=30) as r:
+              assert r.status == 200, r.status
+              data=r.read().decode('utf-8')
+          assert 'PDF EDITOR' in data
+          assert 'pdf-sign.mjs' in data and 'Áp dụng và xem trước' in data
+          print('PASS: deployed PDF EDITOR signature route is accessible')
+          PY
+      - name: Generate disposable QA RSA certificates only
+        run: node scripts/signature/make-fixtures.mjs
+      - name: Run real Chromium against published GitHub Pages
+        env:
+          NODE_PATH: ${{ github.workspace }}/scripts/paddleocr/node_modules
+          SIGN_LIVE_BASE: https://hieudang99dd.github.io/PDF-Editor1
+        run: node tests/signature-browser.cjs
+      - name: Independently verify live PDF and CMS signatures
+        run: python3 scripts/signature/verify.py test-results/signature
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-signature-browser-evidence
+          path: |
+            test-results/signature/*.pdf
+            test-results/signature/*.png
+            test-results/signature/*.json
+          if-no-files-found: ignore
