@@ -10,9 +10,9 @@ if(!hero.querySelector('.eyebrow'))hero.insertAdjacentHTML('afterbegin','<span c
 const q=document.querySelector('#q');
 q.placeholder='Tìm: sửa Text, ghép PDF, xóa trang, OCR, chồng bản vẽ…';
 const categories=['Tất cả','Sửa Text','Biên tập','Tổ chức','Chuyển đổi','Nâng cao'];
-const local=new Set(['PDF sang Word','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF']);
+const local=new Set(['Chuyển đổi tệp','PDF sang Word','PDF sang TIFF','Word sang PDF','Excel sang PDF','PPT sang PDF']);
 const browser=new Set([
-'PDF OCR',
+'PDF OCR','Chuyển đổi tệp',
 'Chỉnh sửa văn bản PDF','Chỉnh sửa PDF','Xóa vector theo vùng','Ký tên vào PDF','Đánh số trang','Đánh số Bates','Watermark PDF',
 'Sắp xếp PDF','Cắt PDF','Xóa trang PDF','Trích xuất trang','Xoay PDF','Đảo thứ tự trang PDF',
 'Trích trang lẻ','Trích trang chẵn','Chèn trang trắng PDF','Xoay PDF góc tùy chỉnh','Ghép PDF',
@@ -32,9 +32,7 @@ const cards=[
  ['merge','Tổ chức','Ghép PDF','Ghép nối hoặc ghép xen kẽ.','⊕',['Ghép PDF','Ghép PDF xen kẽ']],
  ['compress','Tổ chức','Nén PDF','Tối ưu dung lượng và ưu tiên giữ vector.','⇲',['Giảm dung lượng PDF']],
  ['crop','Tổ chức','Cắt lề PDF','Thay đổi vùng nhìn CropBox, không xóa nội dung ngoài lề.','⌗',['Cắt lề PDF']],
- ['export','Chuyển đổi','PDF sang ảnh','Xuất trang PDF thành JPG, PNG hoặc TIFF.','JPG',['PDF sang JPG','PDF sang PNG','PDF sang TIFF']],
- ['image','Chuyển đổi','Ảnh sang PDF','Đổi các định dạng ảnh thông dụng thành PDF.','▣',['JPG sang PDF']],
- ['office','Chuyển đổi','Văn bản & Office','PDF sang Word/TXT; Word, Excel, PPT sang PDF. Một số định dạng cần PC.','W',['PDF sang Word','PDF sang TXT','Word sang PDF','Excel sang PDF','PPT sang PDF']],
+ ['convert','Chuyển đổi','Chuyển đổi định dạng tệp','Chọn tệp đầu vào → định dạng đầu ra. PDF ↔ ảnh; PDF → Word/TXT; Office → PDF.','⇄',['Chuyển đổi tệp']],
  ['ocr','Chuyển đổi','Nhận dạng văn bản OCR','Nhận dạng chữ scan ngay trên trình duyệt.','OCR',['PDF OCR']],
  ['region','Nâng cao','✂ Xóa vector theo vùng','Cắt thực các đoạn vector tại vùng tùy chọn, có vùng bảo vệ. Công cụ riêng, không phủ trắng.','✂',['Xóa vector theo vùng']],
  ['drawings','Nâng cao','Bố trí & chồng bản vẽ','N-up và chồng hai bản vẽ PDF, ưu tiên giữ vector.','▤',['In nhiều trang N-up','Chồng 2 PDF (Overlay)']],
