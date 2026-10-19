@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quản lý trang PDF – PDF EDITOR</title>
+<meta name="description" content="Dàn trang PDF dạng ảnh thu nhỏ: kéo thả, chọn nhiều trang, ghép, tách, xoay, đảo thứ tự, trích xuất và xuất PDF giữ nội dung vector.">
+<link rel="icon" href="./studio/hvd-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./pdf-pages.css?v=20261019-pages1">
+</head>
+<body>
+<div class="pm-app">
+<header class="pm-header">
+<a class="pm-back" href="./index.html">← PDF EDITOR</a>
+<div class="pm-title"><strong>Quản lý trang PDF</strong><small>Dàn trang trực quan – giữ nguyên chữ, ảnh và đường vector</small></div>
+<div class="pm-header-actions">
+<button id="undo" class="pm-quiet" type="button" disabled aria-label="Hoàn tác">↶ Hoàn tác</button>
+<button id="redo" class="pm-quiet" type="button" disabled aria-label="Làm lại">↷ Làm lại</button>
+<button id="apply" class="pm-primary" disabled type="button">✓ Áp dụng & kiểm tra</button>
+<button id="export" class="pm-primary" disabled type="button">↓ Xuất kết quả</button>
+</div>
+</header>
+<div class="pm-tools" aria-label="Thanh công cụ dàn trang">
+<button id="add" type="button">＋ Thêm PDF</button>
+<span class="pm-separator"></span>
+<button id="select-all" type="button">Chọn tất cả</button>
+<button id="select-odd" type="button">Trang lẻ</button>
+<button id="select-even" type="button">Trang chẵn</button>
+<label class="pm-range">Chọn trang <input id="range" type="text" placeholder="1-5, 8, 11" aria-label="Danh sách trang cần chọn"></label>
+<button id="range-apply" type="button">Chọn</button>
+<span class="pm-separator"></span>
+<button id="rotate-left" type="button" disabled>↶ Xoay trái</button>
+<button id="rotate-right" type="button" disabled>↷ Xoay phải</button>
+<button id="duplicate" type="button" disabled>⧉ Nhân đôi</button>
+<button id="delete" class="pm-danger" type="button" disabled>🗑 Xóa</button>
+<button id="reverse" type="button" disabled>⇵ Đảo thứ tự</button>
+<button id="blank" type="button" disabled>＋ Trang trắng</button>
+</div>
+<div class="pm-layout-bar">
+<div><b id="summary">Chưa mở PDF</b><span id="selection-info" class="pm-muted"></span></div>
+<div class="pm-layout-actions">
+<label>Hiển thị <select id="layout"><option value="grid">Lưới trang</option><option value="split">Dàn trang + xem trước</option><option value="rail">Cột trang bên trái</option></select></label>
+<label>Cỡ ảnh <input type="range" id="size" min="110" max="240" value="158" step="8"><output id="size-value">158 px</output></label>
+</div>
+</div>
+<div class="pm-workspace" id="workspace" data-layout="split">
+<main class="pm-scroll" id="scroll">
+<div id="empty" class="pm-empty">
+<span class="pm-empty-icon">▣</span>
+<h1>Thêm PDF để bắt đầu dàn trang</h1>
+<p>Có thể chọn nhiều PDF cùng lúc. Ảnh thu nhỏ được dựng khi cuộn, không mở tất cả trang vào bộ nhớ.</p>
+<button id="open" type="button" class="pm-primary">＋ Chọn các tệp PDF</button>
+<span>Hoặc kéo thả PDF vào vùng này</span>
+</div>
+<div class="pm-grid" id="grid" aria-label="Dàn trang PDF bằng ảnh thu nhỏ"></div>
+</main>
+<aside class="pm-preview">
+<div class="pm-preview-head"><strong>Xem trang đã chọn</strong><span id="preview-info">—</span></div>
+<div class="pm-preview-scroll" id="preview-scroll"><canvas id="preview-canvas"></canvas><div id="preview-empty">Bấm một trang trong danh sách để xem bản lớn.</div></div>
+<div class="pm-preview-footer"><button type="button" id="prev">‹ Trang trước</button><button type="button" id="next">Trang sau ›</button></div>
+</aside>
+</div>
+<footer class="pm-bottom">
+<div class="pm-left"><button id="selected-export" type="button" disabled>Trích xuất trang chọn</button><button id="toggle-split" type="button" disabled>✂ Tách sau trang đang chọn</button><button id="clear-splits" type="button" disabled>Xóa mốc tách</button><span id="split-count">0 mốc tách</span></div>
+<div class="pm-footer-right"><span id="status" role="status" aria-live="polite">Tài liệu chỉ được xử lý trong trình duyệt.</span><progress id="progress" max="100" value="0" hidden></progress></div>
+</footer>
+<div id="result" class="pm-result" hidden role="region" aria-label="Kiểm tra kết quả">
+<div><strong id="result-heading">Đã áp dụng</strong><p id="result-text"></p></div>
+<div><button id="inspect" type="button">Xem PDF kết quả</button><button id="result-export" type="button" class="pm-primary">Xuất PDF</button><button id="result-close" type="button">Đóng</button></div>
+</div>
+<input id="files" type="file" accept="application/pdf,.pdf" multiple hidden>
+</div>
+<script src="./pdf-lib.min.js"></script>
+<script src="./pdf.min.js"></script>
+<script src="./jszip.min.js"></script>
+<script type="module" src="./pdf-pages.mjs?v=20261019-pages1"></script>
+</body></html>
