@@ -2,6 +2,7 @@ import {parsePageRange,containsSignature} from './pdf-pages-core.mjs?v=20261019-
 import {clamp,normalizeRect,validRect,isFullPage,viewportCropRect,almostEqualBox,
  findInkBounds,describeChanges} from './pdf-crop-core.mjs?v=20261019-crop1';
 const el=id=>document.getElementById(id);
+const embedded=new URLSearchParams(location.search).get('embedded')==='1' && window.parent!==window;
 const PDFLib=window.PDFLib,pdfjs=window.pdfjsLib||window['pdfjs-dist/build/pdf'];
 if(!PDFLib?.PDFDocument||!pdfjs?.getDocument)throw Error('Thiếu thư viện PDF.js hoặc pdf-lib.');
 pdfjs.GlobalWorkerOptions.workerSrc='./pdf.worker.min.js';
@@ -311,7 +312,6 @@ updateControls();
 
 // Bridge embedded crop controls to the one PDF EDITOR toolbar.
 // Only limited commands are accepted from the same-origin parent.
-const embedded=new URLSearchParams(location.search).get('embedded')==='1' && window.parent!==window;
 function reportToShell(){
  if(!embedded)return;
  window.parent.postMessage({
