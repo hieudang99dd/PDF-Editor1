@@ -2,3 +2,45 @@
 *{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{border:1px solid #c8d4e1;border-radius:8px;padding:9px 12px;color:#243955;background:#fff;cursor:pointer}button:hover:not(:disabled){border-color:#0b948a}button:disabled{opacity:.43;cursor:not-allowed}
 .primary{background:#078c83;color:white;border-color:#078c83;font-weight:700}.primary:hover:not(:disabled){background:#067c75}
 .header{display:flex;align-items:center;gap:18px;padding:13px clamp(12px,3vw,44px);background:#14233b;color:#fff;position:sticky;top:0;z-index:8;flex-wrap:wrap}.header a{color:#e8f3ff;text-decoration:none}.header div:not(.head-actions){display:grid}.header small{font-size:11px;color:#c2d5e9}.head-actions{margin-left:auto;display:flex;gap:8px}main{max-width:1280px;margin:18px auto;padding:0 16px 46px}section{background:#fff;border:1px solid #d9e3ef;border-radius:14px;margin:0 0 16px;padding:18px;box-shadow:0 3px 16px #1a2d4a0a}h1{font-size:22px;margin:0}h2{font-size:18px;margin:0}h3{font-size:15px;margin:0 0 9px}.intro{color:#64738a;font-size:13px}.file-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 0}.file-button{border-radius:8px;padding:10px 16px;color:#fff;background:#099388;font-weight:650;cursor:pointer}.file-button input{display:none}#file-name{color:#5a6d88;font-size:13px;word-break:break-word}.tool-row{display:flex;gap:10px 14px;flex-wrap:wrap;align-items:end;padding:7px 0}.tool-row label{display:grid;gap:5px;font-size:12px;color:#53657d;font-weight:600}.tool-row select,.tool-row input{min-width:130px;padding:9px;border:1px solid #ccdae7;border-radius:8px;background:#fff}.tool-row.actions{align-items:center}.subtle{color:#677d94;font-size:12px}.warning{color:#c34126;background:#fff0e9;padding:7px;border-radius:6px;font-size:12px;font-weight:700}.warning-note{color:#695b42;font-size:12px;background:#fff8e8;padding:8px 11px;border-radius:7px}.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 13px}.section-heading span{color:#687e92;font-size:12px}.stage-scroll{max-height:68vh;overflow:auto;display:flex;align-items:flex-start;justify-content:center;border:1px solid #d9e1eb;background:#e5ebf2;border-radius:12px;padding:16px}.stage{position:relative;touch-action:none;user-select:none;cursor:crosshair;box-shadow:0 3px 15px #0002;background:white;flex:none}.stage canvas{display:block;width:100%;height:100%}.crop-rectangle{position:absolute;border:2px solid #00a997;box-shadow:0 0 0 1px #ffffffad,inset 0 0 0 9999px #00a9970c;cursor:move;touch-action:none}.crop-label{background:#008f83;color:#fff;font-size:10px;padding:1px 5px;position:absolute;left:1px;top:1px;pointer-events:none;white-space:nowrap}.crop-rectangle i{display:block;width:11px;height:11px;border:2px solid white;box-shadow:0 0 0 1px #008f83;background:#00a997;position:absolute;transform:translate(-50%,-50%);touch-action:none}.crop-rectangle i[data-handle=nw]{left:0;top:0;cursor:nwse-resize}.crop-rectangle i[data-handle=n]{left:50%;top:0;cursor:ns-resize}.crop-rectangle i[data-handle=ne]{left:100%;top:0;cursor:nesw-resize}.crop-rectangle i[data-handle=e]{left:100%;top:50%;cursor:ew-resize}.crop-rectangle i[data-handle=se]{left:100%;top:100%;cursor:nwse-resize}.crop-rectangle i[data-handle=s]{left:50%;top:100%;cursor:ns-resize}.crop-rectangle i[data-handle=sw]{left:0;top:100%;cursor:nesw-resize}.crop-rectangle i[data-handle=w]{left:0;top:50%;cursor:ew-resize}.legend{display:flex;gap:12px;justify-content:space-between;color:#687c92;font-size:12px;flex-wrap:wrap;padding-top:10px}.legend-box{border:2px solid #00a997;width:12px;height:12px;display:inline-block;vertical-align:middle}.review-nav{display:flex;gap:8px;align-items:center;margin-bottom:12px}.review-nav select{padding:7px;border:1px solid #cbd6e4;border-radius:7px}.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.compare-grid article{border:1px solid #d6e0ed;border-radius:9px;padding:11px;min-width:0}.compare-scroll{background:#e7edf3;padding:12px;max-height:470px;overflow:auto;display:flex;justify-content:center}.compare-scroll canvas{display:block;max-width:100%;height:auto;object-fit:contain;box-shadow:0 1px 12px #0003}.review-data{margin-top:15px}.review-data #change-log{max-height:190px;overflow:auto;padding:11px;background:#f3f6fb;border-radius:8px;font-size:12px}.review-data table{border-collapse:collapse;width:100%}.review-data td,.review-data th{padding:7px;text-align:left;border-bottom:1px solid #dce4ee}.approval{display:flex;align-items:flex-start;gap:10px;padding:14px;margin:12px 0;border:1px solid #83c4be;background:#edfaf7;border-radius:9px;font-size:13px;font-weight:600}.approval input{width:17px;height:17px;flex:none}.review-actions{display:flex;gap:8px;flex-wrap:wrap}#status{font-size:13px;color:#526880;padding:9px 2px;white-space:pre-wrap}[hidden]{display:none!important}@media(max-width:700px){.header{position:relative}.head-actions{width:100%;margin:0}.head-actions button{flex:1}.compare-grid{grid-template-columns:1fr}.stage-scroll{max-height:60vh}.tool-row label{flex:1}.tool-row select{min-width:0}.review-data{overflow:auto}}
+
+/* One PDF EDITOR embedded crop workspace; preserve standalone layout for old links. */
+html.pdf-editor-embed{background:#edf2f7;color:#18334e}
+html.pdf-editor-embed body{background:#edf2f7;color:#18334e;min-width:0}
+html.pdf-editor-embed .header{display:none!important}
+html.pdf-editor-embed main{max-width:1560px;display:grid;grid-template-columns:minmax(270px,330px) minmax(0,1fr);gap:14px;margin:0 auto;padding:16px clamp(12px,2vw,24px) 18px;align-items:start}
+html.pdf-editor-embed main>section{margin:0;min-width:0;border:1px solid #d8e4ee;box-shadow:0 3px 16px #21334d09;border-radius:13px}
+html.pdf-editor-embed .control-panel{grid-column:1;grid-row:1;padding:18px;background:#fff}
+html.pdf-editor-embed .crop-workspace{grid-column:2;grid-row:1;padding:17px;background:#fff}
+html.pdf-editor-embed .review{grid-column:1/-1;grid-row:2;margin-top:0;background:#fff;scroll-margin-top:16px}
+html.pdf-editor-embed #status{grid-column:1/-1;grid-row:3;margin:0;border-radius:9px;background:#e6f0f8;padding:12px}
+html.pdf-editor-embed h1{font-size:18px;line-height:1.35}
+html.pdf-editor-embed h2{font-size:16px;line-height:1.4}
+html.pdf-editor-embed .intro{font-size:12px;margin:9px 0 12px;color:#667d92}
+html.pdf-editor-embed .file-row{display:grid;grid-template-columns:1fr;align-items:stretch;gap:7px}
+html.pdf-editor-embed .file-button{text-align:center;min-height:44px;display:grid;place-items:center;background:#0b948a}
+html.pdf-editor-embed .file-row #file-name{max-width:100%;overflow-wrap:anywhere}
+html.pdf-editor-embed .tool-row{display:grid;grid-template-columns:1fr;gap:10px}
+html.pdf-editor-embed .tool-row.actions{grid-template-columns:1fr 1fr;align-items:stretch}
+html.pdf-editor-embed .tool-row.actions button{min-width:0;padding:8px;font-size:12px}
+html.pdf-editor-embed .tool-row label{min-width:0}
+html.pdf-editor-embed .tool-row select,html.pdf-editor-embed .tool-row input{width:100%;min-width:0}
+html.pdf-editor-embed .tool-row .subtle{grid-column:1/-1}
+html.pdf-editor-embed .stage-scroll{max-height:730px;min-height:470px;overflow:auto;align-items:flex-start;padding:18px;background:#e9eff5}
+html.pdf-editor-embed .section-heading{margin-bottom:12px}
+html.pdf-editor-embed .section-heading span{font-size:12px}
+html.pdf-editor-embed .compare-scroll{max-height:610px}
+html.pdf-editor-embed .warning-note{margin:12px 0 0}
+html.pdf-editor-embed .legend{gap:7px}
+@media(max-width:950px){
+ html.pdf-editor-embed main{grid-template-columns:1fr;padding:12px}
+ html.pdf-editor-embed .control-panel,html.pdf-editor-embed .crop-workspace,html.pdf-editor-embed .review,html.pdf-editor-embed #status{grid-column:1;grid-row:auto}
+ html.pdf-editor-embed .tool-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+ html.pdf-editor-embed .file-row{grid-template-columns:auto 1fr;align-items:center}
+ html.pdf-editor-embed .tool-row.actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+ html.pdf-editor-embed .stage-scroll{max-height:620px;min-height:300px}
+}
+@media(max-width:570px){
+ html.pdf-editor-embed .tool-row,html.pdf-editor-embed .tool-row.actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ html.pdf-editor-embed .file-row{grid-template-columns:1fr}
+ html.pdf-editor-embed .stage-scroll{max-height:450px;min-height:260px;padding:9px}
+}
