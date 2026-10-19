@@ -17,3 +17,20 @@
 #unified-loading:empty{display:none}
 @media(max-width:760px){#unified-ws .unified-toolbar{gap:7px}.unified-meta{order:0}.unified-routes{order:3;flex-basis:100%!important}.unified-framebox{height:calc(100dvh - 230px)!important;min-height:540px!important}}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]) #unified-ws{background:#101b2a;color:#e8f0f9}:root:not([data-theme=light]) #unified-ws .unified-toolbar{background:#172538;border-color:#39506b}:root:not([data-theme=light]) #unified-ws .unified-note{background:#18283c;color:#afc6d5}}
+
+/* Main shell owns the PDF Crop workflow actions; PDF document engine remains isolated. */
+#unified-ws[data-tool=crop] .unified-framebox{height:auto;min-height:0;overflow:visible}
+#unified-ws[data-tool=crop] #unified-frame{min-height:720px;height:780px;overflow:hidden}
+#unified-ws[data-tool=crop] .unified-toolbar{position:sticky;top:61px;z-index:7}
+#unified-crop-bar[hidden]{display:none!important}
+#unified-crop-bar{display:flex;align-items:center;gap:11px;flex-wrap:wrap;border-bottom:1px solid #d7e3ec;background:#f7fafc;padding:10px clamp(12px,2vw,30px);position:sticky;top:121px;z-index:6}
+#unified-crop-bar .crop-step{display:inline-flex;gap:6px;align-items:center;font-size:11px;font-weight:650;color:#516a7e;white-space:nowrap}
+#unified-crop-bar .crop-step b{display:grid;place-items:center;border-radius:6px;width:22px;height:22px;background:#d7eae8;color:#08776d;font-size:11px}
+#unified-crop-bar .crop-actions{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap}
+#unified-crop-bar .crop-action{background:#0b9289;color:#fff;border:1px solid #0b9289;border-radius:7px;font-size:12px;padding:9px 13px;font-weight:700;white-space:nowrap}
+#unified-crop-bar .crop-action.secondary{background:white;color:#117f75;border-color:#9ec9c5}
+#unified-crop-bar .crop-action.primary{background:#087e74}
+#unified-crop-bar .crop-action:disabled{opacity:.4;cursor:not-allowed}
+#unified-crop-bar .crop-host-status{font-size:11px;color:#62798b;flex-basis:100%;margin:0;min-height:16px}
+@media(max-width:1050px){#unified-crop-bar,#unified-ws[data-tool=crop] .unified-toolbar{position:relative;top:auto}#unified-crop-bar .crop-actions{margin-left:0}}
+@media(max-width:570px){#unified-crop-bar .crop-step{font-size:10px}#unified-crop-bar .crop-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}#unified-crop-bar #crop-host-export{grid-column:1/-1}}
