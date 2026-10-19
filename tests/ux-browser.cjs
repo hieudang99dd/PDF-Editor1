@@ -59,33 +59,34 @@ async function sample(label){
    let acceptDialogs=true;
    page.on('dialog',dialog=>acceptDialogs?dialog.accept():dialog.dismiss());
    await page.goto(address,{waitUntil:'domcontentloaded'});
-   await page.locator('button.catalog-tile').filter({hasText:'Ghép PDF'}).first().click();
-   await page.locator('button.catalog-action').filter({hasText:'Ghép PDF'}).first().click();
+   // The dedicated merge card was removed at user request; page manager retains merge.
+   // Test binary download + in-place reset with the still-supported numbering tool.
+   await page.locator('button.catalog-tile').filter({hasText:'Đánh số & đóng dấu'}).first().click();
+   await page.locator('button.catalog-action').filter({hasText:'Đánh số trang'}).first().click();
    await page.locator('#ws').waitFor({state:'visible'});
    assert.match(new URL(page.url()).hash,/^#hvd-tool=\d+$/);
-   await page.locator('#fi').setInputFiles([
-     {name:'one.pdf',mimeType:'application/pdf',buffer:await sample('Page one')},
-     {name:'two.pdf',mimeType:'application/pdf',buffer:await sample('Page two')}
-   ]);
-   assert.equal(await page.locator('.files li').count(),2);
+   await page.locator('#fi').setInputFiles({
+     name:'two-pages.pdf',mimeType:'application/pdf',buffer:await vectorSample()
+   });
+   assert.equal(await page.locator('.files li').count(),1);
    await page.locator('#go').click();
    const downloadLink=page.locator('#out a[download]').first();
    await downloadLink.waitFor({state:'visible',timeout:30000});
    const wait=page.waitForEvent('download');
    await downloadLink.click();
    const download=await wait;
-   const destination=path.join('/tmp','hvd-ux-merged-'+process.pid+'.pdf');
+   const destination=path.join('/tmp','hvd-ux-numbered-'+process.pid+'.pdf');
    await download.saveAs(destination);
    const bytes=fs.readFileSync(destination);
    fs.unlinkSync(destination);
    assert.equal(bytes.subarray(0,5).toString('ascii'),'%PDF-');
-   const merged=await PDFLib.PDFDocument.load(bytes);
-   assert.equal(merged.getPageCount(),2);
+   const numbered=await PDFLib.PDFDocument.load(bytes);
+   assert.equal(numbered.getPageCount(),2);
    assert.ok(await page.locator('#ws').isVisible(),'workspace must remain open after binary download');
-   assert.equal(await page.locator('.files li').count(),2,'selected inputs must survive download');
+   assert.equal(await page.locator('.files li').count(),1,'selected input must survive download');
    await page.locator('#ws-refresh').click();
    assert.ok(await page.locator('#ws').isVisible());
-   assert.equal(await page.locator('.files li').count(),2,'refresh should keep selected inputs');
+   assert.equal(await page.locator('.files li').count(),1,'refresh should keep selected input');
    assert.equal(await page.locator('#out a[download]').count(),0,'refresh should clear old result');
    await page.locator('#ws-new').click();
    assert.equal(await page.locator('.files li').count(),0);
@@ -94,7 +95,7 @@ async function sample(label){
    assert.ok(await page.locator('#home').isVisible(),'native Browser Back should return to catalog');
    await page.goForward({waitUntil:'domcontentloaded'});
    await page.locator('#ws').waitFor({state:'visible'});
-   assert.equal(await page.locator('#wt').textContent(),'Ghép PDF');
+   assert.equal(await page.locator('#wt').textContent(),'Đánh số trang');
    await page.setViewportSize({width:375,height:740});
    assert.ok(await page.locator('#refresh-app').isVisible(),'refresh must remain accessible on mobile');
    assert.ok(await page.locator('#ws-new').isVisible(),'New File action must remain accessible on mobile');

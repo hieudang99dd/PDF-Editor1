@@ -29,6 +29,8 @@
  #pdfeditor-workspace-nav .pdfeditor-workspace-links a:hover,#pdfeditor-workspace-nav .pdfeditor-workspace-links a:focus-visible{background:#dceeea!important;color:#116d65!important}
  #pdfeditor-workspace-nav .pdfeditor-workspace-links a[aria-current=page]{background:#d6ede8!important;color:#056e65!important;border-color:#91c9bf!important}
  #pdfeditor-workspace-nav a:focus-visible{outline:2px solid #108e80;outline-offset:1px}
+ /* Full-screen region editor manages its own locked viewport and toolbar. */
+ body.re-workspace-open #pdfeditor-workspace-nav{display:none!important}
  @media(max-width:720px){#pdfeditor-workspace-nav .pdfeditor-workspace-nav-inner{display:block;padding:5px 10px}#pdfeditor-workspace-nav .pdfeditor-workspace-name{display:block;border:0;padding:0 4px 3px}#pdfeditor-workspace-nav .pdfeditor-workspace-links a{min-height:37px}}
  @media(prefers-reduced-motion:reduce){#pdfeditor-workspace-nav a{transition:none!important}}
  `;
