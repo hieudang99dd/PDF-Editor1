@@ -15,9 +15,11 @@
   ]);
   T.push(['PDF sang TXT', 'Trích xuất chữ thành văn bản UTF-8', 'Chuyển đổi', 'TXT', 'local', '.pdf']);
   T.push(['PDF sang TIFF', 'Xuất TIFF nhiều trang, 150 DPI', 'Chuyển đổi', 'TIF', 'local', '.pdf']);
-  OPT.compress = `<label>Tối ưu an toàn cho bản vẽ kỹ thuật</label>
-    <div class="r"><label><input type="radio" name="lv" value="basic" checked> Nén cấu trúc, giữ nguyên hình học vector và chất lượng ảnh</label></div>
-    <small>Chế độ nén JPEG giảm chất lượng chưa được triển khai.</small>`;
+  OPT.compress = `<label>Chế độ nén PDF</label>
+    <div class="r"><label><input type="radio" name="lv" value="safe"> Bảo toàn chất lượng – tối ưu cấu trúc, giữ nguyên mọi ảnh</label></div>
+    <div class="r"><label><input type="radio" name="lv" value="balanced" checked> Cân bằng – nén JPEG ảnh nhúng, giữ chữ và vector (khuyên dùng)</label></div>
+    <div class="r"><label><input type="radio" name="lv" value="strong"> Nén mạnh – giảm độ phân giải ảnh scan, không raster hóa trang CAD</label></div>
+    <small>PDF có chữ ký số được giữ nguyên. Ký tự, nét CAD, bảng và nội dung tìm kiếm được không chuyển thành ảnh. Không bảo đảm nén giảm đáng kể đối với PDF đã tối ưu.</small>`;
   OPT.fmt = `<label>Định dạng đầu ra<select id="fmt-sel">
     <option value="docx">Word (.docx) – văn bản có thể sửa, không bảo đảm bố cục</option>
     <option value="txt">Văn bản (.txt)</option>
@@ -44,24 +46,26 @@
   }
 
   // Keep common PDF tools available on GitHub Pages without a native backend.
-  async function runInBrowser(name, file, target) {
+  async function runInBrowser(name, file, target, onProgress = null) {
     if (!file || !file.size) throw new Error('Chưa chọn tệp hợp lệ');
     const bytes = await file.arrayBuffer();
     if (name === 'Giảm dung lượng PDF') {
-      if (!window.PDFLib || !window.PDFLib.PDFDocument) {
-        throw new Error('Thư viện xử lý PDF chưa tải. Hãy tải lại trang');
-      }
-      const document = await window.PDFLib.PDFDocument.load(bytes);
-      const saved = await document.save({ useObjectStreams: true });
-      // Rewriting PDFs can affect signatures; never claim a size reduction without one.
-      const compressed = saved.byteLength < bytes.byteLength
-        ? new Blob([saved], { type: 'application/pdf' })
-        : new Blob([bytes], { type: 'application/pdf' });
-      return { blob: compressed, extension: 'pdf',
-        filename: 'optimized_' + file.name.replace(/[^a-zA-Z0-9._()\-\u00C0-\u1EF9 ]/g, '_'),
-        note: saved.byteLength < bytes.byteLength
-          ? 'Đã tối ưu cấu trúc PDF ngay trên trình duyệt.'
-          : 'Không tìm thấy cách giảm dung lượng an toàn; đã giữ nguyên bản gốc.' };
+      if (!window.PDFLib?.PDFDocument) throw new Error('Thư viện PDF chưa tải. Hãy tải lại trang.');
+      const modeValue = document.querySelector('input[name="lv"]:checked')?.value || 'balanced';
+      const mode = ({basic:'safe',safe:'safe',balanced:'balanced',strong:'strong'})[modeValue] || 'balanced';
+      const { compressPdfBytes } = await import('./pdf-compress-engine.mjs?v=20261019-compress1');
+      const result = await compressPdfBytes(new Uint8Array(bytes), {
+        PDFLib:window.PDFLib, mode,
+        onProgress: update => onProgress?.(update)
+      });
+      return {
+        blob:new Blob([result.bytes],{type:'application/pdf'}),
+        extension:'pdf',
+        filename:'compressed_'+file.name.replace(/[^a-zA-Z0-9._()\-\u00C0-\u1EF9 ]/g,'_'),
+        note:(result.stats.note || '')+
+          ' Kết quả: '+result.stats.outputBytes.toLocaleString('vi-VN')+' byte từ '+result.stats.originalBytes.toLocaleString('vi-VN')+
+          ' byte; giảm '+result.stats.reduction+'%. Ảnh đã tối ưu: '+result.stats.imagesChanged+'/'+result.stats.imagesFound+'.'
+      };
     }
     if (target === 'txt') {
       const pdfjs = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
@@ -140,7 +144,8 @@
       const target = formatForTool(name);
       if (name === 'Giảm dung lượng PDF' || target === 'txt' && !['PDF OCR'].includes(name)) {
         status.textContent = 'Đang xử lý trực tiếp trên trình duyệt…';
-        const result = await runInBrowser(name, files[0], target);
+        const result = await runInBrowser(name, files[0], target,
+          progress => { status.textContent = 'Đang nén PDF: '+progress.phase+' ('+progress.progress+'%)'; });
         showDownload(result, output);
         return;
       }
