@@ -55,7 +55,10 @@ const renderCatalog=()=>{
    const status=needsPC?(hasWeb?'Web / PC':'Cần ứng dụng PC'):'Trình duyệt';
    const opened=expanded===x[0]&&!single;
    const attrs=single?' data-i="'+idx+'"':' data-group-key="'+esc(x[0])+'" aria-expanded="'+opened+'" aria-controls="catalog-panel-'+esc(x[0])+'"';
-   return '<button type="button" class="tool catalog-tile'+(isText?' is-primary':'')+'"'+attrs+'><span class="ic catalog-icon" aria-hidden="true">'+esc(x[4])+'</span><span class="tool-body"><b>'+esc(x[2])+'</b><span>'+esc(x[3])+'</span><span class="catalog-status">'+status+'</span></span>'+(isText?'<span class="catalog-cta" aria-hidden="true">Mở trình chỉnh sửa <span class="catalog-cta-arrow">→</span></span>':'')+(single?'':'<span class="catalog-chevron" aria-hidden="true">'+(opened?'−':'+')+'</span>')+'</button>';
+   // Stable application routes: do not depend on historic T indices or legacy click handlers.
+   const embeddedRoute=({text:'text',pages:'pages',crop:'crop',convert:'convert',ocr:'ocr',sign:'sign',region:'region'})[x[0]];
+   const appRoute=embeddedRoute?' data-pdf-route="'+embeddedRoute+'"':'';
+   return '<button type="button" class="tool catalog-tile'+(isText?' is-primary':'')+'"'+attrs+appRoute+'><span class="ic catalog-icon" aria-hidden="true">'+esc(x[4])+'</span><span class="tool-body"><b>'+esc(x[2])+'</b><span>'+esc(x[3])+'</span><span class="catalog-status">'+status+'</span></span>'+(isText?'<span class="catalog-cta" aria-hidden="true">Mở trình chỉnh sửa <span class="catalog-cta-arrow">→</span></span>':'')+(single?'':'<span class="catalog-chevron" aria-hidden="true">'+(opened?'−':'+')+'</span>')+'</button>';
   }).join('');
   const active=visible.find(x=>x[0]===expanded&&actions(x).length>1);
   const panel=active?'<div class="catalog-action-panel" role="region" id="catalog-panel-'+esc(active[0])+'" aria-label="'+esc(active[2])+'"><div class="catalog-action-heading"><strong>'+esc(active[2])+'</strong><button type="button" class="catalog-panel-close" data-group-key="'+esc(active[0])+'" aria-label="Thu gọn">×</button></div><div class="catalog-action-list">'+actions(active).map(name=>'<button type="button" class="catalog-action" data-target-tool="'+find(name)+'"><span>'+esc(name)+'</span><small>'+(local.has(name)?'PC':'Web')+'</small></button>').join('')+'</div></div>':'';
