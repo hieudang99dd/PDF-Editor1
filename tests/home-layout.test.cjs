@@ -31,9 +31,9 @@ test('Text editing remains a separate native tool routed to its existing page',(
  assert.match(h.html(),/class="catalog-status">Trình duyệt<\/span>/);
  assert.equal((h.html().match(/Sửa Text PDF gốc/g)||[]).length,1);
 });
-test('16 catalog definitions, original registry immutable, unsupported tools hidden',()=>{
+test('14 catalog definitions, original registry immutable, unsupported tools hidden',()=>{
  const source=ui.match(/const cards=\[([\s\S]*?)\];/)[1];
- assert.equal((source.match(/^\s*\['/gm)||[]).length,16);
+ assert.equal((source.match(/^\s*\['/gm)||[]).length,14);
  const data=[['Giảm dung lượng PDF','Nén','Nén','⇲','compress','.pdf'],['PDF OCR','OCR','Chuyển đổi','OCR','lang','.pdf'],['PDF sang PDF/A','Không có engine','Chuyển đổi','A','none','.pdf'],['Chỉnh sửa văn bản PDF','Text','Chỉnh sửa','T','cit-text-route','.pdf'],['Ghép PDF','Ghép','Sắp xếp','⊕','merge','.pdf'],['Ghép PDF xen kẽ','Xen kẽ','Sắp xếp','⇄','merge','.pdf'],['Chia sẻ PDF','Chưa có server','Chỉnh sửa','↗','qr','.pdf'],['Xóa trang PDF','Xóa','Sắp xếp','×','range','.pdf'],['Trích xuất trang','Trích','Sắp xếp','⇥','range','.pdf']];
  const h=mock(data);
  assert.deepEqual(data,h.saved);
@@ -64,7 +64,7 @@ test('CIT route and editor engine stay unmodified',()=>{
  assert.match(cit,/for\(const t of tools\)if\(!existing\.has\(t\[0\]\)\)T\.push\(t\)/);
  assert.match(cit,/home\(\);\s*\}\)\(\);/);
  assert.doesNotMatch(ui,/T\.push\(|T\[[^\]]+\]\s*=/);
- assert.match(html,/hvd-ui-v2\.js\?v=20261019-sign1/);
+ assert.match(html,/hvd-ui-v2\.js\?v=20261019-convert2/);
  assert.match(html,/hvd-ui-v2\.css\?v=20261016-dao1/);
 });
 test('catalog icon and featured text tile use explicit centered, responsive layout',()=>{
@@ -79,4 +79,24 @@ test('catalog icon and featured text tile use explicit centered, responsive layo
  assert.match(css,/@media\(max-width:640px\)[\s\S]*?\.catalog-tile \.catalog-cta/s,
    'Text editor CTA must wrap correctly on phones');
  assert.match(css,/\.catalog-tile \.catalog-cta\s*\{[^}]*white-space:nowrap/s);
+});
+
+test('conversion groups show one unified tile and preserve OCR separately',()=>{
+ const registry=[
+  ['Chuyển đổi tệp','Đổi định dạng','Chuyển đổi','⇄','universal-route','.pdf'],
+  ['PDF OCR','OCR','Chuyển đổi','OCR','paddle-ocr-route','.pdf'],
+  ['PDF sang JPG','Cũ','Chuyển đổi','JPG','pdf2jpg','.pdf'],
+  ['PDF sang PNG','Cũ','Chuyển đổi','PNG','pdf2png','.pdf'],
+  ['JPG sang PDF','Cũ','Chuyển đổi','▣','img','image/*'],
+  ['PDF sang Word','Cũ','Chuyển đổi','W','none','.pdf'],
+  ['Word sang PDF','Cũ','Chuyển đổi','W','none','.docx']
+ ];
+ const h=mock(registry);
+ const rendered=h.html();
+ assert.equal((rendered.match(/Chuyển đổi định dạng tệp/g)||[]).length,1);
+ assert.match(rendered,/data-i="0"/);
+ assert.match(rendered,/class="catalog-status">Web \/ PC<\/span>/);
+ assert.doesNotMatch(rendered,/PDF sang ảnh|Ảnh sang PDF|Văn bản & Office/);
+ assert.match(rendered,/Nhận dạng văn bản OCR/);
+ assert.match(html,/universal-route[^\n]*convert\.html/);
 });
