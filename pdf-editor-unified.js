@@ -82,7 +82,7 @@
    return;
   }
   const trigger=event.target.closest?.('[data-pdf-route]');
-  if(trigger){event.preventDefault();open(trigger.dataset.pdfRoute);return;}
+  if(trigger){event.preventDefault();event.stopImmediatePropagation();open(trigger.dataset.pdfRoute);return;}
   if(event.target.closest?.('#unified-home')){event.preventDefault();close();return;}
   if(event.target.closest?.('#unified-reload')){
    event.preventDefault();
@@ -114,7 +114,7 @@
  }
  function init(){
   if(!root())return;
-  document.addEventListener('click',click);
+  document.addEventListener('click',click,true); // capture before legacy catalog dispatch
   window.addEventListener('message',frameMessage);
   viewer().addEventListener('load',()=>{
    document.getElementById('unified-loading').textContent='';
