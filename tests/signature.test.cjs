@@ -16,3 +16,28 @@ test('signing routes and pinned vendors are complete and local',()=>{
  for(const [file,hash]of Object.entries(m.sha256))assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'vendor/signature',file))).digest('hex'),hash);
  assert.match(fs.readFileSync(path.join(root,'index.html'),'utf8'),/location.href='\.\/sign.html'/);
 });
+
+test('signed PDFs are accepted for viewing, but never rewritten',async()=>{
+ const {inspectPdfForEditing,detectUploadFormat,assertUnsignedDocument}=await import('../pdf-sign-core.mjs');
+ const pdf=await PDFLib.PDFDocument.create();pdf.addPage();
+ pdf.context.register(pdf.context.obj({Type:'Sig',ByteRange:[0,20,40,10]}));
+ const signed=new Uint8Array(await pdf.save());
+ assert.equal(detectUploadFormat(signed),'pdf');
+ const info=await inspectPdfForEditing(signed,PDFLib);
+ assert.equal(info.signed,true);assert.equal(info.readOnly,true);
+ assert.throws(()=>assertUnsignedDocument(await PDFLib.PDFDocument.load(signed),PDFLib),/chữ ký số/);
+ const unsigned=await PDFLib.PDFDocument.create();unsigned.addPage();
+ const safe=await inspectPdfForEditing(new Uint8Array(await unsigned.save()),PDFLib);
+ assert.equal(safe.readOnly,false);
+});
+test('file chooser routes PDF by magic and supported images by signature',async()=>{
+ const {detectUploadFormat,buildImagePdf,inspectPdfForEditing}=await import('../pdf-sign-core.mjs');
+ const pdf=await PDFLib.PDFDocument.create();pdf.addPage();
+ const bytes=new Uint8Array(await pdf.save());
+ assert.equal(detectUploadFormat(bytes),'pdf');
+ assert.equal(detectUploadFormat(Uint8Array.from([0xff,0xd8,0xff,0x00,0x00])),'jpeg');
+ assert.equal(detectUploadFormat(Uint8Array.from([0x89,0x50,0x4e,0x47,13,10,26,10])),'png');
+ assert.equal(detectUploadFormat(Uint8Array.from([82,73,70,70,0,0,0,0,87,69,66,80])),'webp');
+ assert.throws(()=>detectUploadFormat(new TextEncoder().encode('Notes document')),/Định dạng/);
+ assert.equal((await inspectPdfForEditing(new TextEncoder().encode('%PDF- broken'),PDFLib)).readOnly,true);
+});

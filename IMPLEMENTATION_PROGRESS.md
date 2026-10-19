@@ -447,3 +447,10 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Thêm workflow `.github/workflows/signature-live.yml` để kiểm thử trên đúng `https://hieudang99dd.github.io/PDF-Editor1/sign.html` sau khi triển khai. Sửa lỗi cấu hình fixture: cài `node-forge` qua lockfile trước khi tạo chứng thư QA.
 - [Run trực tiếp website **39195871566**](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195871566): **SUCCESS** toàn bộ bước, gồm mở trang thật, Playwright ký/đặt chữ ký và tải PDF, chứng thư RSA P12/PEM, chặn PDF đã có chữ ký, kiểm hình học PyMuPDF và OpenSSL kiểm CMS `ByteRange` + phát hiện thay đổi dữ liệu. Artifact chỉ lưu PDF, PNG, JSON; chứng thư và khóa QA sinh tạm không được upload.
 - Đây là bằng chứng chữ ký mật mã hợp lệ theo test fixture; **không chứng minh** tin cậy CA thương mại hoặc hỗ trợ USB Token/SmartCA, TSA, LTV. Chưa nghiệm thu chứng thư thật của người dùng.
+
+## 2026-10-19 — Tải PDF đã ký và mở rộng đầu vào cho công cụ chữ ký
+
+- Phân tách **mở/xem/tải bản gốc** với **ghi/chèn chữ ký**; tệp PDF đã có chữ ký không còn bị chặn ở bước tải lên. Với chữ ký cũ, PDF.js hiển thị an toàn và cho tải lại file byte-identical; các nút ghi/ký tiếp bị khóa vì chưa có incremental signing giữ chữ ký trước.
+- Hỗ trợ PDF (kể cả ký số, password-view) và chuyển ảnh PNG/JPG/WebP thành PDF bằng pdf-lib. Nhận dạng magic bytes, lỗi rõ ràng với Word/Excel/CAD chưa có bộ chuyển đổi, tránh nhận là hỗ trợ mọi tệp tùy ý.
+- Bỏ giới hạn cứng 200 MB ở input; vẫn giới hạn theo khả năng RAM của trình duyệt. Chứng thư và ảnh chữ ký giữ giới hạn tài nguyên riêng.
+- Bổ sung kiểm thử signed fixture: xem thành công PDF 4 trang đã ký, tải tệp nguyên byte, không cho ghi lại, cộng kiểm thử từ chối định dạng văn phòng không thể chuyển; giữ test OpenSSL ByteRange không bị đổi và PDF khác vẫn ký được.

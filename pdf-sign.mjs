@@ -1,18 +1,22 @@
 import SignaturePad from './vendor/signature/pad.mjs';
-import { clampBox, imageInkBounds, removeWhite, buildVisualPdf, assertUnsignedDocument } from './pdf-sign-core.mjs';
+import { clampBox, imageInkBounds, removeWhite, buildVisualPdf, inspectPdfForEditing, detectUploadFormat, buildImagePdf } from './pdf-sign-core.mjs';
 const $ = id => document.getElementById(id);
 const pdfjs = window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc = './pdf.worker.min.js';
 let source, documentPdf, previewPdf, visualBytes, filename = '', current = 1, marks = [], asset, selected;
+let documentProtection = null;
 let revision = 0, appliedRevision = -1, generation = 0, paint = 0, busy = false, showingResult = false, downloadUrl, uploadedImage;
 const status = (message, error = false) => { $('status').textContent = message; $('status').classList.toggle('error', error); };
 function revokeDownload() { if (downloadUrl) URL.revokeObjectURL(downloadUrl); downloadUrl = null; $('download').hidden = true; $('download').removeAttribute('href'); }
 function controls() {
-  $('apply').disabled = busy || !documentPdf || (!marks.length && !$('digital').checked);
-  $('export').disabled = busy || appliedRevision !== revision;
-  $('add').disabled = $('repeat').disabled = busy || !asset || !documentPdf;
-  $('remove').disabled = busy || !selected || showingResult;
+  const protectedDocument = Boolean(documentProtection?.readOnly);
+  $('apply').disabled = busy || protectedDocument || !documentPdf || (!marks.length && !$('digital').checked);
+  $('export').disabled = busy || protectedDocument || appliedRevision !== revision;
+  $('add').disabled = $('repeat').disabled = busy || protectedDocument || !asset || !documentPdf;
+  $('remove').disabled = busy || protectedDocument || !selected || showingResult;
   $('original').disabled = busy || !showingResult;
-  for (const id of ['file', 'reset', 'mode', 'use', 'digital', 'certificate', 'password', 'inspect', 'reason', 'location', 'width', 'image', 'remove-white', 'typed', 'font', 'color', 'thickness', 'undo', 'clear']) $(id).disabled = busy;
+  for (const id of ['file','reset']) $(id).disabled = busy;
+  for (const id of ['mode','use','digital','certificate','password','inspect','reason','location','width','image','remove-white','typed','font','color','thickness','undo','clear']) $(id).disabled = busy || protectedDocument;
+  $('download-source').disabled = busy || !documentPdf || !source;
   $('pages').classList.toggle('busy', busy); $('placements').classList.toggle('busy', busy);
 }
 function invalidate() {
@@ -117,7 +121,7 @@ async function renderPage() {
   } catch (error) { if (token === paint) status('Không hiển thị được trang PDF: ' + error.message, true); }
 }
 async function addMark(position, page = current) {
-  if (!asset || !documentPdf || busy) return;
+  if (!asset || !documentPdf || busy || documentProtection?.readOnly) return;
   const doc = documentPdf, token = generation;
   const view = (await doc.getPage(page)).getViewport({ scale: 1 });
   if (token !== generation || doc !== documentPdf) return;
@@ -150,27 +154,70 @@ $('width').onchange = async () => {
 };
 async function reset() {
   generation++; paint++; await previewPdf?.destroy(); await documentPdf?.destroy(); previewPdf = documentPdf = null;
-  source = visualBytes = undefined; marks = []; asset = selected = null; filename = ''; uploadedImage?.close(); uploadedImage = null;
+  source = visualBytes = undefined; documentProtection = null; marks = []; asset = selected = null; filename = ''; uploadedImage?.close(); uploadedImage = null;
   revision++; appliedRevision = -1; showingResult = false; revokeDownload(); pad.clear(); $('pages').replaceChildren(); $('placements').replaceChildren(); $('preview').width = $('preview').height = 1; $('asset').hidden = true;
   for (const id of ['file', 'image', 'certificate', 'password', 'typed', 'cert-info', 'reason', 'location']) { if ('value' in $(id)) $(id).value = ''; else $(id).textContent = ''; }
-  $('digital').checked = false; $('filename').textContent = 'Chưa có tài liệu'; $('page-title').textContent = 'Trang PDF'; status('Chọn PDF để bắt đầu.'); controls();
+  $('digital').checked = false; $('filename').textContent = 'Chưa có tài liệu'; $('page-title').textContent = 'Trang PDF'; $('document-mode').hidden = true; status('Chọn PDF để bắt đầu.'); controls();
 }
 $('reset').onclick = () => { if (!busy) void reset(); };
+async function convertWebp(bytes) {
+  const bitmap = await createImageBitmap(new Blob([bytes],{type:'image/webp'}));
+  try {
+    if(bitmap.width*bitmap.height>16000000)throw new Error('Ảnh WebP quá lớn để chuyển thành PDF trên thiết bị này.');
+    const canvas=document.createElement('canvas');
+    canvas.width=bitmap.width; canvas.height=bitmap.height;
+    canvas.getContext('2d').drawImage(bitmap,0,0);
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Không thể chuyển WebP thành PNG.')),'image/png'));
+    return new Uint8Array(await blob.arrayBuffer());
+  } finally {bitmap.close();}
+}
+function downloadBytes(bytes,name) {
+  const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+  const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a);
+  a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+$('download-source').onclick=()=>{
+  if(!busy && source && documentPdf)downloadBytes(source,filename);
+};
 $('file').onchange = async () => {
   const file = $('file').files[0]; if (!file || busy) return;
   await reset(); busy = true; controls(); const token = generation;
   try {
-    if (file.size > 200 * 1024 * 1024) throw Error('PDF tối đa 200 MB.');
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    const check = await PDFLib.PDFDocument.load(bytes.slice()); assertUnsignedDocument(check, PDFLib);
-    source = bytes; documentPdf = await pdfjs.getDocument({ data: bytes.slice() }).promise; filename = file.name; current = 1;
-    $('filename').textContent = filename; status('Chọn cách tạo chữ ký, đặt lên trang rồi Áp dụng.');
-    for (let n = 1; n <= documentPdf.numPages; n++) {
-      const button = document.createElement('button'); button.dataset.page = n; button.textContent = 'Trang ' + n; button.onclick = () => { if (!busy) { current = n; selected = null; void renderPage(); } }; $('pages').append(button);
+    if (file.size > 200*1024*1024) status('Tệp lớn: việc mở có thể tốn nhiều RAM, hãy đợi trình duyệt xử lý.');
+    const input = new Uint8Array(await file.arrayBuffer());
+    if (token !== generation) return;
+    const format = detectUploadFormat(input);
+    const bytes = format === 'pdf' ? input : await buildImagePdf(input,format,PDFLib,convertWebp);
+    const review = await inspectPdfForEditing(bytes,PDFLib);
+    // PDF.js is read-only at this stage and can display existing cryptographic
+    // signatures without reserializing any signed bytes.
+    const task = pdfjs.getDocument({data:bytes.slice()});
+    task.onPassword = (providePassword)=>{
+      const pw=window.prompt('PDF được bảo vệ. Nhập mật khẩu để xem tài liệu (không lưu mật khẩu):');
+      if(pw===null){void task.destroy();return;}
+      providePassword(pw);
+    };
+    const opened = await task.promise;
+    if (token !== generation) {await opened.destroy();return;}
+    source=bytes; documentPdf=opened; documentProtection=review;
+    filename=format==='pdf' ? file.name.replace(/\.pdf$/i,'')+'.pdf' : file.name.replace(/\.[^.]+$/,'')+'.pdf';
+    current=1; $('filename').textContent=filename;
+    $('document-mode').hidden=!review.readOnly;
+    $('document-mode').textContent=review.reason;
+    status(review.readOnly ? review.reason :
+      format==='pdf' ? 'Đã mở PDF. Tạo chữ ký rồi Áp dụng và Xuất PDF.' :
+        'Ảnh đã được chuyển thành PDF để ký. Chọn vị trí và Áp dụng.');
+    for(let n=1;n<=documentPdf.numPages;n++){
+      const button=document.createElement('button');button.dataset.page=n;button.textContent='Trang '+n;
+      button.onclick=()=>{if(!busy){current=n;selected=null;void renderPage();}};
+      $('pages').append(button);
     }
     await renderPage();
-  } catch (error) { status(error.message || 'Không mở được PDF. Kiểm tra mật khẩu tệp.', true); source = undefined; }
-  finally { if (generation === token) { busy = false; controls(); } }
+  }catch(error){
+    $('document-mode').hidden=true;
+    status(error?.message || 'Không mở được tệp. Vui lòng thử tài liệu khác.',true);
+    source=undefined;documentProtection=null;
+  }finally{if(generation===token){busy=false;controls();}}
 };
 for (const id of ['digital', 'certificate', 'password', 'reason', 'location']) $(id).addEventListener('input', () => { invalidate(); if (id === 'certificate' || id === 'password') $('cert-info').textContent = ''; });
 async function certificateTask(action, pdf) {
@@ -193,7 +240,7 @@ async function certificateTask(action, pdf) {
 function certificateInfo(info) { $('cert-info').textContent = `${info.subject} · RSA ${info.bits} · Cấp bởi ${info.issuer} · Hết hạn ${new Date(info.validTo).toLocaleDateString('vi-VN')}. Khớp khóa, còn hạn; chưa xác thực chuỗi CA hoặc thu hồi.`; }
 $('inspect').onclick = async () => { busy = true; controls(); try { certificateInfo((await certificateTask('inspect')).info); status('Đã đọc chứng thư.'); } catch (e) { status(e.message, true); } finally { busy = false; controls(); } };
 $('apply').onclick = async () => {
-  if (busy || !documentPdf) return;
+  if (busy || !documentPdf || documentProtection?.readOnly) return;
   busy = true; controls(); status('Đang áp dụng chữ ký hiển thị…');
   try {
     const result = await buildVisualPdf(source, marks, PDFLib, documentPdf);
@@ -204,7 +251,7 @@ $('apply').onclick = async () => {
 };
 $('original').onclick = () => { showingResult = false; void renderPage(); };
 $('export').onclick = async () => {
-  if (busy || appliedRevision !== revision || !visualBytes) return;
+  if (busy || documentProtection?.readOnly || appliedRevision !== revision || !visualBytes) return;
   busy = true; controls(); revokeDownload();
   try {
     let bytes = visualBytes;

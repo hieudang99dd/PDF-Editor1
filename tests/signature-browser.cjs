@@ -30,8 +30,22 @@ const {spawn}=require('node:child_process');const {chromium}=require('playwright
   await page.locator('#reason').fill('Phê duyệt hồ sơ kỹ thuật');await page.locator('#location').fill('Thành phố Hồ Chí Minh');
   await page.locator('#apply').click();await page.waitForFunction(()=>!document.querySelector('#export').disabled);download=page.waitForEvent('download');await page.locator('#export').click();await(await download).saveAs(path.join(out,'signed.pdf'));assert.equal(await page.locator('#password').inputValue(),'');
   await page.locator('#certificate').setInputFiles(path.join(out,'identity.pem'));await page.locator('#password').fill('test-password');await page.locator('#apply').click();await page.waitForFunction(()=>!document.querySelector('#export').disabled);download=page.waitForEvent('download');await page.locator('#export').click();await(await download).saveAs(path.join(out,'signed-pem.pdf'));
-  // Already-signed files must fail closed before a rewrite.
-  await page.locator('#file').setInputFiles(path.join(out,'signed.pdf'));await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('đã có chữ ký số'));assert.ok(await page.locator('#apply').isDisabled());
+  // Signed input must be viewable and downloadable byte-for-byte, not rewritten.
+  await page.locator('#file').setInputFiles(path.join(out,'signed.pdf'));
+  await page.waitForFunction(()=>document.querySelector('#document-mode').textContent.includes('chữ ký số')&&
+    !document.querySelector('#document-mode').hidden&&
+    !document.querySelector('#download-source').disabled);
+  assert.ok(await page.locator('#apply').isDisabled());
+  assert.ok(await page.locator('#export').isDisabled());
+  const signedOriginalDownload=page.waitForEvent('download');
+  await page.locator('#download-source').click();
+  await(await signedOriginalDownload).saveAs(path.join(out,'signed-preserved.pdf'));
+  assert.deepEqual(fs.readFileSync(path.join(out,'signed-preserved.pdf')),fs.readFileSync(path.join(out,'signed.pdf')),'Signed original must not change a byte');
+  assert.ok((await page.locator('#page-title').textContent()).includes('Trang 1/4'));
+  // Unsupported office files are selected but clearly rejected (never misrepresented as PDF).
+  await page.locator('#file').setInputFiles({name:'office.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from('PK unsupported fixture')});
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('chưa chuyển được sang PDF'));
+  assert.ok(await page.locator('#apply').isDisabled());
   // Expired credentials never sign a document.
   await page.locator('#certificate').setInputFiles(path.join(out,'expired.p12'));await page.locator('#password').fill('test-password');await page.locator('#inspect').click();await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('hết hạn'));
   await page.locator('#reset').click();assert.equal(await page.locator('#certificate').inputValue(),'');
