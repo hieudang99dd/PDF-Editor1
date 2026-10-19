@@ -64,7 +64,7 @@ test('CIT route and editor engine stay unmodified',()=>{
  assert.match(cit,/for\(const t of tools\)if\(!existing\.has\(t\[0\]\)\)T\.push\(t\)/);
  assert.match(cit,/home\(\);\s*\}\)\(\);/);
  assert.doesNotMatch(ui,/T\.push\(|T\[[^\]]+\]\s*=/);
- assert.match(html,/hvd-ui-v2\.js\?v=20261019-convert2/);
+ assert.match(html,/hvd-ui-v2\.js\?v=20261019-convert3/);
  assert.match(html,/hvd-ui-v2\.css\?v=20261016-dao1/);
 });
 test('catalog icon and featured text tile use explicit centered, responsive layout',()=>{
@@ -95,7 +95,7 @@ test('conversion groups show one unified tile and preserve OCR separately',()=>{
  const rendered=h.html();
  assert.equal((rendered.match(/Chuyển đổi định dạng tệp/g)||[]).length,1);
  assert.match(rendered,/data-i="0"/);
- assert.match(rendered,/class="catalog-status">Web \/ PC<\/span>/);
+ assert.match(rendered,/class="catalog-status">Cần ứng dụng PC<\/span>/);
  assert.doesNotMatch(rendered,/PDF sang ảnh|Ảnh sang PDF|Văn bản & Office/);
  assert.match(rendered,/Nhận dạng văn bản OCR/);
  assert.match(html,/universal-route[^\n]*convert\.html/);
