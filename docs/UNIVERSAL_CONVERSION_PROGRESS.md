@@ -25,3 +25,9 @@
 3. Add PP-StructureV3 table layout into the shared converter, with editable DOCX/XLSX outputs.
 4. Add preview, batch jobs, page selection and cancellation in backend.
 5. Evaluate specialized libraries (img2pdf, pdf2docx, unoserver) by license, version and benchmark before adoption.
+
+## 2026-10-19 — Dọn danh mục
+
+- Loại bỏ thẻ **Thuộc tính PDF** khỏi danh mục `Nâng cao` trong `hvd-ui-v2.js` theo yêu cầu người dùng. Không xóa engine gốc hoặc tệp phụ thuộc để tránh ảnh hưởng công cụ khác.
+- Cache-bust tệp danh mục tại `index.html`: `hvd-ui-v2.js?v=20261019-no-metadata4`.
+- Cập nhật `tests/home-layout.test.cjs` và thêm kiểm thử chống hồi quy; vẫn giữ OCR, bộ chuyển đổi, nén, làm phẳng biểu mẫu.
