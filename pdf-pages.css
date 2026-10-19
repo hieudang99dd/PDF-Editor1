@@ -56,3 +56,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,.pm-card:focus-vis
 
 /* Browser native hidden wins even for flex empty/upload containers. */
 [hidden]{display:none!important}
+
+/* Numbered jump for technical PDFs with hundreds of pages. */
+.pm-layout-actions #jump{width:78px;height:30px;padding:4px 8px;background:#fff;border:1px solid var(--line);border-radius:6px;color:var(--ink)}

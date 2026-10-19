@@ -359,6 +359,17 @@ bind('range-apply',()=>{
  try{setSelectedByIndex(parsePageRange(el('range').value,pages.length))}
  catch(e){message(e.message,true)}
 });
+function jumpToPage(){
+ const num=Number(el('jump').value);
+ if(!Number.isInteger(num)||num<1||num>pages.length)return message('Số trang phải từ 1 đến '+pages.length+'.',true);
+ const id=pages[num-1].id;
+ selectCard(id);
+ el('grid').querySelector('[data-id="'+id+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});
+ message('Đang xem trang '+num+' / '+pages.length);
+}
+bind('jump-btn',jumpToPage);
+el('jump').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();jumpToPage()}});
+
 el('range').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();el('range-apply').click()}});
 bind('rotate-left',()=>mutate(()=>{for(const p of activePages())p.rotation=rotateDegrees((p.rotation||0)-90)}));
 bind('rotate-right',()=>mutate(()=>{for(const p of activePages())p.rotation=rotateDegrees((p.rotation||0)+90)}));

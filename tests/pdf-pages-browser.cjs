@@ -53,6 +53,9 @@ async function run(){
   await page.locator('#layout').selectOption('rail');
   assert.equal(await page.locator('#workspace').getAttribute('data-layout'),'rail');
   await page.locator('#layout').selectOption('split');
+  await page.locator('#jump').fill('4');
+  await page.locator('#jump-btn').click();
+  assert.match(await page.locator('#preview-info').innerText(),/Trang 4 \/ 4/);
   await page.locator('#range').fill('2-3');
   await page.locator('#range-apply').click();
   assert.match(await page.locator('#selection-info').innerText(),/2 trang/);
