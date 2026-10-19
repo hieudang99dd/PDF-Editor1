@@ -25,7 +25,8 @@ test('signed PDFs are accepted for viewing, but never rewritten',async()=>{
  assert.equal(detectUploadFormat(signed),'pdf');
  const info=await inspectPdfForEditing(signed,PDFLib);
  assert.equal(info.signed,true);assert.equal(info.readOnly,true);
- assert.throws(()=>assertUnsignedDocument(await PDFLib.PDFDocument.load(signed),PDFLib),/chữ ký số/);
+ const loaded=await PDFLib.PDFDocument.load(signed);
+ assert.throws(()=>assertUnsignedDocument(loaded,PDFLib),/chữ ký số/);
  const unsigned=await PDFLib.PDFDocument.create();unsigned.addPage();
  const safe=await inspectPdfForEditing(new Uint8Array(await unsigned.save()),PDFLib);
  assert.equal(safe.readOnly,false);
