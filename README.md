@@ -2,7 +2,7 @@
 
 Bộ công cụ PDF EDITOR: sửa văn bản gốc, biên tập trang, chuyển đổi, kiểm tra chất lượng PDF OCR trên trình duyệt và các tác vụ Office qua engine PC tùy chọn. Trang chính triển khai bằng GitHub Pages, dữ liệu PDF trên các công cụ browser không tự tải lên dịch vụ cloud.
 
-**Truy cập:** https://hieudang99dd.github.io/PDF-Editor-Hdv/
+**Truy cập:** https://hieudang99dd.github.io/PDF-Editor1/index.html
 
 ## Luồng chức năng
 
@@ -66,3 +66,18 @@ Mở `region-eraser.html`, chọn trang trong dàn trang để phóng to. Hỗ t
 
 
 **Quy trình xác nhận trước khi xuất:** công cụ Xóa vector theo vùng có hai nút độc lập **Áp dụng** (thực thi PDFium ngay trên web, mở kết quả để xem) và **Xuất PDF** (chỉ được bật sau khi áp dụng thành công). Có nút **Chỉnh sửa lại** giữ các vùng đã chọn và cho phép áp dụng lại, không tải PDF khi mới bấm Áp dụng; xem `docs/REGION_ERASER.md`.
+
+
+## Giao diện thống nhất — PDF EDITOR (2026-10-19)
+
+**Trang chủ chính thức:** https://hieudang99dd.github.io/PDF-Editor1/index.html
+
+Giao diện `index.html` là điểm vào chung; các thuật toán chuyên sâu vẫn nằm ở trang độc lập để không thay đổi vòng đời PDF.js, PDFium, Worker hoặc file đang xử lý. Các trang `pages.html`, `crop.html`, `ocr.html`, `convert.html`, `sign.html`, `region-eraser.html` và `pdfium-preflight.html` có thanh chuyển công cụ PDF EDITOR chung (`pdf-editor-workspace.js`). Trình sửa Text tại `studio/edit-pdf-text.html` đã có `studio/hvd-hub.js` điều hướng về trang chủ, nên không tiêm thanh điều hướng mới vào bản build upstream.
+
+- **Quản lý trang PDF:** có ghép PDF; thẻ Ghép PDF trùng lặp đã ẩn khỏi danh mục.
+- **Cắt lề PDF:** áp dụng thực, review hình ảnh trước/sau, xác nhận trước khi xuất.
+- **OCR:** PaddleOCR.js chạy web; PP-StructureV3 là lựa chọn backend riêng, chưa được coi là hoạt động trên GitHub Pages.
+- **Chuyển đổi:** giao diện tập trung; những định dạng cần FastAPI/LibreOffice phải chạy engine tương ứng, GitHub Pages không thể chạy Python.
+- **Các công cụ khác:** Nén PDF, sửa Text, ký PDF, xóa vector theo vùng giữ nguyên runtime.
+
+Luồng sử dụng: mở `index.html` → chọn công cụ → xử lý → kiểm tra/áp dụng → xuất khi tác vụ hỗ trợ. Không tự chuyển file giữa các công cụ (để bảo vệ dữ liệu). Thay đổi này chỉ đồng bộ giao diện và điều hướng, **không** tuyên bố bổ sung thuật toán PDF mới.

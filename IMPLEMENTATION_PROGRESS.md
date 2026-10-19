@@ -517,3 +517,13 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Kiểm thử `tests/pdf-crop.test.cjs` + Playwright Chromium `tests/pdf-crop-browser.cjs`. GitHub Actions [crop QA 39225574091](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39225574091): **SUCCESS**; [Pages build 39225572827](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39225572827): **SUCCESS**, commit `a68ef36ab`.
 - Phạm vi nghiệm thu: 2 trang vector khác hướng, vùng cắt, duyệt/tải kết quả, bảo toàn MediaBox & page count, chặn xuất khi chưa review hoặc sau thay đổi, khóa PDF ký số. Chưa nghiệm thu diện rộng A0/A1, nhiều lớp CAD, XFA hoặc in nhiều máy in.
 - Giới hạn quan trọng: CropBox **không xóa dữ liệu ngoài vùng cắt**, không thay thế công cụ xóa bảo mật. Tham khảo `docs/PDF_CROP_REVIEW.md`.
+
+
+### Đồng bộ các cập nhật trong giao diện PDF EDITOR mới — 2026-10-19
+- Trang chính `index.html` dẫn vào tất cả công cụ đã triển khai; giữ các engine trang riêng để tránh xung đột PDF.js/PDFium/Web Workers và thao tác file chưa xuất.
+- Thêm `pdf-editor-workspace.js`: thanh điều hướng PDF EDITOR thống nhất trên công cụ Quản lý trang, Cắt lề (có review), OCR, Chuyển đổi, Chữ ký, Xóa vector, Kiểm tra PDF, lối về Nén PDF và Sửa Text. Không đổi logic engine hoặc tải lại file ngầm.
+- Giữ `studio/hvd-hub.js` trong Sửa Text upstream, không chỉnh/sửa bản build PDFium.
+- Đồng nhất nhãn PDF EDITOR trong Cắt lề và Chuyển đổi, tăng version script danh mục để tránh cache cũ.
+- Giữ thẻ Thuộc tính PDF và thẻ Ghép PDF riêng ngoài danh mục (ghép đã nằm trong Quản lý trang).
+- Cập nhật README từ website cũ sang `https://hieudang99dd.github.io/PDF-Editor1/index.html`; thêm kiểm thử định tuyến tại `tests/pdf-editor-integration.test.cjs`.
+- Không tuyên bố engine backend PP-StructureV3/Office đã chạy ngay trên web tĩnh; chúng vẫn tùy chọn hoặc cần chạy backend.

@@ -5,7 +5,7 @@ const main=document.querySelector('#home');
 if(!main||typeof home!=='function')return;
 const hero=main.querySelector('.hero');
 hero.querySelector('h1').textContent='Bộ công cụ PDF chuyên nghiệp';
-hero.querySelector('p').textContent='Chỉnh sửa, tổ chức, chuyển đổi và xuất bản hồ sơ. Các tác vụ cần engine PC được ghi rõ.';
+hero.querySelector('p').textContent='Sửa Text, quản lý trang, cắt lề có review, OCR, chuyển đổi và ký PDF trong một hệ thống. Tác vụ cần engine PC được ghi rõ.';
 if(!hero.querySelector('.eyebrow'))hero.insertAdjacentHTML('afterbegin','<span class="eyebrow">PDF EDITOR / KHÔNG GIAN LÀM VIỆC</span>');
 const q=document.querySelector('#q');
 q.placeholder='Tìm: sửa Text, ghép PDF, xóa trang, OCR, chồng bản vẽ…';
@@ -31,8 +31,8 @@ const cards=[
  ['pages','Tổ chức','Quản lý trang PDF','Ghép, sắp xếp, tách, xóa, trích xuất, xoay và chèn trang.','▦',['Sắp xếp PDF','Cắt PDF','Xóa trang PDF','Trích xuất trang','Xoay PDF','Đảo thứ tự trang PDF','Trích trang lẻ','Trích trang chẵn','Chèn trang trắng PDF','Xoay PDF góc tùy chỉnh']],
  ['compress','Tổ chức','Nén PDF','Tối ưu dung lượng và ưu tiên giữ vector.','⇲',['Giảm dung lượng PDF']],
  ['crop','Tổ chức','Cắt lề PDF','Kéo vùng cắt, dò lề tự động và so sánh trước/sau. Phải kiểm tra rồi mới xuất.','⌗',['Cắt lề PDF']],
- ['convert','Chuyển đổi','Chuyển đổi định dạng tệp','Chọn tệp đầu vào → định dạng đầu ra. PDF ↔ ảnh; PDF → Word/TXT; Office → PDF.','⇄',['Chuyển đổi tệp']],
- ['ocr','Chuyển đổi','Nhận dạng văn bản OCR','Nhận dạng chữ scan ngay trên trình duyệt.','OCR',['PDF OCR']],
+ ['convert','Chuyển đổi','Chuyển đổi định dạng tệp','Chọn đầu vào và đầu ra tại một nơi. Chuyển đổi nâng cao cần engine trên PC.','⇄',['Chuyển đổi tệp']],
+ ['ocr','Chuyển đổi','Nhận dạng văn bản OCR','Nhận dạng chữ scan ngay trên trình duyệt. Nhận dạng cấu trúc nâng cao là tùy chọn engine PC.','OCR',['PDF OCR']],
  ['region','Nâng cao','✂ Xóa vector theo vùng','Cắt thực các đoạn vector tại vùng tùy chọn, có vùng bảo vệ. Công cụ riêng, không phủ trắng.','✂',['Xóa vector theo vùng']],
  ['drawings','Nâng cao','Bố trí & chồng bản vẽ','N-up và chồng hai bản vẽ PDF, ưu tiên giữ vector.','▤',['In nhiều trang N-up','Chồng 2 PDF (Overlay)']],
  ['flatten','Nâng cao','Làm phẳng biểu mẫu','Làm phẳng trường biểu mẫu, không khẳng định tất cả chú thích.','▭',['Làm phẳng PDF']]
