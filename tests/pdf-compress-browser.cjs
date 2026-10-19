@@ -47,15 +47,17 @@ async function fixture(page){
  }));
 }
 async function main(){
- const server=serve();
- await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const live=process.env.COMPRESS_BASE_URL?.replace(/\\/$/,'') || null;
+ const server=live?null:serve();
+ if(server)await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const base=live || 'http://127.0.0.1:'+server.address().port+'/PDF-Editor1';
  const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
  try{
   const page=await browser.newPage({viewport:{width:1380,height:920},acceptDownloads:true});
   const faults=[];
   page.on('pageerror',e=>faults.push(e.message));
   page.on('response',r=>{if(r.status()>=400&&/\.m?js/.test(r.url()))faults.push(r.status()+' '+r.url())});
-  await page.goto('http://127.0.0.1:'+server.address().port+'/PDF-Editor1/compress.html');
+  await page.goto(base+'/compress.html');
   await page.waitForFunction(()=>window.PDFLib?.PDFDocument);
   const input=await fixture(page);
   fs.writeFileSync(path.join(out,'source.pdf'),input);
@@ -91,7 +93,7 @@ async function main(){
   console.log('PASS: PDF EDITOR compresses embedded JPEG, retains PDF pages/vectors, and exports without size increase.');
 
   // The user-facing homepage tool must use the same engine as the standalone UI.
-  await page.goto('http://127.0.0.1:'+server.address().port+'/PDF-Editor1/index.html',{waitUntil:'load'});
+  await page.goto(base+'/index.html',{waitUntil:'load'});
   await page.waitForFunction(()=>typeof window.openTool==='function'&&window.PDFLib?.PDFDocument);
   await page.evaluate(()=>{
     const selected=T.findIndex(x=>x[0]==='Giảm dung lượng PDF');
@@ -113,7 +115,7 @@ async function main(){
   console.log('PASS: homepage compressor uses the shared engine with balanced quality and creates downloadable PDF.');
  }finally{
    await browser.close();
-   await new Promise(r=>server.close(r));
+   if(server)await new Promise(r=>server.close(r));
  }
 }
 main().catch(e=>{console.error(e.stack);process.exitCode=1});
