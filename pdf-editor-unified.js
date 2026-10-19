@@ -17,7 +17,7 @@
  const viewer=()=>document.getElementById('unified-frame');
  const home=()=>document.getElementById('home');
  const legacy=()=>document.getElementById('ws');
- const getUrl=key=>new URL('./'+ROUTES[key][0]+(key==='crop'?'?embedded=1&ui=20261019-crop-ui2':''),location.href).href;
+ const getUrl=key=>new URL('./'+ROUTES[key][0]+(key==='crop'?'?embedded=1&ui=20261019-crop-ui2':key==='pages'?'?embedded=1&ui=20261019-pages-clean1':''),location.href).href;
  function showHome(){
   root().hidden=true;
   root().removeAttribute('data-tool');
@@ -39,6 +39,7 @@
   legacy().style.display='none';
   root().hidden=false;
   root().dataset.tool=route;
+  syncShellHeight();
   document.getElementById('unified-crop-bar').hidden=route!=='crop';
   resetCropButtons();
   document.getElementById('unified-title').textContent=ROUTES[route][1];
@@ -112,8 +113,14 @@
   else if(Object.hasOwn(ROUTES,data.route))open(data.route);
   else if(data.route==='compress'){if(close())window.openTool?.(0);}
  }
+ function syncShellHeight(){
+  const hdr=document.querySelector('body > header');
+  root().style.setProperty('--pdfeditor-header-height',Math.ceil(hdr?.getBoundingClientRect().height||60)+'px');
+ }
  function init(){
   if(!root())return;
+  syncShellHeight();
+  window.addEventListener('resize',syncShellHeight);
   document.addEventListener('click',click,true); // capture before legacy catalog dispatch
   window.addEventListener('message',frameMessage);
   viewer().addEventListener('load',()=>{

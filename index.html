@@ -70,7 +70,7 @@ footer{padding:24px 5vw;color:var(--mute);font-size:13px;text-align:center}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <link rel="stylesheet" href="hvd-ui-v2.css?v=20261016-dao1">
-<link rel="stylesheet" href="pdf-editor-unified.css?v=20261019-crop-ui2">
+<link rel="stylesheet" href="pdf-editor-unified.css?v=20261019-pages-clean1">
 <style>
 .hvd-workspace-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
 .hvd-workspace-nav .back{margin:0;padding:10px 0;font-weight:650}
@@ -116,16 +116,6 @@ footer{padding:24px 5vw;color:var(--mute);font-size:13px;text-align:center}
  <div class="unified-toolbar">
   <button id="unified-home" class="unified-home" type="button">← Tất cả công cụ</button>
   <div class="unified-meta"><strong id="unified-title">PDF EDITOR</strong><small>Không gian làm việc thống nhất</small></div>
-  <nav class="unified-routes" aria-label="Các công cụ PDF EDITOR">
-   <button type="button" data-pdf-route="text">Sửa Text</button>
-   <button type="button" data-pdf-route="pages">Quản lý trang</button>
-   <button type="button" data-pdf-route="crop">Cắt lề</button>
-   <button type="button" data-pdf-route="convert">Chuyển đổi</button>
-   <button type="button" data-pdf-route="ocr">OCR</button>
-   <button type="button" data-pdf-route="sign">Chữ ký</button>
-   <button type="button" data-pdf-route="region">Xóa vector</button>
-   <button type="button" data-pdf-route="inspect">Kiểm tra PDF</button>
-  </nav>
   <button class="unified-reload" id="unified-reload" type="button">↻ Đặt lại công cụ</button>
  </div>
  <div class="unified-crop-bar" id="unified-crop-bar" hidden aria-label="Quy trình Cắt lề PDF">
@@ -771,7 +761,7 @@ document.addEventListener('click',e=>{
 $('#q').oninput=home;home();
 </script>
 <script src="hvd-ui-v2.js?v=20261019-crop-ui3"></script>
-<script src="pdf-editor-unified.js?v=20261019-crop-ui3" defer></script>
+<script src="pdf-editor-unified.js?v=20261019-pages-clean1" defer></script>
 <script src="pdf-lib.min.js"></script>
 <script>if(!window.PDFLib){document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');}</script>
 <script src="pdf.min.js"></script>

@@ -47,7 +47,7 @@ async function run(){
    {name:'Bravo.pdf',mimeType:'application/pdf',buffer:B},
   ]);
   await page.waitForFunction(()=>document.querySelectorAll('#grid .pm-card').length===4&&
-   document.querySelector('#apply').disabled===false,{timeout:45000});
+   document.querySelector('#export').disabled===false,{timeout:45000});
   await page.waitForFunction(()=>document.querySelectorAll('#grid .pm-thumb img[src^="data:image"]').length>0,null,{timeout:40000});
   assert.equal(await page.locator('#summary').innerText(),'4 trang · 2 tệp PDF');
   await page.locator('#layout').selectOption('grid');
@@ -71,10 +71,9 @@ async function run(){
   assert.match(await page.locator('#split-count').innerText(),/1 mốc/);
   await page.screenshot({path:path.join(out,'01-layout.png'),fullPage:true});
   await page.locator('#clear-splits').click();
-  await page.locator('#apply').click();
-  await page.locator('#result').waitFor({state:'visible',timeout:45000});
+  assert.equal(await page.locator('#apply').isVisible(),false,'No duplicate Apply step in Page Manager');
   const downloading=page.waitForEvent('download');
-  await page.locator('#result-export').click();
+  await page.locator('#export').click();
   await(await downloading).saveAs(path.join(out,'organized.pdf'));
   const bytes=fs.readFileSync(path.join(out,'organized.pdf'));
   const pdf=await PDFLib.PDFDocument.load(bytes);
@@ -83,14 +82,12 @@ async function run(){
   assert.equal(mode,'split');
   assert.deepEqual(errors,[]);
   await page.screenshot({path:path.join(out,'02-result.png'),fullPage:true});
-  console.log('PASS: live visual page layout, thumbnails, multi-file, range select, rotate, undo/redo, duplicate, split marker and apply/export');
+  console.log('PASS: live page layout, thumbnail and direct export without duplicate Apply/Review');
   // Split point must produce a ZIP containing real independent PDFs.
   await page.locator('#grid .pm-card').first().click();
   await page.locator('#toggle-split').click();
-  await page.locator('#apply').click();
-  await page.locator('#result').waitFor({state:'visible',timeout:45000});
   const getZip=page.waitForEvent('download');
-  await page.locator('#result-export').click();
+  await page.locator('#export').click();
   await(await getZip).saveAs(path.join(out,'split.zip'));
   const zipped=require('../jszip.min.js');
   const archive=await zipped.loadAsync(fs.readFileSync(path.join(out,'split.zip')));
@@ -111,7 +108,7 @@ async function run(){
   await page.reload();
   await page.locator('#files').setInputFiles({name:'signed.pdf',mimeType:'application/pdf',buffer:signedBytes});
   await page.waitForFunction(()=>document.querySelectorAll('#grid .pm-card').length===1);
-  assert.equal(await page.locator('#apply').isDisabled(),true);
+  assert.equal(await page.locator('#apply').isVisible(),false);
   assert.equal(await page.locator('#export').isEnabled(),true);
   const dl=page.waitForEvent('download');
   await page.locator('#export').click();
@@ -119,6 +116,34 @@ async function run(){
   assert.deepEqual(fs.readFileSync(path.join(out,'signed.pdf')),signedBytes);
   assert.deepEqual(errors,[]);
   console.log('PASS: digitally signed original opens read-only and downloads byte-for-byte');
+  // Integrated page manager must fully occupy the visible viewport, without a white masking layer.
+  await page.goto(base+'/index.html#workspace=pages');
+  await page.locator('#unified-ws').waitFor({state:'visible'});
+  await page.waitForFunction(()=>location.hash==='#workspace=pages');
+  assert.equal(await page.locator('#unified-ws .unified-toolbar').isVisible(),false,'No duplicate navigation strip');
+  assert.equal(await page.locator('#unified-ws .unified-note').isVisible(),false,'No redundant notice');
+  const frame=page.frameLocator('#unified-frame');
+  await frame.locator('#empty').waitFor({state:'visible'});
+  const geometry=await page.evaluate(()=>{
+   const frame=document.querySelector('#unified-frame'),outer=document.querySelector('.unified-framebox');
+   return {viewport:innerHeight,frame:frame.getBoundingClientRect().toJSON(),outer:outer.getBoundingClientRect().toJSON()};
+  });
+  assert.ok(geometry.frame.height>geometry.viewport*.68&&geometry.frame.width>1000,'Viewer must fill page, not become a short white rectangle: '+JSON.stringify(geometry));
+  const empty=await frame.locator('#empty').boundingBox();
+  assert.ok(empty&&empty.width>260&&empty.height>120,'Upload prompt must be visible, not covered');
+  await frame.locator('#files').setInputFiles({name:'Alpha.pdf',mimeType:'application/pdf',buffer:A});
+  await frame.locator('#grid .pm-card').first().waitFor({state:'visible',timeout:45000});
+  await frame.locator('#grid .pm-thumb img[src^="data:image"]').first().waitFor({state:'visible',timeout:45000});
+  const visibility=await frame.locator('#grid .pm-card').first().evaluate(card=>{
+    const el=card.querySelector('img')||card;
+    const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+    const front=document.elementFromPoint(x,y);
+    return {x,y,visible:!!front,covered:!card.contains(front)&&front!==card,front:front?.id||front?.className||front?.tagName};
+  });
+  assert.equal(visibility.covered,false,'No white overlay above PDF page thumbnails: '+JSON.stringify(visibility));
+  await page.screenshot({path:path.join(out,'03-integrated-visible.png'),fullPage:true});
+  console.log('PASS: unified PDF Editor page manager: no duplicate nav, canvas and uploads unobscured');
+
  }finally{
   await browser.close();
   if(!live)await new Promise(resolve=>server.close(resolve));

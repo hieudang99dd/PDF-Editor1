@@ -68,7 +68,8 @@ async function sample(label){
    assert.equal(await cropFrame.locator('#review').count(),1);
    await page.locator('#unified-ws').waitFor({state:'visible'});
    assert.equal(await page.locator('#home').isVisible(),false);
-   await page.locator('#unified-ws .unified-routes [data-pdf-route=pages]').click();
+   await page.locator('#unified-home').click();
+   await page.locator('button.catalog-tile').filter({hasText:'Quản lý trang PDF'}).first().click();
    await page.waitForFunction(()=>location.hash==='#workspace=pages');
    await page.frameLocator('#unified-frame').locator('#files').waitFor({state:'attached'});
    await page.locator('#unified-home').click();

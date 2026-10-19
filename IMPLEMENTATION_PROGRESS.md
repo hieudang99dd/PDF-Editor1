@@ -549,3 +549,10 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - `crop.html?embedded=1` không còn header riêng; bố cục thao tác trái, khung PDF phải, nhật ký và review trước/sau phía dưới. Tự cập nhật chiều cao iframe qua `ResizeObserver` và origin-validated message.
 - Bảo toàn thuật toán gốc trong `pdf-crop.mjs` (CropBox vector, đa trang, phát hiện PDF ký số, điều khiển điểm/cạnh); `crop.html` độc lập còn giữ làm đường dẫn tương thích, không là giao diện làm việc chính.
 - Kiểm thử PDF hai trang thật, lựa chọn vùng, review, phê duyệt, tải xuống từ nút trên trang chủ: **đạt**, GitHub Actions `39234617346`. Kiểm thử UX Chromium trên catalog: **đạt** `39234759206`. Xác nhận phát hành qua GitHub Pages theo workflow mới nhất.
+
+
+### 2026-10-19 — Sửa thanh điều hướng dư và lớp trắng của Quản lý trang PDF
+- Bỏ thanh chuyển công cụ `unified-routes` trùng danh mục chính. Riêng Quản lý trang chỉ hiện header gốc `pages.html`; thanh shell và thông báo dư bị ẩn. Dùng nút quay về PDF EDITOR bên trong.
+- Sửa iframe Pages theo vùng hiển thị thực: `html.pm-embedded`, chiều cao `--pdfeditor-header-height` đo từ header chính; `#unified-frame` position:absolute/inset:0 trong flex vùng làm việc. Đảm bảo `#empty` và `#grid` không bị phủ trắng, chiều cao không bị mất.
+- Quản lý trang trực tiếp: ẩn nút Apply kiểm tra nội bộ, hiển thị Hoàn tác/Làm lại/Xuất PDF. Nhấn Xuất tự kết hợp manifest PDF hiện tại hoặc ZIP nếu có mốc tách; không bắt buộc review kiểu Cắt lề. Chữ ký số gốc chỉ được tải xuống byte nguyên trạng.
+- Bổ sung kiểm thử Chromium kiểm tra dàn trang sau upload, kích thước iframe, vùng không bị lớp khác che và nút Xuất trực tiếp.

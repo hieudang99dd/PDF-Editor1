@@ -72,9 +72,8 @@ function updateControls(){
  }
  for(const id of ['blank','reverse','select-all','select-odd','select-even','range-apply','clear-splits'])
   el(id).disabled=!editable||(id==='clear-splits'&&!cuts.size);
- el('apply').disabled=!editable;
- el('export').disabled=busy||!(appliedRevision===revision&&prepared)||false;
- if(isOriginalLocked()&&!busy)el('export').disabled=false;
+ el('apply').disabled=!editable; // Legacy, hidden: direct export no longer requires review.
+ el('export').disabled=busy||!ready||(locked()&&!isOriginalLocked());
  el('undo').disabled=busy||historyIndex<=0||locked();
  el('redo').disabled=busy||historyIndex>=history.length-1||locked();
  el('add').disabled=busy;el('open').disabled=busy;
@@ -312,9 +311,17 @@ async function exportResult(){
  if(isOriginalLocked()){
   return download(sources[0].bytes,sources[0].name);
  }
- if(!prepared||appliedRevision!==revision){message('Nhấn Áp dụng & kiểm tra trước khi xuất PDF.',true);return}
+ if(!pages.length||locked())return message('Chưa có PDF hợp lệ để xuất.',true);
  if(!cuts.size){
-  download(prepared,fileName(sources[0]?.name)+'_organized.pdf');message('Đã yêu cầu tải PDF kết quả.');return;
+  setBusy(true,'Đang xuất PDF theo các trang đã chỉnh sửa…');
+  try{
+   // Build from the current manifest; no stale apply/review snapshot.
+   const bytes=await assemblePages(pages,sources,PDFLib);
+   download(bytes,fileName(sources[0]?.name)+'_organized.pdf');
+   message('Đã tạo PDF kết quả theo các thao tác hiện tại.');
+  }catch(e){message('Không thể xuất PDF: '+(e.message||String(e)),true)}
+  finally{setBusy(false)}
+  return;
  }
  if(!window.JSZip)return message('Chưa tải thư viện ZIP để tách PDF.',true);
  setBusy(true,'Đang chia tài liệu thành các PDF…');

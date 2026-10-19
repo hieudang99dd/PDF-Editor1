@@ -68,7 +68,7 @@ test('existing signing ByteRange blocks rewriting, even if caller ignores lock b
  await assert.rejects(()=>assemblePages(entries,[{bytes:signed,pageCount:1,locked:false}],PDFLib),/chữ ký số/);
  await assert.rejects(()=>assemblePages(entries,[{bytes:signed,pageCount:1,locked:true}],PDFLib),/bảo vệ/);
 });
-test('page management has dedicated grid, thumbnail scroll, preview, apply/export routes',()=>{
+test('page management has grid, thumbnail preview and direct export without review gate',()=>{
  const html=fs.readFileSync(path.join(__dirname,'../pages.html'),'utf8');
  const js=fs.readFileSync(path.join(__dirname,'../pdf-pages.mjs'),'utf8');
  const css=fs.readFileSync(path.join(__dirname,'../pdf-pages.css'),'utf8');
@@ -83,4 +83,13 @@ test('page management has dedicated grid, thumbnail scroll, preview, apply/expor
  assert.match(js,/assemblePages\(/);
  assert.match(css,/data-layout=rail/);
  assert.match(css,/\[hidden\]\{display:none!important\}/);
+});
+
+test('page manager does not require an Apply step to export',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'../pages.html'),'utf8');
+ const script=fs.readFileSync(path.join(__dirname,'../pdf-pages.mjs'),'utf8');
+ assert.match(html,/id="apply"[^>]*hidden/);
+ assert.match(html,/id="export"[^>]*Xuất PDF/);
+ assert.match(script,/const bytes=await assemblePages\(pages,sources,PDFLib\)/);
+ assert.doesNotMatch(script,/Nhấn Áp dụng & kiểm tra trước khi xuất PDF/);
 });

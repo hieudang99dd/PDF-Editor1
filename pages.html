@@ -4,7 +4,8 @@
 <title>Quản lý trang PDF – PDF EDITOR</title>
 <meta name="description" content="Dàn trang PDF dạng ảnh thu nhỏ: kéo thả, chọn nhiều trang, ghép, tách, xoay, đảo thứ tự, trích xuất và xuất PDF giữ nội dung vector.">
 <link rel="icon" href="./studio/hvd-mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./pdf-pages.css?v=20261019-pages2">
+<script>if(new URLSearchParams(location.search).get('embedded')==='1')document.documentElement.classList.add('pm-embedded');</script>
+<link rel="stylesheet" href="./pdf-pages.css?v=20261019-pages-clean1">
 </head>
 <body>
 <div class="pm-app">
@@ -14,8 +15,9 @@
 <div class="pm-header-actions">
 <button id="undo" class="pm-quiet" type="button" disabled aria-label="Hoàn tác">↶ Hoàn tác</button>
 <button id="redo" class="pm-quiet" type="button" disabled aria-label="Làm lại">↷ Làm lại</button>
-<button id="apply" class="pm-primary" disabled type="button">✓ Áp dụng & kiểm tra</button>
-<button id="export" class="pm-primary" disabled type="button">↓ Xuất kết quả</button>
+<!-- Kept only as an internal compatibility hook; Page Manager exports current edits directly. -->
+<button id="apply" type="button" disabled hidden aria-hidden="true">Áp dụng nội bộ</button>
+<button id="export" class="pm-primary" disabled type="button">↓ Xuất PDF</button>
 </div>
 </header>
 <div class="pm-tools" aria-label="Thanh công cụ dàn trang">
@@ -72,6 +74,6 @@
 <script src="./pdf-lib.min.js"></script>
 <script src="./pdf.min.js"></script>
 <script src="./jszip.min.js"></script>
-<script type="module" src="./pdf-pages.mjs?v=20261019-pages2"></script>
+<script type="module" src="./pdf-pages.mjs?v=20261019-pages-clean1"></script>
 <script defer src="./pdf-editor-workspace.js?v=20261019-suite1"></script>
 </body></html>

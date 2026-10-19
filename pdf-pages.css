@@ -59,3 +59,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,.pm-card:focus-vis
 
 /* Numbered jump for technical PDFs with hundreds of pages. */
 .pm-layout-actions #jump{width:78px;height:30px;padding:4px 8px;background:#fff;border:1px solid var(--line);border-radius:6px;color:var(--ink)}
+
+/* Unified PDF EDITOR: page manager uses the whole iframe viewport, never a second top toolbar. */
+html.pm-embedded,html.pm-embedded body{height:100%;overflow:hidden;background:var(--bg)}
+html.pm-embedded .pm-app{height:100%;height:100dvh;min-height:0;max-height:100dvh;overflow:hidden}
+html.pm-embedded .pm-header{position:relative;z-index:2}
+html.pm-embedded .pm-workspace{min-height:0;flex:1 1 auto;overflow:hidden}
+html.pm-embedded .pm-scroll{min-height:0;position:relative;overflow:auto;background:var(--bg)}
+html.pm-embedded .pm-empty:not([hidden]){display:flex!important;position:relative;z-index:1;opacity:1;visibility:visible}
+html.pm-embedded .pm-preview-scroll{min-height:0;overflow:auto}
+html.pm-embedded .pm-layout-bar{min-height:46px}
+html.pm-embedded .pm-result[hidden]{display:none!important}
+html.pm-embedded .pm-footer-right #status{max-width:min(350px,28vw)}
+@media(max-width:700px){html.pm-embedded .pm-header{min-height:60px}html.pm-embedded .pm-header-actions{flex-wrap:wrap}html.pm-embedded .pm-tools{padding:7px}}
