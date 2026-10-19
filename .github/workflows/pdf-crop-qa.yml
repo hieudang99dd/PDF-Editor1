@@ -8,6 +8,7 @@ on:
       - 'hvd-ui-v2.js'
       - 'index.html'
       - 'tests/pdf-crop*'
+      - 'tests/home-layout.test.cjs'
       - '.github/workflows/pdf-crop-qa.yml'
   workflow_dispatch:
 permissions:
