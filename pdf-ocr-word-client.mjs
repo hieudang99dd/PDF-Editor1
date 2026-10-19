@@ -1,6 +1,6 @@
 import { boundedScale } from './pdf-ocr-core.mjs';
 import { bounds, detectRuledTables, assignItemsToTables, nativeTextItems } from './pdf-ocr-word-layout.mjs';
-import { createEditableDocx } from './pdf-ocr-word.mjs';
+import { createEditableDocx } from './pdf-ocr-word.mjs?v=20261019-wordscan1';
 import { mergeTextLines } from './pdf-ocr-word-flow.mjs';
 const fontKinds = ['Regular', 'Bold', 'Italic', 'BoldItalic'];
 async function wordFonts() {

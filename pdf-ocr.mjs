@@ -1,4 +1,4 @@
-import { parsePages, boundedScale, normalizeItems, preserveNativeTextLayer, exportSearchablePdf } from './pdf-ocr-core.mjs';
+import { parsePages, boundedScale, normalizeItems, preserveNativeTextLayer, exportSearchablePdf } from './pdf-ocr-core.mjs?v=20261019-wordscan1';
 const $ = id => document.getElementById(id);
 const pdfjs = window.pdfjsLib;
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('./pdf.worker.min.js', import.meta.url).href;
@@ -78,7 +78,7 @@ async function refineVietnamese(canvas, items, token) {
 }
 async function refineTableCells(canvas, items, token) {
   if (!vietnameseWorker || token !== generation) return;
-  const { findTables } = await import('./pdf-ocr-word-client.mjs');
+  const { findTables } = await import('./pdf-ocr-word-client.mjs?v=20261019-wordscan1');
   const { bounds } = await import('./pdf-ocr-word-layout.mjs');
   if (token !== generation) return;
   const inside = (item, table) => {
