@@ -53,3 +53,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,.pm-card:focus-vis
 .pm-scroll.dragging-over{outline:3px dashed var(--accent);outline-offset:-8px}
 @media(max-width:1000px){.pm-header{flex-wrap:wrap}.pm-title small{display:none}.pm-header-actions{margin-left:auto}.pm-preview{width:42%}.pm-card-actions{flex-wrap:wrap}}
 @media(max-width:650px){.pm-header{padding:8px;gap:7px}.pm-header-actions{flex-wrap:wrap;justify-content:flex-end}.pm-title strong{font-size:14px}.pm-header button{font-size:11px;padding:7px}.pm-layout-bar{align-items:flex-start;flex-direction:column}.pm-layout-actions{flex-wrap:wrap;gap:8px}.pm-preview{width:48%;min-width:0}.pm-scroll{padding:9px}.pm-grid{gap:8px}.pm-workspace[data-layout=rail] .pm-scroll{width:135px;flex-basis:135px}.pm-bottom{flex-direction:column;align-items:stretch}.pm-footer-right{justify-content:space-between}.pm-card{padding:6px}.pm-card-actions button{padding:4px}.pm-preview-scroll{padding:7px}.pm-thumb{min-height:110px;height:125px}}
+
+/* Browser native hidden wins even for flex empty/upload containers. */
+[hidden]{display:none!important}

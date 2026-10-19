@@ -115,6 +115,7 @@ const T=[
 ['Excel sang PDF','Đổi XLS, XLSX sang PDF','Chuyển đổi','X','none','.xls,.xlsx'],
 ['PPT sang PDF','Đổi PPT, PPTX sang PDF','Chuyển đổi','P','none','.ppt,.pptx'],
 ['TXT, RTF sang PDF','Đổi định dạng văn bản sang PDF','Chuyển đổi','T','none','.txt,.rtf,.html,.csv'],
+['Quản lý trang PDF','Dàn trang, sắp xếp, xoay, ghép, tách và trích xuất bằng ảnh thu nhỏ','Sắp xếp','▦','pages-route','.pdf'],
 ['Ghép PDF','Gộp nhiều tệp thành một','Sắp xếp','⊕','merge','.pdf'],
 ['Cắt PDF','Tách tệp theo khoảng trang','Sắp xếp','✂','range','.pdf'],
 ['Xoay PDF','Xoay toàn bộ hoặc từng trang','Sắp xếp','⟳','rot','.pdf'],
@@ -200,6 +201,7 @@ const OPT={
  none:''};
 function openTool(i, restore=false){
  if(!Number.isInteger(i)||!T[i])return;
+ if(T[i]?.[4]==='pages-route' || ['Sắp xếp PDF','Ghép PDF','Cắt PDF','Xoay PDF','Xóa trang PDF','Trích xuất trang'].includes(T[i]?.[0])){location.href='./pages.html';return;}
  if(T[i]?.[4]==='signature-route'){location.href='./sign.html';return;}
  if(T[i]?.[4]==='paddle-ocr-route'){location.href='./ocr.html';return;}
  if(T[i]?.[4]==='cit-text-route'){location.href='./text-editor.html';return;}
