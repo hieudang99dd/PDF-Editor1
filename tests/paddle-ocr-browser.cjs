@@ -82,9 +82,9 @@ const {chromium}=require('playwright');
    if(parsed.querySelector('parsererror'))throw Error(parsed.querySelector('parsererror').textContent);
    const ns='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
    return {tables:parsed.getElementsByTagNameNS(ns,'tbl').length,sections:parsed.getElementsByTagNameNS(ns,'sectPr').length,
-    text:[...parsed.getElementsByTagNameNS(ns,'t')].map(t=>t.textContent).join(' '),fonts:Object.keys(zip.files).filter(n=>n.endsWith('.odttf')).length};
+    textboxes:parsed.getElementsByTagNameNS(ns,'txbxContent').length,text:[...parsed.getElementsByTagNameNS(ns,'t')].map(t=>t.textContent).join(' '),fonts:Object.keys(zip.files).filter(n=>n.endsWith('.odttf')).length};
   },[...fs.readFileSync(path.join(out,'editable.docx'))]);
-  assert.ok(wordCheck.tables>=2,JSON.stringify(wordCheck));assert.equal(wordCheck.sections,3);assert.equal(wordCheck.fonts,4);
+  assert.ok(wordCheck.tables>=2,JSON.stringify(wordCheck));assert.equal(wordCheck.sections,3);assert.equal(wordCheck.fonts,4);assert.equal(wordCheck.textboxes,0);
   assert.ok(wordCheck.text.includes(corrected));assert.ok(wordCheck.text.includes('Cốt thép'));
   assert.ok(!wordCheck.text.includes('Outside selected range'));
   fs.writeFileSync(path.join(out,'word-verification.json'),JSON.stringify(wordCheck,null,2));

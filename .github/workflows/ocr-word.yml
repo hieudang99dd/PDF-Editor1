@@ -6,7 +6,9 @@ on:
       - 'pdf-ocr*'
       - 'ocr.html'
       - 'tests/paddle-ocr*'
-      - 'scripts/paddleocr/verify_word.py'
+      - 'scripts/paddleocr/verify_word*.py'
+      - 'scripts/word/**'
+      - 'vendor/docx/**'
       - '.github/workflows/ocr-word.yml'
   workflow_dispatch:
 permissions:
@@ -25,6 +27,9 @@ jobs:
       - name: Install browser QA dependencies
         working-directory: scripts/paddleocr
         run: npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
+      - name: Rebuild pinned browser Word library
+        working-directory: scripts/word
+        run: npm ci --no-audit --no-fund && npm run build && git diff --exit-code -- ../../vendor/docx/
       - name: Install independent Word renderer
         run: |
           sudo apt-get update
@@ -39,9 +44,11 @@ jobs:
       - name: Actual OCR and PDF TXT DOCX downloads
         env:
           NODE_PATH: ${{ github.workspace }}/scripts/paddleocr/node_modules
-        run: node tests/paddle-ocr-browser.cjs
+        run: node tests/paddle-ocr-browser.cjs && node tests/paddle-ocr-word-flow-browser.cjs
       - name: Verify editable tables and render Word independently
-        run: python3 scripts/paddleocr/verify_word.py test-results/paddle-ocr/editable.docx test-results/paddle-ocr/source.pdf
+        run: |
+          python3 scripts/paddleocr/verify_word.py test-results/paddle-ocr/editable.docx test-results/paddle-ocr/source.pdf
+          python3 scripts/paddleocr/verify_word_flow.py test-results/paddle-ocr/letter
       - uses: actions/upload-artifact@v4
         if: always()
         with:

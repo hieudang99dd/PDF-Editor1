@@ -417,3 +417,9 @@ GitHub Pages chỉ chạy frontend tĩnh. Office/Tesseract/LibreOffice chạy na
 - Release: `dfce85ab612d3bad8047720c0f5d2f51bbd7e3d8`. Word acceptance run `39190058047` (branch) and `39190219048` (master): success. Pages build/deployment `39190218655`: success.
 - Direct live browser acceptance passed on `https://hieudang99dd.github.io/PDF-Editor1/ocr.html`: PDF/TXT/DOCX download, corrected Unicode, three Word sections, two editable ruled tables (native and scan), four embedded fonts, original PDF rendering unchanged, page range respected and no external document upload.
 - Local Node regression: 222 passed, 2 skipped. Three rendered Word pages were inspected; independent font-byte, Unicode, pagination, graphic and visible table-border checks passed. Complex/source-specific layout and recognition limitations remain documented.
+
+## 2026-10-19 — Correct editable Word font/spacing failures
+
+User screenshot showed per-line TextBoxes and broken spacing. Replaced custom VML text reconstruction with pinned MIT dolanmiu/docx 9.6.1 browser library and normal flowing paragraphs/tables; kept full four-face Noto Sans embedding through a small font adapter. Fixed dropped native whitespace and gutter bridging. A realistic administrative-letter regression additionally exposed residual raster Vietnamese accents; full-line font-relative masking eliminates these in the fixture. Corrected landscape dimension handling in the library adapter.
+
+Validation: 225 Node tests (223 pass, two pre-existing skips), real Paddle/Tesseract browser OCR and PDF/TXT/DOCX downloads, independent three-page Word rendering, merged/native/scanned tables, reversible font bytes, dimensions and graphic preservation. Added actual fragmented PDF administrative-letter/paired-header fixture and edited-font document; independent render + pixel check catches ghost accents. Deployment verification pending. Original user PDF/DOCX not supplied; do not claim an exact-file fix or perfect conversion.

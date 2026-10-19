@@ -39,16 +39,32 @@ node build.mjs
 
 Build tải model/ngôn ngữ chính thức, kiểm tra hash đã duyệt, tạo bundle main và sao nguyên worker/WASM. Workflow `.github/workflows/paddle-ocr.yml` chạy regression, browser acceptance rồi mới commit runtime được kiểm thử; từ chối ghi đè nếu nhánh đã tiến lên. Studio Text/PDFium không đổi thuật toán. Full publish script giữ redirect OCR riêng khi tạo lại Studio.
 
-## Xuất Word chỉnh sửa được (2026-10-19)
+## Xuất Word chỉnh sửa được (cập nhật 2026-10-19)
 
-Nút **Xuất Word sửa được (.docx)** xuất các trang đã xử lý, gồm cả trang được giữ chữ gốc. Các trang ngoài phạm vi chưa xử lý không được tự thêm vào Word. PDF tìm kiếm được vẫn giữ toàn bộ trang như trước.
+Nút **Xuất Word sửa được (.docx)** xuất các trang đã xử lý, gồm cả trang giữ lớp chữ gốc. Các trang ngoài phạm vi không được tự thêm vào Word. PDF tìm kiếm được vẫn giữ toàn bộ trang.
 
-- `pdf-ocr-word-layout.mjs`: phát hiện đoạn kẻ ngang/dọc và thành phần liên thông, dựng ô, gộp ô chữ nhật ngang/dọc, gán chữ vào ô theo tọa độ. Với trang PDF có chữ, lấy chữ và hình học từ PDF.js thay vì OCR lại.
-- Khi bật kiểm tra tiếng Việt, bảng scan có đường kẻ được nhận dạng lại theo từng ô, cắt bỏ biên kẻ để giảm lỗi nhận đường kẻ thành ký tự và gộp chữ nhiều cột. Kết quả vẫn được sửa trong danh sách dòng trước khi xuất.
-- `pdf-ocr-word-client.mjs`: dựng ảnh trang, suy luận bảng, tách chữ khỏi phần đồ họa; giữ phần ảnh/đồ họa còn lại làm nền theo section, dưới các chữ và bảng để không che đường kẻ. Không dùng ảnh nguyên trang để thay cho toàn bộ chữ/bảng.
-- `pdf-ocr-word.mjs`: tạo OOXML DOCX bằng JSZip cùng origin; chữ thường là hộp văn bản chỉnh sửa được tại vị trí gốc, bảng là `w:tbl` với `gridSpan`/`vMerge`, hàng có chiều cao tối thiểu và được phép giãn khi sửa. Giữ kích thước/hướng từng trang bằng section; giấy lớn hơn giới hạn 22 inch của Word được thu tỷ lệ.
-- Nhúng đủ bốn font Noto Sans Regular/Bold/Italic/BoldItalic theo font relationships và `.odttf`. Kiểm tra giải mã ngược font phải khớp byte với TTF gốc. Dùng Unicode NFC; không chuyển sang mã VNI/TCVN3. Noto Sans là font thay thế hỗ trợ tiếng Việt, không giả nhận đã phục hồi font gốc của ảnh scan.
+### Thư viện GitHub được tích hợp
 
-**Giới hạn:** ưu tiên bố cục, không bảo đảm giống tuyệt đối PDF. Chữ sửa được trong hộp văn bản, không phải toàn bộ tài liệu liên tục tự dàn lại như văn bản soạn mới. Bảng không đường kẻ, đường kẻ đứt/mờ, bảng xoay/nghiêng lớn, đường bao CAD phức tạp, màu sắc/kiểu chữ gốc và OCR ảnh kém vẫn cần kiểm tra/chỉnh lại. Ô/phần chữ không được nhận dạng có thể còn trong nền ảnh. Nhúng font cần trình đọc Word hỗ trợ; không bảo đảm mọi trình xem web hiển thị như Word desktop.
+- [dolanmiu/docx](https://github.com/dolanmiu/docx), MIT, bản ghim **9.6.1**: thực sự tạo Paragraph/TextRun/Table, section, DrawingML và gói DOCX ngay trong trình duyệt. Bundle cùng origin tại `vendor/docx/docx.mjs`, SHA-256 và giấy phép kèm theo. Tái dựng: `cd scripts/word && npm ci && npm run build`.
+- Đã đối chiếu [ArtifexSoftware/pdf2docx](https://github.com/ArtifexSoftware/pdf2docx), Python. Không tích hợp hoặc giả lập engine Python này trong website tĩnh. Hình học ghép dòng/đoạn và nhận bảng bên dưới là mã ứng dụng, không phải thuật toán của thư viện docx.
 
-**QA:** mẫu bốn trang gồm trang scan chữ Việt và đồ họa, bảng native, bảng scan và trang ngoài phạm vi. Xuất Word ba trang, hai bảng thật có ô gộp, bốn font nhúng. Playwright kiểm tra tải DOCX, XML, chữ đã sửa và không thêm trang ngoài phạm vi. LibreOffice + PyMuPDF độc lập kiểm tra số/kích thước trang, tiếng Việt, tiêu đề không bị xuống dòng ngoài ý muốn và đồ họa giữ đúng vị trí. Đã render và xem từng trang PNG. Workflow `.github/workflows/ocr-word.yml` giữ artifact kiểm chứng.
+### Kiến trúc và sửa lỗi
+
+- `pdf-ocr-word-client.mjs` render từng trang, lấy chữ PDF hoặc kết quả OCR đã sửa và nhận bảng có đường kẻ. Nền giữ đồ họa; xóa toàn dòng chữ bằng biên an toàn theo cỡ font để loại dấu tiếng Việt còn sót. Bảng scan được OCR lại theo ô trước bước xuất.
+- `pdf-ocr-word-layout.mjs` trả các mảnh chữ native **kèm dấu cách**, tách gán vào ô trước khi ghép; nhận đường kẻ/gộp ô chữ nhật như trước.
+- `pdf-ocr-word-flow.mjs` ghép theo baseline và khoảng cách, giữ dấu cách riêng, chuẩn hóa Unicode NFC, không ghép qua khoảng trống cột lớn. Gom dòng liền thành đoạn khi đủ bằng chứng hình học; tiêu đề cơ quan hai bên được giữ trong bảng Word không viền.
+- `pdf-ocr-word.mjs` dùng **đoạn văn thông thường và bảng Word trong luồng**, không tạo TextBox cho từng dòng, không ép giãn ký tự. Chữ sửa và đổi font được; hàng bảng dùng chiều cao tối thiểu để giãn khi sửa. Mỗi trang nguồn là một section, giữ kích thước/hướng; giấy hơn 22 inch được thu tỷ lệ.
+- Font Noto Sans Regular/Bold/Italic/BoldItalic nhúng đủ, không subset, kiểm chứng giải mã khớp byte TTF. Adapter nhỏ bổ sung bốn face vì API font của docx 9.6.1 chỉ công khai regular. Compatibility mode 15. Không chuyển sang VNI/TCVN3, không tuyên bố khôi phục font gốc.
+
+### Giới hạn
+
+Ưu tiên khả năng sửa chữ và bảng với bố cục gần bản gốc; không bảo đảm giống tuyệt đối. Đổi font/cỡ chữ hoặc thêm nội dung có thể dàn lại và tăng số trang. Văn bản nhiều cột phức tạp, chữ xoay, bảng không đường kẻ/mờ, bảng CAD và ảnh kém vẫn cần kiểm tra. Nền ảnh giữ đồ họa không tự dàn lại theo chữ; vùng chữ chưa nhận dạng có thể còn trong nền. Mask biên rộng có thể ảnh hưởng đồ họa sát chữ. Nhúng font tùy khả năng trình đọc; chưa tự động kiểm thử bằng Microsoft Word desktop.
+
+PDF có lớp chữ sai ToUnicode/VNI/TCVN3 không tự sửa bằng đổi font. Bỏ chọn **Bỏ qua trang đã có chữ**, chạy nhận dạng lại rồi kiểm tra/sửa dấu và số liệu trước khi xuất. OCR cũng không bảo đảm mọi dấu/số liệu đúng.
+
+### Kiểm định
+
+- Mẫu bốn trang: scan chữ Việt + đồ họa, bảng native, bảng scan, trang ngoài phạm vi; xuất ba trang, hai bảng thật có ô gộp, bốn font nhúng. Browser kiểm tra OCR thật, sửa chữ, hủy/chạy lại, PDF/TXT/DOCX, không TextBox, không thêm trang ngoài phạm vi, tài sản cùng origin.
+- Mẫu văn bản hành chính: PDF.js thực sự tách từ/dấu cách, tiêu đề hai bên, chữ Việt và số tiền. Xuất Word và bản đổi font sang Liberation Serif; LibreOffice/PyMuPDF kiểm tra hiển thị hai font khác nhau, khoảng trắng và số liệu. Kiểm tra nền mẫu toàn chữ không còn pixel mực để bắt lỗi dấu/nét ma.
+- Render và xem toàn bộ trang PNG bằng quy trình tài liệu; không dùng kiểm tra XML thay cho kiểm tra hình ảnh. CI `ocr-word.yml` tái dựng thư viện ghim và giữ bằng chứng browser/render.
+- Chưa có PDF/DOCX gốc của ảnh người dùng báo lỗi; mẫu tổng hợp kiểm chứng nguyên nhân chung, không chứng minh tài liệu đó đã chuyển đúng hoàn toàn.

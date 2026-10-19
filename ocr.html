@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PDF EDITOR – Nhận dạng văn bản OCR</title><link rel="stylesheet" href="pdf-ocr.css?v=20261019-word1"></head>
+<title>PDF EDITOR – Nhận dạng văn bản OCR</title><link rel="stylesheet" href="pdf-ocr.css?v=20261019-word2"></head>
 <body><header><a href="./index.html">← Tất cả công cụ</a><strong>PDF EDITOR</strong><span>Nhận dạng văn bản OCR</span></header>
 <main><section class="controls"><h1>Nhận dạng chữ trong PDF scan</h1><p>Xử lý trên máy của bạn trong trình duyệt. Tài liệu không được tải lên máy chủ. Lần đầu cần tải bộ nhận dạng.</p>
 <div class="options"><label class="file">Chọn tệp PDF<input id="file" type="file" accept="application/pdf,.pdf"></label><span id="filename">Chưa chọn tệp</span></div>
@@ -9,10 +9,10 @@
 <label>Ngôn ngữ<select id="language"><option value="vi">Tiếng Việt + English</option><option value="en">English</option></select></label>
 <label class="check"><input id="refine" type="checkbox" checked>Kiểm tra dấu tiếng Việt bằng Tesseract</label>
 <label class="check"><input id="skip" type="checkbox" checked>Bỏ qua trang đã có chữ</label></div>
-<p class="hint">Với trang vừa có chữ vừa có ảnh scan, bỏ chọn “Bỏ qua trang đã có chữ” để nhận dạng cả trang; lớp chữ xuất có thể trùng với chữ gốc.</p>
+<p class="hint">Nếu chữ gốc bị sai mã/font hoặc trang vừa có chữ vừa có ảnh scan, bỏ chọn “Bỏ qua trang đã có chữ” để nhận dạng cả trang; lớp chữ xuất có thể trùng với chữ gốc.</p>
 <div class="actions"><button id="run" disabled>Nhận dạng OCR</button><button id="cancel" class="secondary" disabled>Hủy</button><button id="pdf" class="secondary" disabled>Xuất PDF tìm kiếm được</button><button id="word" class="secondary" disabled>Xuất Word sửa được (.docx)</button><button id="txt" class="secondary" disabled>Xuất TXT</button></div>
-<p class="hint">Word xuất các trang đã xử lý: chữ sửa được, bảng có đường kẻ rõ được dựng thành bảng Word, font Unicode được nhúng. Bố cục phức tạp cần kiểm tra lại sau chuyển đổi.</p>
+<p class="hint">Word xuất các trang đã xử lý: chữ là đoạn văn sửa và đổi font được, bảng có đường kẻ rõ được dựng thành bảng Word, font Unicode được nhúng. Bố cục phức tạp cần kiểm tra lại sau chuyển đổi.</p>
 <p id="status" role="status" aria-live="polite">Chọn PDF để bắt đầu.</p><progress id="progress" max="1" value="0" aria-label="Tiến trình OCR"></progress></section>
 <div class="workspace"><nav id="page-list" aria-label="Danh sách trang"></nav><section class="preview" aria-label="Xem trang"><div id="paper"><canvas id="preview"></canvas><svg id="boxes" aria-label="Vị trí chữ nhận dạng"></svg></div></section>
 <section class="results"><h2 id="result-title">Kết quả nhận dạng</h2><p class="hint">Bấm dòng để kiểm tra vị trí và sửa nội dung trước khi xuất. Màu cam: độ tin cậy dưới 85%. Điểm tin cậy không bảo đảm đúng dấu hoặc số liệu. OCR không xác định chính xác font gốc.</p><div id="lines"></div></section></div>
-</main><script src="pdf.min.js"></script><script src="pdf-lib.min.js"></script><script src="fontkit.umd.min.js"></script><script src="jszip.min.js"></script><script type="module" src="pdf-ocr.mjs?v=20261019-word1"></script></body></html>
+</main><script src="pdf.min.js"></script><script src="pdf-lib.min.js"></script><script src="fontkit.umd.min.js"></script><script src="jszip.min.js"></script><script type="module" src="pdf-ocr.mjs?v=20261019-word2"></script></body></html>

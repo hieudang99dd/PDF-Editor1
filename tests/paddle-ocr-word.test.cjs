@@ -41,8 +41,22 @@ test('DOCX contains Unicode editable text, native table, sections and reversible
  assert.match(xml,/Khối lượng bê tông: 125,50 m3/);assert.match(xml,/Cốt thép/);
  assert.equal((xml.match(/<w:tbl>/g)||[]).length,2);assert.match(xml,/<w:gridSpan w:val="3"/);
  assert.equal((xml.match(/<w:sectPr>/g)||[]).length,2);
+ assert.doesNotMatch(xml, /txbxContent|v:textbox|w:tblpPr|w:fitText|w:w w:val=/);
+ assert.match(await zip.file('word/settings.xml').async('string'), /w:compatSetting(?=[^>]*w:val="15")(?=[^>]*w:name="compatibilityMode")/);
  const ft=await zip.file('word/fontTable.xml').async('string');const guid=ft.match(/w:fontKey="\{([^}]+)\}"/)[1];
  const embedded=await zip.file('word/fonts/NotoSans-Regular.odttf').async('uint8array');
  assert.deepEqual(Buffer.from(obfuscateFont(embedded,guid)),fonts.Regular);
  assert.ok(!(await zip.file('docProps/core.xml').async('string')).includes('<Việt>'));
+});
+
+test('PDF whitespace and split Vietnamese combining marks survive line reconstruction',async()=>{
+ const {mergeTextLines,flowBlocks}=await import('../pdf-ocr-word-flow.mjs');
+ const item=(text,x,width=10,y=20)=>({text,fontSize:12,baseline:y+12,poly:[[x,y],[x+width,y],[x+width,y+12],[x,y+12]]});
+ const lines=mergeTextLines([item('Sở',10,15),item(' ',25,3),item('Xây',28,20),item(' ',48,3),item('dựng',51,25)]);
+ assert.equal(lines.length,1);assert.equal(lines[0].text,'Sở Xây dựng');
+ assert.equal(mergeTextLines([item('u',10,7),item('\u031b\u0301',17,0)])[0].text,'ứ');
+ const columns=flowBlocks([item('ỦY BAN NHÂN DÂN',10,140),item('CỘNG HÒA XÃ HỘI',300,150),item('SỞ XÂY DỰNG',10,120,38),item('Độc lập Tự do Hạnh phúc',300,160,38)],[],500);
+ assert.equal(columns.blocks[0].kind,'columns');assert.equal(columns.blocks[0].columns[0].length,2);
+ const body=flowBlocks([item('Dòng đầu của đoạn văn',10,450,80),item('dòng tiếp theo trong cùng đoạn.',10,300,98)],[],500);
+ assert.equal(body.blocks.length,1);assert.equal(body.blocks[0].lines.length,2);
 });

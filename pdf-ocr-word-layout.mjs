@@ -82,7 +82,9 @@ export function assignItemsToTables(items, tables) {
   return remaining;
 }
 export function nativeTextItems(layer, viewport, pdfjs) {
-  const raw = layer.items.filter(i => typeof i.str === 'string' && i.str.trim()).map(item => {
+  // Keep whitespace fragments: PDF.js can emit spaces separately from letters.
+  // Merging is deferred until after table assignment so adjacent cells stay separate.
+  return layer.items.filter(i => typeof i.str === 'string' && i.str.length).map(item => {
     const t = pdfjs.Util.transform(viewport.transform, item.transform);
     const height = Math.hypot(t[2], t[3]);
     const style = layer.styles[item.fontName] || {}, ascent = Number.isFinite(style.ascent) ? style.ascent : .8;
@@ -90,20 +92,9 @@ export function nativeTextItems(layer, viewport, pdfjs) {
     const dx = Math.cos(angle), dy = Math.sin(angle), ux = Math.sin(angle), uy = -Math.cos(angle);
     const bl = [t[4] - ux * height * (1 - ascent), t[5] - uy * height * (1 - ascent)];
     const tl = [bl[0] + ux * height, bl[1] + uy * height];
-    return { text: item.str.normalize('NFC'), score: 1, fontSize: height,
+    return { text: item.str, score: 1, fontSize: height, baseline: t[5], hasEOL: item.hasEOL,
       bold: /bold|black|heavy/i.test(item.fontName + ' ' + style.fontFamily),
       italic: /italic|oblique/i.test(item.fontName + ' ' + style.fontFamily),
       poly: [tl, [tl[0] + dx * width, tl[1] + dy * width], [bl[0] + dx * width, bl[1] + dy * width], bl] };
-  });
-  // Merge PDF.js fragments within one text line, while keeping cell/column gaps.
-  const visible = raw.filter(item => { const b = bounds(item); return b.right > 0 && b.bottom > 0 && b.x < viewport.width && b.y < viewport.height; });
-  const merged = [];
-  for (const item of visible.sort((a, b) => bounds(a).y - bounds(b).y || bounds(a).x - bounds(b).x)) {
-    const b = bounds(item), last = merged.at(-1), l = last && bounds(last);
-    if (last && Math.abs(b.y - l.y) < Math.min(item.fontSize, last.fontSize) * .2 && b.x >= l.right - 1 && b.x - l.right < item.fontSize * .8 && Math.abs(last.fontSize - item.fontSize) < 1) {
-      last.text += (b.x - l.right > item.fontSize * .2 ? ' ' : '') + item.text;
-      last.poly[1] = item.poly[1]; last.poly[2] = item.poly[2];
-    } else merged.push(item);
-  }
-  return merged;
+  }).filter(item => { const b = bounds(item); return b.right > 0 && b.bottom > 0 && b.x < viewport.width && b.y < viewport.height; });
 }

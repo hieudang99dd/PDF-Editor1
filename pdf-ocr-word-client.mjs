@@ -1,6 +1,7 @@
 import { boundedScale } from './pdf-ocr-core.mjs';
 import { bounds, detectRuledTables, assignItemsToTables, nativeTextItems } from './pdf-ocr-word-layout.mjs';
 import { createEditableDocx } from './pdf-ocr-word.mjs';
+import { mergeTextLines } from './pdf-ocr-word-flow.mjs';
 const fontKinds = ['Regular', 'Bold', 'Italic', 'BoldItalic'];
 async function wordFonts() {
   const entries = await Promise.all(fontKinds.map(async kind => {
@@ -30,8 +31,10 @@ export function findTables(canvas) {
 }
 function clearTextFromBackground(canvas, items, tables) {
   const context = canvas.getContext('2d', { willReadFrequently: true });
-  for (const box of [...items.map(bounds), ...tables]) {
-    const padding = box.xs ? 6 : 2;
+  for (const box of [...mergeTextLines(items), ...tables]) {
+    // PDF font metrics can exclude Vietnamese combining accents. Mask the whole
+    // visual line with a font-relative safety band, rather than individual glyphs.
+    const padding = box.xs ? 6 : Math.max(3, box.fontSize * .5);
     const x = Math.max(0, Math.min(canvas.width - 1, Math.floor(box.x - padding))), y = Math.max(0, Math.min(canvas.height - 1, Math.floor(box.y - padding)));
     const right = Math.min(canvas.width, Math.ceil(box.right + padding)), bottom = Math.min(canvas.height, Math.ceil(box.bottom + padding));
     if (right <= x || bottom <= y) continue;

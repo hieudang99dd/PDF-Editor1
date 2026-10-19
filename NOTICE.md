@@ -67,3 +67,7 @@ Full feature matrix and limitations: `docs/PROCESSING_AND_QA.md`.
 - PDF searchable-text integration is application code. OCR does not recover the original font from scanned images.
 
 Vietnamese refinement uses Tesseract.js 6.0.1 / tesseract.js-core 6.0.0 and [tessdata_fast](https://github.com/tesseract-ocr/tessdata_fast) `vie+eng` (Apache-2.0). Retained notices are bundled in `vendor/paddleocr/THIRD_PARTY_NOTICES.txt`.
+
+## Editable Word export (2026-10-19)
+
+[dolanmiu/docx](https://github.com/dolanmiu/docx), version 9.6.1, MIT. Browser bundle in `vendor/docx/docx.mjs`; license and dependency notices retained alongside it. Reproducible source and lockfile in `scripts/word/`. The application's geometric paragraph reconstruction/table detection is separate from docx, which generates the OOXML document. No Python pdf2docx engine is bundled.

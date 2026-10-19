@@ -258,3 +258,9 @@ Với mỗi file đầu ra: mở bằng **Chrome PDF viewer** và **một trình
 
 - [x] DOCX sửa chữ/bảng có đường kẻ, giữ phân trang/vị trí, gộp ô chữ nhật, font Noto Sans tiếng Việt nhúng.
 - [x] OCR bảng scan từng ô và kiểm thử ZIP/font/Word renderer; xem `docs/OCR_BROWSER.md` và workflow `ocr-word.yml`.
+
+### 2026-10-19 — Word font/editability correction
+
+- [x] Tích hợp dolanmiu/docx 9.6.1 cùng origin, đoạn văn và bảng thật thay TextBox từng dòng.
+- [x] Giữ dấu cách native, không ghép qua cột; sửa nền sót dấu/nét; nhúng đủ font Việt và Word compatibility 15.
+- [x] Mẫu hành chính, đổi font và kiểm tra nền không còn mực; tiếp tục cần PDF/DOCX gốc để đối chiếu đúng hồ sơ người dùng.
