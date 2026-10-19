@@ -20,7 +20,7 @@ test('inline app remains valid JavaScript with independent workspace controls',(
 });
 
 function navigationFixture(){
- const T=[['Ghép PDF','Nhập file','Sắp xếp','⊕','merge','.pdf']];
+ const T=[['Trình đọc PDF','Mở tệp','Chỉnh sửa','👁','organize','.pdf']];
  const nodes={
   '#ws':{style:{display:'none'}},
   '#home':{style:{display:'block'}},
