@@ -42,7 +42,7 @@ export function detectUploadFormat(bytes) {
   if(bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff)return 'jpeg';
   if(bytes[0]===82&&bytes[1]===73&&bytes[2]===70&&bytes[3]===70&&
     bytes[8]===87&&bytes[9]===69&&bytes[10]===66&&bytes[11]===80)return 'webp';
-  throw new Error('Định dạng này chưa chuyển được sang PDF trên trình duyệt. Hỗ trợ PDF (kể cả đã ký), PNG, JPG và WebP; tài liệu Word/Excel cần chuyển sang PDF trước khi ký.');
+  return 'unknown';
 }
 export async function inspectPdfForEditing(bytes, PDFLib) {
   try {

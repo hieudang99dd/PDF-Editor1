@@ -39,6 +39,6 @@ test('file chooser routes PDF by magic and supported images by signature',async(
  assert.equal(detectUploadFormat(Uint8Array.from([0xff,0xd8,0xff,0x00,0x00])),'jpeg');
  assert.equal(detectUploadFormat(Uint8Array.from([0x89,0x50,0x4e,0x47,13,10,26,10])),'png');
  assert.equal(detectUploadFormat(Uint8Array.from([82,73,70,70,0,0,0,0,87,69,66,80])),'webp');
- assert.throws(()=>detectUploadFormat(new TextEncoder().encode('Notes document')),/Định dạng/);
+ assert.equal(detectUploadFormat(new TextEncoder().encode('Notes document')),'unknown');
  assert.equal((await inspectPdfForEditing(new TextEncoder().encode('%PDF- broken'),PDFLib)).readOnly,true);
 });

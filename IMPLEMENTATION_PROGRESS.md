@@ -454,3 +454,8 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Hỗ trợ PDF (kể cả ký số, password-view) và chuyển ảnh PNG/JPG/WebP thành PDF bằng pdf-lib. Nhận dạng magic bytes, lỗi rõ ràng với Word/Excel/CAD chưa có bộ chuyển đổi, tránh nhận là hỗ trợ mọi tệp tùy ý.
 - Bỏ giới hạn cứng 200 MB ở input; vẫn giới hạn theo khả năng RAM của trình duyệt. Chứng thư và ảnh chữ ký giữ giới hạn tài nguyên riêng.
 - Bổ sung kiểm thử signed fixture: xem thành công PDF 4 trang đã ký, tải tệp nguyên byte, không cho ghi lại, cộng kiểm thử từ chối định dạng văn phòng không thể chuyển; giữ test OpenSSL ByteRange không bị đổi và PDF khác vẫn ký được.
+
+### Tải mọi phần mở rộng — bổ sung an toàn
+
+- Bỏ bộ lọc `accept` cố định của input. Tệp không phải PDF/ảnh vẫn được nhận vào phiên, hiển thị thông báo chưa thể xem/ký và cung cấp nút tải lại **đúng byte**, không đưa tệp nhị phân lạ vào PDF.js/PDFLib.
+- Test Chromium xác nhận DOCX thử nghiệm tiếp nhận và tải lại, mọi thao tác sửa/áp dụng vẫn bị khóa. Ký trực tiếp trên DOCX/CAD không được tuyên bố hỗ trợ. Chỉ PDF và ảnh đã hỗ trợ có thể sửa/ký theo thuật toán hiện hành.

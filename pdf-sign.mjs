@@ -16,7 +16,7 @@ function controls() {
   $('original').disabled = busy || !showingResult;
   for (const id of ['file','reset']) $(id).disabled = busy;
   for (const id of ['mode','use','digital','certificate','password','inspect','reason','location','width','image','remove-white','typed','font','color','thickness','undo','clear']) $(id).disabled = busy || protectedDocument;
-  $('download-source').disabled = busy || !documentPdf || !source;
+  $('download-source').disabled = busy || !source;
   $('pages').classList.toggle('busy', busy); $('placements').classList.toggle('busy', busy);
 }
 function invalidate() {
@@ -172,12 +172,13 @@ async function convertWebp(bytes) {
   } finally {bitmap.close();}
 }
 function downloadBytes(bytes,name) {
-  const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+  const mime = /\.pdf$/i.test(name) ? 'application/pdf' : 'application/octet-stream';
+  const url=URL.createObjectURL(new Blob([bytes],{type:mime}));
   const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a);
   a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 $('download-source').onclick=()=>{
-  if(!busy && source && documentPdf)downloadBytes(source,filename);
+  if(!busy && source)downloadBytes(source,filename);
 };
 $('file').onchange = async () => {
   const file = $('file').files[0]; if (!file || busy) return;
@@ -187,6 +188,20 @@ $('file').onchange = async () => {
     const input = new Uint8Array(await file.arrayBuffer());
     if (token !== generation) return;
     const format = detectUploadFormat(input);
+    if (format === 'unknown') {
+      // Generic files are accepted locally for safe, byte-for-byte download.
+      // They must not be passed to PDF.js or a PDF signing algorithm.
+      source = input;
+      documentProtection = {readOnly:true,signed:false,
+        reason:'Tệp đã được tiếp nhận. Định dạng này chưa có bộ xem/ký trong PDF EDITOR; hãy chuyển sang PDF để đặt chữ ký. Có thể tải lại tệp gốc nguyên vẹn.'};
+      filename = file.name;
+      $('filename').textContent = filename;
+      $('document-mode').hidden = false;
+      $('document-mode').textContent = documentProtection.reason;
+      $('page-title').textContent = 'Chưa hỗ trợ xem trước định dạng này';
+      status('Đã tiếp nhận: '+filename+'. Chỉ hỗ trợ tải bản gốc; chưa thể ký tệp ở định dạng này.');
+      return;
+    }
     const bytes = format === 'pdf' ? input : await buildImagePdf(input,format,PDFLib,convertWebp);
     const review = await inspectPdfForEditing(bytes,PDFLib);
     // PDF.js is read-only at this stage and can display existing cryptographic

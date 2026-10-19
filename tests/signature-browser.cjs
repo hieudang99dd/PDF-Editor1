@@ -44,8 +44,13 @@ const {spawn}=require('node:child_process');const {chromium}=require('playwright
   assert.ok((await page.locator('#page-title').textContent()).includes('Trang 1/4'));
   // Unsupported office files are selected but clearly rejected (never misrepresented as PDF).
   await page.locator('#file').setInputFiles({name:'office.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer:Buffer.from('PK unsupported fixture')});
-  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('chưa chuyển được sang PDF'));
+  await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('Đã tiếp nhận: office.docx'));
   assert.ok(await page.locator('#apply').isDisabled());
+  assert.ok(await page.locator('#download-source').isEnabled());
+  const genericDownload=page.waitForEvent('download');
+  await page.locator('#download-source').click();
+  await(await genericDownload).saveAs(path.join(out,'generic-preserved.docx'));
+  assert.deepEqual(fs.readFileSync(path.join(out,'generic-preserved.docx')),Buffer.from('PK unsupported fixture'));
   // Expired credentials never sign a document.
   await page.locator('#certificate').setInputFiles(path.join(out,'expired.p12'));await page.locator('#password').fill('test-password');await page.locator('#inspect').click();await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('hết hạn'));
   await page.locator('#reset').click();assert.equal(await page.locator('#certificate').inputValue(),'');

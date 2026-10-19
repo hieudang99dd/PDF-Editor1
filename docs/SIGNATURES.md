@@ -62,3 +62,8 @@ Không log hoặc lưu khóa/mật khẩu trong localStorage/IndexedDB/server. W
 - Bỏ giới hạn cứng 200 MB khi tải PDF; tệp lớn được cảnh báo vì RAM/trình duyệt có thể hết bộ nhớ. Không thể bảo đảm mở tệp vô hạn dung lượng hay hỗ trợ mọi định dạng nhị phân.
 - DOCX/XLSX/CAD và các tệp không phải PDF/ảnh hỗ trợ chưa được chuyển đổi bằng chính công cụ chữ ký; hiển thị lỗi rõ ràng, không lén xử lý thành PDF. Chứng thư và ảnh chữ ký vẫn có giới hạn an toàn riêng.
 - QA: kiểm bằng PDF ký RSA thật, nút tải lại bất biến từng byte, chặn rewrite, xem trước 4 trang và phản hồi với file định dạng không hỗ trợ.
+
+### Nhận mọi loại tệp để tải lại nguyên bản
+
+- Nút chọn tệp **không lọc phần mở rộng**, bao gồm PDF đã ký số và các tệp Word/Excel/CAD/khác. Loại chưa có bộ đọc vẫn được giữ nguyên byte trong phiên và có nút **Tải bản gốc**, nhưng không có xem trước hoặc khả năng ký/chỉnh nội dung.
+- Chỉ PDF (bao gồm PDF ký số ở chế độ xem) và PNG/JPG/WebP (chuyển thành PDF) là loại đang được hiển thị/xử lý. Không quảng cáo rằng bất kỳ tệp nào cũng có thể ký số.
