@@ -11,7 +11,7 @@ test('all advanced PDF tools share PDF EDITOR navigation without replacing proce
  assert.match(script,/document\.createElement\('nav'\)/);
  assert.match(script,/insertAdjacentElement\('afterend',nav\)/);
  assert.match(script,/aria-current/);
- assert.match(script,/body\\.re-workspace-open #pdfeditor-workspace-nav/);
+ assert.ok(script.includes('body.re-workspace-open #pdfeditor-workspace-nav'));
  for(const name of tools){
   const body=read(name);
   assert.match(body,/pdf-editor-workspace\.js\?v=20261019-suite1/,name+' must load shared navigation');
