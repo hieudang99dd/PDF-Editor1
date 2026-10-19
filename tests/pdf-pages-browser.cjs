@@ -82,6 +82,26 @@ async function run(){
   assert.deepEqual(errors,[]);
   await page.screenshot({path:path.join(out,'02-result.png'),fullPage:true});
   console.log('PASS: live visual page layout, thumbnails, multi-file, range select, rotate, undo/redo, duplicate, split marker and apply/export');
+  // Split point must produce a ZIP containing real independent PDFs.
+  await page.locator('#grid .pm-card').first().click();
+  await page.locator('#toggle-split').click();
+  await page.locator('#apply').click();
+  await page.locator('#result').waitFor({state:'visible',timeout:45000});
+  const getZip=page.waitForEvent('download');
+  await page.locator('#result-export').click();
+  await(await getZip).saveAs(path.join(out,'split.zip'));
+  const zipped=require('../jszip.min.js');
+  const archive=await zipped.loadAsync(fs.readFileSync(path.join(out,'split.zip')));
+  const names=Object.keys(archive.files).filter(name=>name.endsWith('.pdf'));
+  assert.equal(names.length,2,'Expected two PDFs split after first page');
+  const pageCounts=[];
+  for(const name of names){
+    const bytes=await archive.file(name).async('uint8array');
+    const d=await PDFLib.PDFDocument.load(bytes);
+    pageCounts.push(d.getPageCount());
+  }
+  assert.deepEqual(pageCounts,[1,5]);
+  console.log('PASS: split marker exports a real ZIP with 1-page and 5-page vector PDFs');
 
   const signed=await PDFLib.PDFDocument.create();signed.addPage();
   signed.context.register(signed.context.obj({Type:'Sig',ByteRange:[0,22,33,45]}));
