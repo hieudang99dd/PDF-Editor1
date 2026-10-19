@@ -11,7 +11,7 @@ let revision=0,appliedRevision=-1,reviewReady=false,reviewPages=[],changeRows=[]
 let busy=false,openGeneration=0,stageGeneration=0,reviewGeneration=0,drag=null,stageViewport=null;
 let stageRender=null,beforeRender=null,afterRender=null;
 const mm=n=>(n*25.4/72).toFixed(1);
-function status(msg,error=false){el('status').textContent=msg;el('status').style.color=error?'#b22b2b':'#526880'}
+function status(msg,error=false){el('status').textContent=msg;el('status').style.color=error?'#b22b2b':'#526880';reportToShell()}
 function getName(){return (el('file').files[0]?.name||'document.pdf').replace(/\.pdf$/i,'').replace(/[^a-zA-Z0-9À-ỹ_.()\- ]/g,'_').slice(0,90)}
 function updateControls(){
  const ready=!!sourceJs&&!busy;
@@ -23,6 +23,7 @@ function updateControls(){
  for(const id of ['export','review-export'])el(id).disabled=!approved||busy||locked;
  el('inspect').disabled=!outputUrl;
  el('approved').disabled=!reviewReady;
+ reportToShell();
 }
 async function clearReview(){
  ++reviewGeneration;
@@ -307,3 +308,34 @@ el('review-export').addEventListener('click',exportResult);
 el('inspect').addEventListener('click',()=>{if(outputUrl)window.open(outputUrl,'_blank','noopener,noreferrer')});
 window.addEventListener('pagehide',()=>{if(outputUrl)URL.revokeObjectURL(outputUrl);void outputJs?.destroy?.();void sourceJs?.destroy?.()});
 updateControls();
+
+// Bridge embedded crop controls to the one PDF EDITOR toolbar.
+// Only limited commands are accepted from the same-origin parent.
+const embedded=new URLSearchParams(location.search).get('embedded')==='1' && window.parent!==window;
+function reportToShell(){
+ if(!embedded)return;
+ window.parent.postMessage({
+  type:'pdf-editor:crop-state',
+  applyEnabled:!el('apply').disabled,
+  exportEnabled:!el('export').disabled,
+  reviewAvailable:!el('review').hidden,
+  status:el('status').textContent.slice(0,320)
+ },location.origin);
+}
+function syncFrameHeight(){
+ if(!embedded)return;
+ const height=Math.ceil(document.documentElement.scrollHeight);
+ window.parent.postMessage({type:'pdf-editor:crop-height',height},location.origin);
+}
+if(embedded){
+ window.addEventListener('message',event=>{
+  if(event.origin!==location.origin||event.source!==window.parent||event.data?.type!=='pdf-editor:crop-command')return;
+  const action=event.data.action;
+  if(action==='apply'&&!el('apply').disabled)el('apply').click();
+  else if(action==='export'&&!el('export').disabled)el('export').click();
+  else if(action==='review'&&!el('review').hidden)el('review').scrollIntoView({behavior:'smooth',block:'start'});
+ });
+ new ResizeObserver(syncFrameHeight).observe(document.body);
+ window.addEventListener('load',syncFrameHeight);
+}
+reportToShell();
