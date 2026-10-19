@@ -47,6 +47,9 @@ jobs:
           assert 'pdf-sign.mjs' in data and 'Áp dụng và xem trước' in data
           print('PASS: deployed PDF EDITOR signature route is accessible')
           PY
+      - name: Install pinned local signature fixture dependencies
+        working-directory: scripts/signature
+        run: npm ci --no-audit --no-fund
       - name: Generate disposable QA RSA certificates only
         run: node scripts/signature/make-fixtures.mjs
       - name: Run real Chromium against published GitHub Pages
