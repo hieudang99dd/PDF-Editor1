@@ -54,6 +54,18 @@ const {spawn}=require('node:child_process');const {chromium}=require('playwright
   await page.locator('#original').click();await page.waitForSelector('.sig-box');
   const signature=await page.locator('#asset').getAttribute('src');const image=Buffer.from(signature.split(',')[1],'base64');await page.locator('#mode').selectOption('image');await page.locator('#image').setInputFiles({name:'signature.png',mimeType:'image/png',buffer:image});await page.waitForFunction(()=>document.querySelector('#asset-status').textContent.includes('Đã chọn ảnh'));await page.locator('#remove-white').check();await page.locator('#use').click();await page.waitForFunction(()=>!document.querySelector('#add').disabled);
   await page.screenshot({path:path.join(out,'desktop.png'),fullPage:true});await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(out,'mobile.png'),fullPage:true});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
-  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);console.log('PASS: draw/drag/resize/repeat, rotated CropBox pages, apply/export, RSA P12+PEM, wrong password, expired certificate, signed-input block, typed Vietnamese, image signature, mobile and same-origin.');
+  // Image documents are converted into editable PDFs on import.
+  await page.setViewportSize({width:1500,height:1100});
+  await page.locator('#file').setInputFiles({name:'snapshot.png',mimeType:'image/png',buffer:image});
+  await page.waitForFunction(()=>document.querySelector('#filename').textContent==='snapshot.pdf'&&
+     !document.querySelector('#download-source').disabled &&
+     document.querySelector('#page-title').textContent.includes('Trang 1/1'));
+  assert.ok(await page.locator('#document-mode').isHidden());
+  const convertedDownload=page.waitForEvent('download');
+  await page.locator('#download-source').click();
+  await(await convertedDownload).saveAs(path.join(out,'image-import.pdf'));
+  const converted=await PDFLib.PDFDocument.load(fs.readFileSync(path.join(out,'image-import.pdf')));
+  assert.equal(converted.getPageCount(),1);
+  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);console.log('PASS: draw/drag/resize/repeat, rotated CropBox pages, apply/export, RSA P12+PEM, wrong password, expired certificate, signed-input read-only + byte-perfect export, PNG-as-PDF import, typed Vietnamese, image signature, mobile and same-origin.');
  }finally{if(browser)await browser.close();if(server)server.kill();}
 })().catch(e=>{console.error(e);process.exit(1);});
