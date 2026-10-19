@@ -47,7 +47,7 @@ async function fixture(page){
  }));
 }
 async function main(){
- const live=process.env.COMPRESS_BASE_URL?.replace(/\\/$/,'') || null;
+ const live=process.env.COMPRESS_BASE_URL?.replace(/\/$/,'') || null;
  const server=live?null:serve();
  if(server)await new Promise(r=>server.listen(0,'127.0.0.1',r));
  const base=live || 'http://127.0.0.1:'+server.address().port+'/PDF-Editor1';
