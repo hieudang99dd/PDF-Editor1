@@ -70,7 +70,7 @@ footer{padding:24px 5vw;color:var(--mute);font-size:13px;text-align:center}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <link rel="stylesheet" href="hvd-ui-v2.css?v=20261016-dao1">
-<link rel="stylesheet" href="pdf-editor-unified.css?v=20261019-unified1">
+<link rel="stylesheet" href="pdf-editor-unified.css?v=20261019-crop-ui2">
 <style>
 .hvd-workspace-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:20px}
 .hvd-workspace-nav .back{margin:0;padding:10px 0;font-weight:650}
@@ -128,7 +128,15 @@ footer{padding:24px 5vw;color:var(--mute);font-size:13px;text-align:center}
   </nav>
   <button class="unified-reload" id="unified-reload" type="button">↻ Đặt lại công cụ</button>
  </div>
- <div class="unified-note">Các thuật toán PDF được giữ nguyên. Chuyển công cụ có thể làm mất thay đổi chưa xuất; PDF scan/Office nâng cao vẫn cần engine tương ứng.</div>
+ <div class="unified-crop-bar" id="unified-crop-bar" hidden aria-label="Quy trình Cắt lề PDF">
+   <span class="crop-step"><b>01</b> Chọn PDF & vùng giữ lại</span>
+   <span class="crop-step"><b>02</b> Áp dụng</span>
+   <span class="crop-step"><b>03</b> Review trước/sau</span>
+   <span class="crop-step"><b>04</b> Xuất PDF</span>
+   <div class="crop-actions"><button id="crop-host-apply" class="crop-action" type="button" disabled>Áp dụng & kiểm tra</button><button id="crop-host-review" class="crop-action secondary" type="button" disabled>Xem trước/sau</button><button id="crop-host-export" class="crop-action primary" type="button" disabled>Xuất PDF</button></div>
+   <p id="crop-host-status" class="crop-host-status" role="status" aria-live="polite">Chọn PDF và vẽ vùng cần giữ lại.</p>
+ </div>
+ <div class="unified-note">Công cụ thuộc một giao diện PDF EDITOR. Chuyển công cụ có thể mất thay đổi chưa xuất; OCR nâng cao và chuyển đổi Office có thể cần engine PC.</div>
  <div class="unified-framebox"><span id="unified-loading" role="status" aria-live="polite"></span><iframe id="unified-frame" title="Công cụ PDF EDITOR" loading="eager" referrerpolicy="same-origin"></iframe></div>
 </main>
 <div id="toast" role="status"></div>
@@ -763,7 +771,7 @@ document.addEventListener('click',e=>{
 $('#q').oninput=home;home();
 </script>
 <script src="hvd-ui-v2.js?v=20261019-unified1"></script>
-<script src="pdf-editor-unified.js?v=20261019-unified1" defer></script>
+<script src="pdf-editor-unified.js?v=20261019-crop-ui2" defer></script>
 <script src="pdf-lib.min.js"></script>
 <script>if(!window.PDFLib){document.write('<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"><\/script>');}</script>
 <script src="pdf.min.js"></script>
