@@ -75,7 +75,7 @@ async function sample(label){
    // Embedded page manager supplies its own back control; duplicate shell nav is hidden.
    assert.equal(await page.locator('#unified-ws .unified-toolbar').isVisible(),false);
    await page.frameLocator('#unified-frame').locator('.pm-back').click();
-   await page.waitForURL('**/index.html?*');
+   await page.waitForFunction(()=>document.querySelector('#unified-ws')?.hidden===true);
    assert.equal(await page.locator('#unified-ws').isHidden(),true);
    await page.goto(address,{waitUntil:'domcontentloaded'});
    // The dedicated merge card was removed at user request; page manager retains merge.
