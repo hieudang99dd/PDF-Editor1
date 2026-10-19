@@ -1,5 +1,5 @@
 import SignaturePad from './vendor/signature/pad.mjs';
-import { clampBox, imageInkBounds, removeWhite, buildVisualPdf, inspectPdfForEditing, detectUploadFormat, buildImagePdf } from './pdf-sign-core.mjs';
+import { clampBox, imageInkBounds, removeWhite, buildVisualPdf, inspectPdfForEditing, detectUploadFormat, buildImagePdf } from './pdf-sign-core.mjs?v=20261019-upload3';
 const $ = id => document.getElementById(id);
 const pdfjs = window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc = './pdf.worker.min.js';
 let source, documentPdf, previewPdf, visualBytes, filename = '', current = 1, marks = [], asset, selected;
