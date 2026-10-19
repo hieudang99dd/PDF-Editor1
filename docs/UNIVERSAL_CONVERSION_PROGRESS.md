@@ -31,3 +31,9 @@
 - Loại bỏ thẻ **Thuộc tính PDF** khỏi danh mục `Nâng cao` trong `hvd-ui-v2.js` theo yêu cầu người dùng. Không xóa engine gốc hoặc tệp phụ thuộc để tránh ảnh hưởng công cụ khác.
 - Cache-bust tệp danh mục tại `index.html`: `hvd-ui-v2.js?v=20261019-no-metadata4`.
 - Cập nhật `tests/home-layout.test.cjs` và thêm kiểm thử chống hồi quy; vẫn giữ OCR, bộ chuyển đổi, nén, làm phẳng biểu mẫu.
+
+## 2026-10-19 — Gỡ thẻ ghép PDF trùng chức năng
+
+- Ẩn thẻ **Ghép PDF** độc lập trong `hvd-ui-v2.js`, không xóa thuật toán hoặc router cũ để tránh ảnh hưởng các tác vụ.
+- **Quản lý trang PDF** vẫn cho phép ghép nhiều PDF, chỉnh sửa trang, sắp xếp và kiểm tra trước khi xuất; bổ sung từ “Ghép” vào mô tả thẻ để dễ nhận biết.
+- Tăng asset version thành `hvd-ui-v2.js?v=20261019-no-merge5`; cập nhật `tests/home-layout.test.cjs` xác nhận không còn thẻ trùng.
