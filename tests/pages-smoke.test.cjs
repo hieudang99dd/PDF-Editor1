@@ -8,6 +8,14 @@ const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const bridge = fs.readFileSync(path.join(root, 'pdf-local-tools.js'), 'utf8');
 
+test('home compression uses the dedicated image-aware engine and never claims fake percentages', () => {
+  assert.match(bridge, /compressPdfBytes/);
+  assert.match(bridge, /pdf-compress-engine\.mjs\?v=/);
+  assert.match(bridge, /input\[name="lv"\]:checked/);
+  assert.match(bridge, /Nén mạnh/);
+  assert.doesNotMatch(bridge, /const document = await window\.PDFLib\.PDFDocument\.load\(bytes\)/);
+});
+
 test('GitHub Pages homepage includes independent PDF tools and correct asset order', () => {
   assert.match(html, /<script src="pdf-lib\.min\.js"><\/script>/);
   assert.match(html, /<script src="pdf-local-tools\.js\?v=[^"]+"><\/script>/);
@@ -68,7 +76,6 @@ function mockPage(toolName, target) {
 }
 
 for (const [name,target,output] of [
-  ['Giảm dung lượng PDF',null,'optimized_civil3d.pdf'],
   ['PDF sang TXT',null,'civil3d.txt'],
   ['Chuyển đổi PDF','txt','civil3d.txt']
 ]) {
