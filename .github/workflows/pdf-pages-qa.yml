@@ -1,0 +1,62 @@
+name: PDF EDITOR visual page manager acceptance
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'pdf-pages*.mjs'
+      - 'pdf-pages.css'
+      - 'pages.html'
+      - 'index.html'
+      - 'studio/organize-pdf.html'
+      - 'studio/pdf-multi-tool.html'
+      - 'tests/pdf-pages*.cjs'
+      - '.github/workflows/pdf-pages-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pages-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify pure manifest engine and browser scripts
+        run: |
+          node --check pdf-pages.mjs
+          node --check pdf-pages-core.mjs
+          node --check tests/pdf-pages-browser.cjs
+          node --test tests/pdf-pages.test.cjs tests/pages-smoke.test.cjs tests/organizer-reset.test.cjs
+      - name: Install Chromium and PDF verifier
+        run: |
+          npm install --no-save playwright@1.57.0
+          npx playwright install --with-deps chromium
+          python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Accept real PDF files via thumbnail page manager
+        run: node tests/pdf-pages-browser.cjs
+      - name: Independently verify exported text and page geometry
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import fitz
+          path=Path('test-results/pages/organized.pdf')
+          doc=fitz.open(path)
+          assert len(doc)==6,len(doc)
+          text='\n'.join(p.get_text() for p in doc)
+          assert 'ALPHA PAGE 1' in text
+          assert 'ALPHA PAGE 2' in text
+          assert 'BRAVO PAGE 1' in text
+          assert any(p.rect.width>700 for p in doc)
+          assert all(p.get_drawings() for p in doc)
+          print('PASS: 6 native PDF pages retain text, vector drawings and source dimensions')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-page-manager-evidence
+          path: |
+            test-results/pages/*.png
+            test-results/pages/*.pdf
+          if-no-files-found: ignore
