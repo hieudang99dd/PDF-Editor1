@@ -440,3 +440,10 @@ Local verification: 229 Node tests (227 pass, two existing skips), real Chromium
 - Bảo vệ PDF đã có chữ ký chống rewrite (chưa incremental sign), giữ nguyên text và form trước đó. Browser automation tạo chứng thư kiểm thử tạm, OpenSSL kiểm chứng `ByteRange`, dữ liệu sửa bị từ chối, PyMuPDF xác thực CropBox/Rotate và chữ ký trên bốn trang.
 - Đã đưa bản đạt CI lên `master` bằng fast-forward `fa7dfc4ad82e45b87b5e7739de6d2c2c6b85d86a`. [CI ký](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195292511), [Pages deploy](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195291882) và [Pages smoke](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195292503) đều thành công. Bổ sung workflow nghiệm thu trình duyệt trực tiếp trên website sau khi triển khai.
 - Giới hạn: chưa PAdES-LT/LTA, TSA/timestamp chứng thực, CA trust/OCSP/CRL, ECDSA, PKCS#11 USB Token, remote signing, ký nhiều bên giữ chữ ký cũ; không được mô tả các cơ chế này như đã hỗ trợ. Xem `docs/SIGNATURES.md`.
+
+### Kiểm thử website chữ ký sau phát hành — 2026-10-19
+
+- Đã phát hành `sign.html` trên `master`; CI source/browser/crypto `39195292511` và GitHub Pages `39195291882` đều thành công.
+- Thêm workflow `.github/workflows/signature-live.yml` để kiểm thử trên đúng `https://hieudang99dd.github.io/PDF-Editor1/sign.html` sau khi triển khai. Sửa lỗi cấu hình fixture: cài `node-forge` qua lockfile trước khi tạo chứng thư QA.
+- [Run trực tiếp website **39195871566**](https://github.com/hieudang99dd/PDF-Editor1/actions/runs/39195871566): **SUCCESS** toàn bộ bước, gồm mở trang thật, Playwright ký/đặt chữ ký và tải PDF, chứng thư RSA P12/PEM, chặn PDF đã có chữ ký, kiểm hình học PyMuPDF và OpenSSL kiểm CMS `ByteRange` + phát hiện thay đổi dữ liệu. Artifact chỉ lưu PDF, PNG, JSON; chứng thư và khóa QA sinh tạm không được upload.
+- Đây là bằng chứng chữ ký mật mã hợp lệ theo test fixture; **không chứng minh** tin cậy CA thương mại hoặc hỗ trợ USB Token/SmartCA, TSA, LTV. Chưa nghiệm thu chứng thư thật của người dùng.
