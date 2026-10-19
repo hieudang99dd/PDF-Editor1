@@ -70,7 +70,7 @@ el('stage').addEventListener('pointerdown',event=>{
  if(!sourceJs||busy||locked||event.button!==0)return;
  const handle=event.target.closest('[data-handle]')?.dataset.handle;
  const inside=event.target.closest('#crop-rectangle');
- const mode=handle|| (inside?'move':'draw');
+ const mode=handle|| (inside&&!isFullPage(selected)?'move':'draw');
  drag={mode,base:{...selected},start:cursorPoint(event),originPage:pageNumber};
  el('stage').setPointerCapture(event.pointerId);
 });
