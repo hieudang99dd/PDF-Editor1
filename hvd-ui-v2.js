@@ -30,7 +30,7 @@ const cards=[
  ['stamp','Biên tập','Đánh số & đóng dấu','Đánh số trang, Bates và watermark.','#',['Đánh số trang','Đánh số Bates','Watermark PDF']],
  ['pages','Tổ chức','Quản lý trang PDF','Ghép, sắp xếp, tách, xóa, trích xuất, xoay và chèn trang.','▦',['Sắp xếp PDF','Cắt PDF','Xóa trang PDF','Trích xuất trang','Xoay PDF','Đảo thứ tự trang PDF','Trích trang lẻ','Trích trang chẵn','Chèn trang trắng PDF','Xoay PDF góc tùy chỉnh']],
  ['compress','Tổ chức','Nén PDF','Tối ưu dung lượng và ưu tiên giữ vector.','⇲',['Giảm dung lượng PDF']],
- ['crop','Tổ chức','Cắt lề PDF','Thay đổi vùng nhìn CropBox, không xóa nội dung ngoài lề.','⌗',['Cắt lề PDF']],
+ ['crop','Tổ chức','Cắt lề PDF','Kéo vùng cắt, dò lề tự động và so sánh trước/sau. Phải kiểm tra rồi mới xuất.','⌗',['Cắt lề PDF']],
  ['convert','Chuyển đổi','Chuyển đổi định dạng tệp','Chọn tệp đầu vào → định dạng đầu ra. PDF ↔ ảnh; PDF → Word/TXT; Office → PDF.','⇄',['Chuyển đổi tệp']],
  ['ocr','Chuyển đổi','Nhận dạng văn bản OCR','Nhận dạng chữ scan ngay trên trình duyệt.','OCR',['PDF OCR']],
  ['region','Nâng cao','✂ Xóa vector theo vùng','Cắt thực các đoạn vector tại vùng tùy chọn, có vùng bảo vệ. Công cụ riêng, không phủ trắng.','✂',['Xóa vector theo vùng']],
