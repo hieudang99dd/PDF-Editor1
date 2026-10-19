@@ -31,9 +31,9 @@ test('Text editing remains a separate native tool routed to its existing page',(
  assert.match(h.html(),/class="catalog-status">Trình duyệt<\/span>/);
  assert.equal((h.html().match(/Sửa Text PDF gốc/g)||[]).length,1);
 });
-test('13 catalog definitions, original registry immutable, unsupported tools hidden',()=>{
+test('12 catalog definitions, original registry immutable, unsupported tools hidden',()=>{
  const source=ui.match(/const cards=\[([\s\S]*?)\];/)[1];
- assert.equal((source.match(/^\s*\['/gm)||[]).length,13);
+ assert.equal((source.match(/^\s*\['/gm)||[]).length,12);
  const data=[['Giảm dung lượng PDF','Nén','Nén','⇲','compress','.pdf'],['PDF OCR','OCR','Chuyển đổi','OCR','lang','.pdf'],['PDF sang PDF/A','Không có engine','Chuyển đổi','A','none','.pdf'],['Chỉnh sửa văn bản PDF','Text','Chỉnh sửa','T','cit-text-route','.pdf'],['Ghép PDF','Ghép','Sắp xếp','⊕','merge','.pdf'],['Ghép PDF xen kẽ','Xen kẽ','Sắp xếp','⇄','merge','.pdf'],['Chia sẻ PDF','Chưa có server','Chỉnh sửa','↗','qr','.pdf'],['Xóa trang PDF','Xóa','Sắp xếp','×','range','.pdf'],['Trích xuất trang','Trích','Sắp xếp','⇥','range','.pdf']];
  const h=mock(data);
  assert.deepEqual(data,h.saved);
@@ -64,7 +64,7 @@ test('CIT route and editor engine stay unmodified',()=>{
  assert.match(cit,/for\(const t of tools\)if\(!existing\.has\(t\[0\]\)\)T\.push\(t\)/);
  assert.match(cit,/home\(\);\s*\}\)\(\);/);
  assert.doesNotMatch(ui,/T\.push\(|T\[[^\]]+\]\s*=/);
- assert.match(html,/hvd-ui-v2\.js\?v=20261019-no-metadata4/);
+ assert.match(html,/hvd-ui-v2\.js\?v=20261019-no-merge5/);
  assert.match(html,/hvd-ui-v2\.css\?v=20261016-dao1/);
 });
 test('catalog icon and featured text tile use explicit centered, responsive layout',()=>{
@@ -114,4 +114,19 @@ test('PDF metadata card removed without impacting independent advanced tools',()
  assert.doesNotMatch(h.html(),/Thuộc tính PDF|Xem thuộc tính PDF|Sửa thuộc tính PDF|Xóa metadata cơ bản|Xóa chú thích PDF/);
  assert.match(h.html(),/Làm phẳng biểu mẫu/);
  assert.match(h.html(),/Nén PDF/);
+});
+
+test('standalone merge PDF card removed; merging remains available via page manager',()=>{
+ const data=[
+  ['Ghép PDF','Ghép PDF','Sắp xếp','⊕','merge','.pdf'],
+  ['Ghép PDF xen kẽ','Ghép PDF xen kẽ','Sắp xếp','⇄','merge','.pdf'],
+  ['Sắp xếp PDF','Sắp xếp','Sắp xếp','▦','pages-route','.pdf'],
+  ['Trích xuất trang','Trích xuất','Sắp xếp','⇥','range','.pdf']
+ ];
+ const h=mock(data);
+ assert.match(h.html(),/Quản lý trang PDF/);
+ assert.match(h.html(),/Ghép, sắp xếp, tách, xóa, trích xuất, xoay và chèn trang/);
+ assert.doesNotMatch(h.html(),/>Ghép PDF<\/b>|>Ghép PDF<\/strong>/);
+ assert.doesNotMatch(h.html(),/data-group-key="merge"/);
+ assert.match(html,/if\(T\[i\]\?\.\[4\]==='pages-route'/);
 });
