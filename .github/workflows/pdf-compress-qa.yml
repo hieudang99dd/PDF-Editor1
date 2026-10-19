@@ -1,0 +1,48 @@
+name: PDF EDITOR compress - image and vector acceptance
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'pdf-compress-engine.mjs'
+      - 'pdf-compress-page.mjs'
+      - 'compress.html'
+      - 'pdf-local-tools.js'
+      - 'index.html'
+      - 'tests/pdf-compress*'
+      - 'scripts/verify_compress.py'
+      - '.github/workflows/pdf-compress-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compress-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static and PDF-library regression
+        run: |
+          node --check pdf-compress-engine.mjs
+          node --check pdf-compress-page.mjs
+          node --check pdf-local-tools.js
+          node --test tests/pdf-compress.test.cjs tests/pages-smoke.test.cjs
+      - name: Prepare real browser and independent PDF inspection
+        run: |
+          npm install --no-save playwright@1.57.0
+          npx playwright install --with-deps chromium
+          python3 -m pip install --user --break-system-packages 'pymupdf>=1.24,<2'
+      - name: Compress photo-heavy multi-page CAD/vector PDF in Chromium
+        run: node tests/pdf-compress-browser.cjs
+      - name: Validate original versus compressed PDF independently
+        run: python3 scripts/verify_compress.py test-results/compress
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: PDF-EDITOR-compress-qa
+          path: |
+            test-results/compress/*.png
+            test-results/compress/*.pdf
+          if-no-files-found: ignore
