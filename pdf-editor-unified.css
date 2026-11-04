@@ -38,6 +38,14 @@
 /* Remove duplicated tool switcher from the work area. Main PDF EDITOR header is the only global navigation. */
 #unified-ws .unified-routes{display:none!important}
 #unified-ws .unified-toolbar .unified-meta{flex:1}
+/* A percentage-height iframe inside an indefinite flex column falls back to
+   its intrinsic 150px height. Give the text workspace a definite viewport
+   height and fill the remaining, shrinkable framebox independently of flow. */
+#unified-ws[data-tool=text]{height:calc(100dvh - var(--pdfeditor-header-height,60px));min-height:0;overflow:hidden}
+#unified-ws[data-tool=text] .unified-toolbar,
+#unified-ws[data-tool=text] .unified-note{flex-shrink:0}
+#unified-ws[data-tool=text] .unified-framebox{flex:1 1 0%;height:auto!important;min-height:0!important;overflow:hidden}
+#unified-ws[data-tool=text] #unified-frame{position:absolute;inset:0;display:block;width:100%;height:100%;min-height:0}
 #unified-ws[data-tool=pages]{height:calc(100dvh - var(--pdfeditor-header-height,60px));min-height:0;max-height:100dvh;overflow:hidden;background:#eef2f7}
 #unified-ws[data-tool=pages] .unified-toolbar,
 #unified-ws[data-tool=pages] .unified-note{display:none!important}
