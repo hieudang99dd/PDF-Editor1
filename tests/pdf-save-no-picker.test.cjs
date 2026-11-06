@@ -13,7 +13,9 @@ test('PDF export never requests access to Chrome system folders',()=>{
     'po-save-mode','po-save-pick-dir','po-save-dir','po-save-clear-dir']){
     assert.equal(organizer.includes(blocked),false,'Forbidden save mode still present: '+blocked);
   }
-  assert.match(organizer,/id="po-save-confirm"[^>]*>Tạo PDF &amp; tải xuống/);
+  assert.match(organizer,/id="po-save-confirm"[^>]*>Tạo PDF/);
+  assert.match(organizer,/id="po-save-download-link"[^>]*download hidden/);
+  assert.doesNotMatch(organizer,/a\.click\(\)/);
   assert.match(organizer,/id="po-save-filename"/);
   assert.match(organizer,/this\.downloadSaveBlob\(blob, filename\)/);
   assert.doesNotMatch(organizer,/this\.savedHistoryIndex\s*=\s*historyAtSave/);
@@ -45,18 +47,19 @@ test('PDF filename validation preserves Vietnamese and rejects unsafe Windows na
   }
 });
 
-test('An interrupted automatic download leaves a clickable PDF link for retry',()=>{
+test('PDF stays ready for explicit user click with no synthetic download',()=>{
   const begin=organizer.indexOf('    downloadSaveBlob(blob, filename) {');
   const end=organizer.indexOf('    async showSaveModal(',begin);
   assert.ok(begin>=0&&end>begin);
   const links=new Map(),started=[],revoked=[];
+  const modalDownload={hidden:true,href:'',download:''};
   const button={insertAdjacentElement(_position,element){links.set(element.id,element)}};
   const document={
     body:{appendChild(){}},
-    getElementById(id){return id==='po-save'?button:links.get(id)||null},
+    getElementById(id){return id==='po-save'?button:id==='po-save-download-link'?modalDownload:links.get(id)||null},
     createElement(){
       return {style:{},href:'',download:'',id:'',className:'',textContent:'',
-        remove(){},click(){started.push(this.download)}};
+        remove(){},setAttribute(){},click(){started.push(this.download)}};
     }
   };
   let n=0;
@@ -69,12 +72,17 @@ test('An interrupted automatic download leaves a clickable PDF link for retry',(
   const unit=new cls();
   const pdf={size:3,type:'application/pdf'};
   unit.downloadSaveBlob(pdf,'Hồ sơ.pdf');
-  assert.equal(started[0],'Hồ sơ.pdf');
+  assert.deepEqual(started,[],'Generating the file must never force a download');
+  assert.equal(modalDownload.hidden,false);
+  assert.equal(modalDownload.href,'blob:pdf-1');
+  assert.equal(modalDownload.download,'Hồ sơ.pdf');
   assert.equal(links.get('po-download-manual').download,'Hồ sơ.pdf');
   assert.equal(links.get('po-download-manual').href,'blob:pdf-1');
   assert.deepEqual(revoked,[]);
   unit.downloadSaveBlob(pdf,'Hồ sơ_v2.pdf');
   assert.equal(links.get('po-download-manual').download,'Hồ sơ_v2.pdf');
+  assert.equal(modalDownload.download,'Hồ sơ_v2.pdf');
+  assert.deepEqual(started,[]);
   assert.deepEqual(revoked,['blob:pdf-1']);
 });
 
