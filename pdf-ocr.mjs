@@ -6,6 +6,12 @@ let file, bytes, documentPdf, current = 1, results = new Map(), busy = false;
 let vietnameseWorker;
 let engine, engineWorker, generation = 0, previewTask, previewGeneration = 0;
 const downloads = new Set();
+let latestExportUrl = null;
+function clearExportLink() {
+  if (latestExportUrl) { URL.revokeObjectURL(latestExportUrl); downloads.delete(latestExportUrl); latestExportUrl = null; }
+  const link = $('download-result');
+  if (link) { link.hidden = true; link.removeAttribute('href'); }
+}
 function status(text, error = false) { $('status').textContent = text; $('status').classList.toggle('error', error); }
 function controls() {
   for (const id of ['file', 'pages', 'dpi', 'language', 'skip', 'refine']) $(id).disabled = busy;
@@ -167,7 +173,7 @@ function updatePageLabels() {
 }
 $('file').addEventListener('change', async event => {
   const selected = event.target.files[0]; if (!selected) return;
-  stop(); const token = generation; busy = true; controls();
+  stop(); clearExportLink(); const token = generation; busy = true; controls();
   results.clear(); $('lines').replaceChildren(); $('boxes').replaceChildren();
   $('pdf').disabled = $('txt').disabled = $('word').disabled = true;
   try {
@@ -262,11 +268,15 @@ $('run').addEventListener('click', async () => {
   } finally { if (token === generation) { busy = false; controls(); } }
 });
 function download(blob, extension) {
-  const url = URL.createObjectURL(blob); downloads.add(url);
-  const link = document.createElement('a'); link.href = url;
+  clearExportLink();
+  latestExportUrl = URL.createObjectURL(blob);
+  downloads.add(latestExportUrl);
+  const link = $('download-result');
+  link.href = latestExportUrl;
   link.download = file.name.replace(/\.pdf$/i, '') + '_ocr.' + extension;
-  document.body.append(link); link.click(); link.remove();
-  setTimeout(() => { URL.revokeObjectURL(url); downloads.delete(url); }, 120000);
+  link.textContent = '↓ Tải ' + extension.toUpperCase() + ' đã tạo';
+  link.hidden = false;
+  // No synthetic a.click(): the user starts the download directly.
 }
 $('txt').addEventListener('click', () => {
   const text = [...results].sort((a, b) => a[0] - b[0]).map(([n, r]) =>
@@ -284,7 +294,7 @@ $('word').addEventListener('click', async () => {
       text => { if (token === generation) status(text); }, () => token !== generation);
     if (token !== generation) return;
     download(new Blob([output.bytes], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), 'docx');
-    status(`Đã xuất Word: ${output.pages} trang, ${output.tables} bảng chỉnh sửa được. Font tiếng Việt đã được nhúng.`);
+    status(`Đã tạo Word: ${output.pages} trang, ${output.tables} bảng. Nhấn “Tải DOCX đã tạo” để lưu về máy.`);
   } catch (error) { if (token === generation) status('Không xuất được Word: ' + error.message, true); }
   finally { if (token === generation) { busy = false; controls(); } }
 });
@@ -297,7 +307,7 @@ $('pdf').addEventListener('click', async () => {
     if (!response.ok) throw new Error('Không tải được font tiếng Việt.');
     const output = await exportSearchablePdf(bytes, results, window.PDFLib, window.fontkit, await response.arrayBuffer());
     download(new Blob([output], { type: 'application/pdf' }), 'pdf');
-    status('Đã xuất PDF với lớp chữ tìm kiếm được. Các trang ngoài phạm vi được giữ trong tệp.');
+    status('Đã tạo PDF có lớp chữ tìm kiếm được. Nhấn “Tải PDF đã tạo” để lưu về máy.');
   } catch (error) { status('Không xuất được PDF: ' + error.message, true); }
   finally { busy = false; controls(); }
 });
