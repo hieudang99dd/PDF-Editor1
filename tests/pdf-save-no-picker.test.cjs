@@ -77,3 +77,65 @@ test('An interrupted automatic download leaves a clickable PDF link for retry',(
   assert.equal(links.get('po-download-manual').download,'Hồ sơ_v2.pdf');
   assert.deepEqual(revoked,['blob:pdf-1']);
 });
+
+
+test('Export with a Unicode text annotation builds PDF and preserves retryable state',async()=>{
+  const start=organizer.indexOf('    async executeSave() {');
+  const end=organizer.indexOf('    showSuccess(',start);
+  assert.ok(start>=0&&end>start);
+  const draws=[],downloads=[],messages=[];
+  const page={
+    getRotation(){return {angle:0}},
+    getWidth(){return 595},
+    getHeight(){return 842},
+    drawText(t){draws.push(t)}
+  };
+  let pageList=[page];
+  const pdf={
+    getForm(){return {getFields(){return []}}},
+    getPages(){return [...pageList]},
+    getPageCount(){return pageList.length},
+    getPage(i){return pageList[i]},
+    removePage(i){pageList.splice(i,1)},
+    addPage(p){pageList.push(p);return p},
+    async save(){return new Uint8Array([37,80,68,70,45,49])}
+  };
+  const native={PDFLib:{
+    PDFDocument:{load:async()=>pdf},
+    rgb:(r,g,b)=>({r,g,b}),
+    degrees:a=>({angle:a})
+  }};
+  const modal={classList:{add(){},remove(){}}},confirmButton={disabled:false};
+  class BlobMock {
+    constructor(parts,{type}){this.parts=parts;this.size=parts.reduce((n,x)=>n+(x.length||0),0);this.type=type}
+  }
+  const ctor=new Function('window','document','Blob','toast','confirm','console',
+    'return class Test{'+organizer.slice(start,end)+'}');
+  const Unit=ctor(native,{getElementById:id=>id==='po-save-confirm'?confirmButton:modal},
+    BlobMock,m=>messages.push(m),()=>true,{error(){}});
+  const unit=new Unit();
+  Object.assign(unit,{
+    exportSelectedMode:false,
+    pages:[{type:'pdf',fileIndex:0,pageIndex:0,rotation:0,textEdits:[],
+      annotations:[{type:'text',leftPct:10,topPct:10,widthPct:30,heightPct:10,
+        text:'Hồ sơ cầu đường',fontSize:14,color:'#1a1f36'}]}],
+    files:[{arrayBuffer:async()=>new Uint8Array([37,80,68,70]).buffer}],
+    encrypted:[false],historyIndex:2,activeEditDiv:null,pendingTextCommit:null,
+    getSaveFilename:()=> 'Bản vẽ thử.pdf',
+    updateProgress(){},showLoading(){},hideLoading(){},
+    async getUnicodeFont(){return {unicode:true}},
+    downloadSaveBlob(blob,filename){downloads.push({blob,filename})},
+    showSuccess(){}
+  });
+  await unit.executeSave();
+  assert.deepEqual(draws,['Hồ sơ cầu đường']);
+  assert.equal(downloads.length,1);
+  assert.equal(downloads[0].filename,'Bản vẽ thử.pdf');
+  assert.equal(downloads[0].blob.type,'application/pdf');
+  assert.equal(unit.isSaving,false);
+  assert.equal(confirmButton.disabled,false);
+  assert.equal(unit.lastExportedHistoryIndex,2);
+  assert.equal(unit.savedHistoryIndex,undefined,
+    'Unconfirmed browser download must not be treated as an actual saved file');
+  assert.deepEqual(messages,[]);
+});
