@@ -272,8 +272,16 @@ $('export').onclick = async () => {
     let bytes = visualBytes;
     if ($('digital').checked) { status('Đang ký số RSA/SHA-256 trong trình duyệt…'); const signed = await certificateTask('sign', bytes); bytes = signed.bytes; certificateInfo(signed.info); }
     downloadUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-    const link = $('download'); link.href = downloadUrl; link.download = filename.replace(/\.pdf$/i, '') + ($('digital').checked ? '_signed.pdf' : '_signature.pdf'); link.hidden = false; link.click();
-    status($('digital').checked ? 'Đã tạo PDF có chữ ký số. Mở bằng trình đọc PDF để kiểm tra chữ ký và độ tin cậy chứng thư.' : 'Đã tạo PDF có chữ ký hiển thị; đây không phải chữ ký số bằng chứng thư.');
+    const link = $('download');
+    link.href = downloadUrl;
+    link.download = filename.replace(/\.pdf$/i, '') + ($('digital').checked ? '_signed.pdf' : '_signature.pdf');
+    link.hidden = false;
+    link.textContent = '↓ Tải PDF đã tạo';
+    // A direct anchor click avoids browser restrictions on scripted downloads
+    // after the asynchronous digital signature generation has finished.
+    status($('digital').checked
+      ? 'PDF ký số đã sẵn sàng. Nhấn “Tải PDF đã tạo”, sau đó kiểm tra chữ ký bằng trình đọc PDF.'
+      : 'PDF có chữ ký hiển thị đã sẵn sàng. Nhấn “Tải PDF đã tạo” để lưu xuống máy.');
   } catch (e) { status(e.message, true); }
   finally { $('password').value = ''; busy = false; controls(); }
 };
