@@ -2996,6 +2996,8 @@ class PDFOrganizer {
                 finalDoc=await PDFDocument.load(rewritten.bytes,{updateMetadata:false});
             }
             const finalPages = finalDoc.getPages();
+            // Lazily embed a Unicode font only if the document contains text annotations.
+            let editFont = null;
 
             // Apply Rich Annotations (Shapes, Text, Images, Signatures, Pen)
             for (let i = 0; i < targetPages.length; i++) {
