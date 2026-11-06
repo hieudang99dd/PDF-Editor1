@@ -23,19 +23,18 @@ function clearDownload(){
 }
 function download(bytes,name,type='application/pdf'){
  clearDownload();
- const url=URL.createObjectURL(new Blob([bytes],{type}));
- latestDownloadUrl=url;
- // A real link remains available after the scripted download attempt. Browsers
- // may block a.click() when PDF generation has consumed the user activation.
- const retry=el('download-retry');
- if(retry){
-  retry.href=url;retry.download=name;retry.hidden=false;retry.style.display='inline-flex';
-  retry.title='Bấm để tải '+name+' nếu trình duyệt đã chặn lượt tải tự động';
- }
- const link=document.createElement('a');
- link.href=url;link.download=name;document.body.append(link);
- try{link.click()}catch(error){console.warn('Tải tự động bị chặn. Bấm Tải lại:',error)}
- finally{link.remove()}
+ latestDownloadUrl=URL.createObjectURL(new Blob([bytes],{type}));
+ // Do not trigger a synthetic click after asynchronous PDF assembly.
+ // User interaction with this persistent anchor starts the download.
+ const link=el('download-retry');
+ if(!link)throw Error('Không tìm thấy nút tải PDF.');
+ link.href=latestDownloadUrl;
+ link.download=name;
+ link.hidden=false;
+ link.style.display='inline-flex';
+ link.textContent='↓ Tải kết quả';
+ link.title='Nhấn để tải '+name+' về máy';
+ message('Đã tạo '+name+'. Nhấn “Tải kết quả” để tải xuống.');
 }
 function fileName(name){
  return (name||'document').replace(/\.pdf$/i,'').replace(/[^a-zA-Z0-9À-ỹ_.()\- ]/g,'_').slice(0,90);
@@ -335,7 +334,7 @@ async function exportResult(){
    // Build from the current manifest; no stale apply/review snapshot.
    const bytes=await assemblePages(pages,sources,PDFLib);
    download(bytes,fileName(sources[0]?.name)+'_organized.pdf');
-   message('Đã tạo PDF kết quả theo các thao tác hiện tại.');
+   message('Đã tạo PDF kết quả. Nhấn “Tải kết quả” để lưu xuống máy.');
   }catch(e){message('Không thể xuất PDF: '+(e.message||String(e)),true)}
   finally{setBusy(false)}
   return;
@@ -353,7 +352,7 @@ async function exportResult(){
   }
   const blob=await archive.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:4}});
   download(await blob.arrayBuffer(),fileName(sources[0]?.name)+'_split.zip','application/zip');
-  message('Đã xuất '+parts.length+' tệp PDF trong ZIP.');
+  message('Đã tạo ZIP gồm '+parts.length+' tệp PDF. Nhấn “Tải kết quả” để lưu.');
  }catch(e){message('Không thể tách PDF: '+e.message,true)}finally{setBusy(false)}
 }
 async function extractSelected(){
@@ -362,7 +361,7 @@ async function extractSelected(){
  try{
   const result=await assemblePages(activePages(),sources,PDFLib);
   download(result,fileName(sources[0]?.name)+'_selected.pdf');
-  message('Đã trích xuất '+selected.size+' trang PDF.');
+  message('Đã tạo tệp trích xuất '+selected.size+' trang. Nhấn “Tải kết quả” để lưu.');
  }catch(e){message('Không thể trích xuất: '+e.message,true)}finally{setBusy(false)}
 }
 function bind(id,fn){el(id).addEventListener('click',fn)}
