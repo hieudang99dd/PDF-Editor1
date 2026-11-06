@@ -276,7 +276,7 @@ function download(blob, extension) {
   link.download = file.name.replace(/\.pdf$/i, '') + '_ocr.' + extension;
   link.textContent = '↓ Tải ' + extension.toUpperCase() + ' đã tạo';
   link.hidden = false;
-  // No synthetic a.click(): the user starts the download directly.
+  // A real click on the visible link initiates this download.
 }
 $('txt').addEventListener('click', () => {
   const text = [...results].sort((a, b) => a[0] - b[0]).map(([n, r]) =>
