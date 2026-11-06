@@ -108,3 +108,13 @@ Từng vòng phải cập nhật `IMPLEMENTATION_PROGRESS.md`. Nếu chưa có E
 
 - `.github/workflows/cit-original-build.yml` chỉ tự kích hoạt khi tệp đầu vào chuyên biệt của Studio thay đổi (`scripts/cit-original/**`, kiểm thử CIT browser hoặc file lock upstream). Chỉnh sửa Organizer, trang chủ và engine browser **không** được tự biên dịch lại toàn bộ Studio và ghi đè thư mục `studio/` đang hoạt động.
 - Build Studio thủ công vẫn được hỗ trợ qua `workflow_dispatch`. Khi cần rebuild upstream, kiểm tra thay đổi giao diện đã cá nhân hóa và giấy phép trước khi ghi đè artifact.
+
+
+## 8. Xuất PDF không phụ thuộc quyền thư mục của Chrome (2026-11-06)
+
+- Đối với **Chỉnh sửa PDF** (Organizer, route #hvd-tool=22), luồng xuất chính không gọi File System Access API: showSaveFilePicker, showDirectoryPicker, createWritable. Chrome không cho phép website ghi vào một số thư mục hệ thống.
+- Luồng chỉ yêu cầu **tên PDF** → xây dựng PDF trong trình duyệt → tạo Blob URL kèm liên kết tải xuống. Sau khi thử tự tải, giữ nút **↓ Tải PDF** để có thể bấm lại cho đến khi đổi kết quả hoặc đóng phiên.
+- Không khẳng định đã ghi file thành công xuống máy chỉ vì trình duyệt nhận yêu cầu tải; không đánh dấu lịch sử chỉnh sửa là đã lưu dựa trên yêu cầu tải.
+- Muốn chọn vị trí lưu mỗi lần, tự bật Chrome > Cài đặt > Tệp tải xuống > Hỏi nơi lưu từng tệp trước khi tải xuống; không tắt bảo vệ trình duyệt.
+- Nếu đang có phiên cũ với chỉnh sửa chưa lưu, chọn Hủy trong hộp thoại lỗi rồi đổi Cách lưu thành Tải xuống theo cài đặt trình duyệt trước khi tải lại trang.
+- Hồi quy tự động: tests/pdf-save-no-picker.test.cjs kiểm tra chế độ không dùng picker, tên Unicode, liên kết tải lại, và xuất PDF có chú thích chữ.
