@@ -6,3 +6,11 @@
 .readonly-notice{background:rgba(244,171,55,.13);border:1px solid #dca34d;border-radius:8px;color:#ffe4b6;padding:10px 14px;margin:8px 0;font-size:13px;line-height:1.5}
 .readonly-notice[hidden]{display:none!important}
 #download-source:disabled{opacity:.5;cursor:not-allowed}
+
+/* The final step is a real anchor click, not an auto-download script. */
+#download:not([hidden]) {
+ display:inline-flex;align-items:center;justify-content:center;
+ background:#0e8a79;color:#fff;font-weight:700;
+ text-decoration:none;padding:9px 14px;min-height:40px;
+}
+#download[hidden]{display:none!important}
