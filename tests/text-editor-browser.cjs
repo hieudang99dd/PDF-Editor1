@@ -100,9 +100,10 @@ async function main() {
         await page.evaluate(()=>organizerInstance.redo());
         await page.waitForFunction(()=>organizerInstance.pages[0].textEdits?.length===1 && !organizerInstance.previewTask);
         await page.locator('#po-save').click();
-        await page.locator('#po-save-mode').selectOption('download');
-        const downloadPromise=page.waitForEvent('download');
         await page.locator('#po-save-confirm').click();
+        await page.locator('#po-save-download-link:visible').waitFor({timeout:120000});
+        const downloadPromise=page.waitForEvent('download');
+        await page.locator('#po-save-download-link').click();
         const download=await downloadPromise;
         const destination=path.join(outputDir,'edited.pdf');await download.saveAs(destination);
         const output=await PDFLib.PDFDocument.load(fs.readFileSync(destination));assert.equal(output.getPageCount(),1);
@@ -120,7 +121,10 @@ async function main() {
         await page.waitForFunction(()=>organizerInstance.pages[0].textEdits?.length===2 && !organizerInstance.previewTask).catch(async e=>{console.error('ROTATED STATUS',await page.locator('#po-ft-status').textContent(),errors);throw e;});
         await page.screenshot({path:path.join(outputDir,'rotated.png')});
         await page.locator('#po-save').click();
-        const rotatedDownloadPromise=page.waitForEvent('download');await page.locator('#po-save-confirm').click();
+        await page.locator('#po-save-confirm').click();
+        await page.locator('#po-save-download-link:visible').waitFor({timeout:120000});
+        const rotatedDownloadPromise=page.waitForEvent('download');
+        await page.locator('#po-save-download-link').click();
         const rotatedDownload=await rotatedDownloadPromise;
         const rotatedDestination=path.join(outputDir,'rotated-edited.pdf');await rotatedDownload.saveAs(rotatedDestination);
         const rotatedOutput=await PDFLib.PDFDocument.load(fs.readFileSync(rotatedDestination));
