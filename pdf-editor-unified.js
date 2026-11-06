@@ -17,7 +17,7 @@
  const viewer=()=>document.getElementById('unified-frame');
  const home=()=>document.getElementById('home');
  const legacy=()=>document.getElementById('ws');
- const getUrl=key=>new URL('./'+ROUTES[key][0]+(key==='crop'?'?embedded=1&ui=20261019-crop-ui2':key==='pages'?'?embedded=1&ui=20261019-pages-clean1':''),location.href).href;
+ const getUrl=key=>new URL('./'+ROUTES[key][0]+(key==='crop'?'?embedded=1&ui=20261019-crop-ui2':key==='pages'?'?embedded=1&ui=20261106-download-fallback1':''),location.href).href;
  function showHome(){
   root().hidden=true;
   root().removeAttribute('data-tool');
