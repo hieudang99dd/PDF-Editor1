@@ -31,13 +31,19 @@
   let doc;
   try{doc=frame.contentDocument;}catch(_){return;}
   if(!doc?.body)return;
-  const measured=Math.ceil(Math.max(
-   doc.body.scrollHeight||0,
-   doc.documentElement.scrollHeight||0,
-   doc.body.getBoundingClientRect().height||0
-  ));
+  // html.scrollHeight is at least the iframe viewport height. Measuring it
+  // and adding padding would enlarge the iframe endlessly on each resize.
+  const bodyBox=doc.body.getBoundingClientRect();
+  let measured=Math.max(doc.body.offsetHeight||0,bodyBox.height||0);
+  const last=doc.body.lastElementChild;
+  if(last){
+   const lastBox=last.getBoundingClientRect();
+   const margin=parseFloat(frame.contentWindow.getComputedStyle(last).marginBottom)||0;
+   measured=Math.max(measured,lastBox.bottom-bodyBox.top+Math.max(0,margin));
+  }
+  measured=Math.ceil(measured);
   if(!Number.isFinite(measured)||measured<100)return;
-  const desired=Math.max(480,Math.min(24000,measured+16));
+  const desired=Math.max(360,Math.min(24000,measured+12));
   if(Math.abs(frame.getBoundingClientRect().height-desired)>8)frame.style.height=desired+'px';
  }
  function installFrameLayout(){
