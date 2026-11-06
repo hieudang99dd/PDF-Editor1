@@ -88,3 +88,8 @@ html.pm-embedded .pm-footer-right #status{max-width:min(350px,28vw)}
  .pm-result>div:last-child button{flex:1;min-width:0;white-space:normal}
  .pm-footer-right #status{max-width:100%!important;white-space:normal}
 }
+
+
+/* Generated PDF/ZIP link appears after build and waits for user click. */
+#download-retry:not([hidden]){align-items:center;justify-content:center;padding:8px 12px;border-radius:7px;font-size:12px;font-weight:700;min-height:34px}
+#download-retry[hidden]{display:none!important}
