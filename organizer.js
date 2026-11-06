@@ -59,7 +59,7 @@ class PDFOrganizer {
             const link = document.createElement('link');
             link.id = 'po-style';
             link.rel = 'stylesheet';
-            link.href = 'organizer.css?v=20261016-workspace2';
+            link.href = 'organizer.css?v=20261106-save-click1';
             document.head.appendChild(link);
         }
         
