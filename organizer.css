@@ -605,3 +605,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
  #po-save-modal .po-modal-footer>*{flex:1 1 40%;text-align:center}
  .po-header-right #po-download-manual{white-space:normal}
 }
+
+#po-save-modal #po-save-open-link{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:34px;gap:6px;padding:6px 12px;
+  border:1px solid var(--po-border);border-radius:6px;
+  background:var(--po-surface);color:var(--po-text-main);
+  text-decoration:none;font-size:13px;font-weight:650;
+}
