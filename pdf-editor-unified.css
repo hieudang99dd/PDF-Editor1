@@ -78,7 +78,7 @@
 #unified-ws[data-tool=sign] #unified-frame,
 #unified-ws[data-tool=inspect] #unified-frame,
 #unified-ws[data-tool=crop] #unified-frame{
-  position:relative;inset:auto;height:740px;min-height:480px;overflow:visible;background:transparent;
+  position:relative;inset:auto;height:740px;min-height:320px;overflow:visible;background:transparent;
 }
 #unified-ws[data-tool=region]{
   height:calc(100dvh - var(--pdfeditor-header-height,60px));
