@@ -9,16 +9,33 @@ pdfjs.GlobalWorkerOptions.workerSrc='./pdf.worker.min.js';
 let sources=[],pages=[],history=[],historyIndex=-1,serial=0,focusId=null,lastAnchor=null;
 let selected=new Set(),cuts=new Set(),busy=false,revision=0,appliedRevision=-1;
 let prepared=null,preparedUrl=null,thumbObserver=null,thumbJobs=[],activeThumbs=0,thumbEpoch=0;
+let latestDownloadUrl=null;
 const thumbCache=new Map();
 let previewEpoch=0,dragIds=[];
 const MAX_THUMB_PARALLEL=2;
 const MAX_THUMB_CACHE=90;
 const message=(s,error=false)=>{el('status').textContent=s;el('status').style.color=error?'#be3535':''};
 function fmt(n){return n>1024*1024?(n/1048576).toFixed(2)+' MB':(n/1024).toFixed(1)+' KB'}
+function clearDownload(){
+ if(latestDownloadUrl){URL.revokeObjectURL(latestDownloadUrl);latestDownloadUrl=null;}
+ const retry=el('download-retry');
+ if(retry){retry.removeAttribute('href');retry.hidden=true;retry.style.display='none';}
+}
 function download(bytes,name,type='application/pdf'){
+ clearDownload();
  const url=URL.createObjectURL(new Blob([bytes],{type}));
- const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();
- setTimeout(()=>URL.revokeObjectURL(url),60000);
+ latestDownloadUrl=url;
+ // A real link remains available after the scripted download attempt. Browsers
+ // may block a.click() when PDF generation has consumed the user activation.
+ const retry=el('download-retry');
+ if(retry){
+  retry.href=url;retry.download=name;retry.hidden=false;retry.style.display='inline-flex';
+  retry.title='Bấm để tải '+name+' nếu trình duyệt đã chặn lượt tải tự động';
+ }
+ const link=document.createElement('a');
+ link.href=url;link.download=name;document.body.append(link);
+ try{link.click()}catch(error){console.warn('Tải tự động bị chặn. Bấm Tải lại:',error)}
+ finally{link.remove()}
 }
 function fileName(name){
  return (name||'document').replace(/\.pdf$/i,'').replace(/[^a-zA-Z0-9À-ỹ_.()\- ]/g,'_').slice(0,90);
@@ -33,7 +50,7 @@ function revokePreview(){
  prepared=null;appliedRevision=-1;el('result').hidden=true;
 }
 function touch(){
- revision++;revokePreview();
+ revision++;revokePreview();clearDownload();
 }
 function snapshot(){
  return {pages:cloneManifest(pages),selected:[...selected],cuts:[...cuts],focusId};
@@ -350,7 +367,7 @@ async function extractSelected(){
 }
 function bind(id,fn){el(id).addEventListener('click',fn)}
 bind('open',()=>el('files').click());bind('add',()=>el('files').click());
-el('files').addEventListener('change',e=>{void loadFiles(e.target.files);e.target.value=''});
+el('files').addEventListener('change',e=>{clearDownload();void loadFiles(e.target.files);e.target.value=''});
 for(const id of ['scroll','empty']){
  const zone=el(id);
  zone.addEventListener('dragover',e=>{if(e.dataTransfer?.types.includes('Files')){e.preventDefault();zone.classList.add('dragging-over')}});
@@ -418,6 +435,7 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('pagehide',()=>{
  thumbObserver?.disconnect();if(preparedUrl)URL.revokeObjectURL(preparedUrl);
+ clearDownload();
  for(const source of sources)source.doc?.destroy?.();
 });
 updateMeta();
