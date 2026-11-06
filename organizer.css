@@ -582,3 +582,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
  .po-container .po-toolbar{height:46px}
  .po-container #po-initial-upload{width:calc(100% - 24px);min-height:240px}
 }
+
+
+/* Download flow: generated PDF is exposed as a native link after async build.
+   A user click on an anchor is not a scripted download and needs no folder permission. */
+#po-save-modal [hidden], #po-download-manual[hidden]{display:none!important}
+#po-save-modal .po-modal-footer{flex-wrap:wrap;align-items:center}
+#po-save-modal #po-save-download-link,
+.po-header-right #po-download-manual{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  text-decoration:none;white-space:nowrap;min-height:34px;
+}
+#po-save-modal .po-save-ready{
+  display:grid;gap:5px;overflow-wrap:anywhere;
+  color:var(--po-text-main);background:var(--po-primary-light);
+  border:1px solid var(--po-border);border-radius:8px;padding:12px;
+  font-size:13px;line-height:1.5;margin-top:12px;
+}
+#po-save-modal .po-save-ready strong{font-size:14px}
+#po-save-modal .po-save-ready span{color:var(--po-text-muted)}
+@media(max-width:500px){
+ #po-save-modal .po-modal-footer>*{flex:1 1 40%;text-align:center}
+ .po-header-right #po-download-manual{white-space:normal}
+}
