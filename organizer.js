@@ -655,7 +655,7 @@ class PDFOrganizer {
         document.getElementById('po-save-cancel').onclick = () => document.getElementById('po-save-modal').classList.remove('active');
         document.getElementById('po-save-confirm').onclick = () => this.executeSave();
         
-                const fileInput = document.getElementById('po-save-filename');
+        const fileInput = document.getElementById('po-save-filename');
         if (fileInput) {
             fileInput.oninput = () => this.updatePathPreview();
         }
@@ -2720,10 +2720,10 @@ class PDFOrganizer {
     updatePathPreview() {
         const fname = document.getElementById('po-save-filename').value.trim() || 'organized.pdf';
         document.getElementById('po-save-preview-path').textContent =
-            'Tên tệp sẽ tải: ' + (/\\.pdf$/i.test(fname) ? fname : fname + '.pdf');
+            'Tên tệp sẽ tải: ' + (/\.pdf$/i.test(fname) ? fname : fname + '.pdf');
     }
 
-        downloadSaveBlob(blob, filename) {
+    downloadSaveBlob(blob, filename) {
         // Keep a real, user-clickable link. Scripted download after asynchronous
         // PDF processing may be blocked by browser download permissions.
         if (this.latestDownloadUrl) URL.revokeObjectURL(this.latestDownloadUrl);
@@ -2789,7 +2789,7 @@ class PDFOrganizer {
         try {
             const filename = this.getSaveFilename();
 
-                        if(this.activeEditDiv && !await this.commitEdit(this.activeEditDiv)) throw new Error('Vùng chữ đang sửa chưa hợp lệ. Hãy sửa nội dung hoặc bấm Hủy trong thanh sửa chữ.');
+            if(this.activeEditDiv && !await this.commitEdit(this.activeEditDiv)) throw new Error('Vùng chữ đang sửa chưa hợp lệ. Hãy sửa nội dung hoặc bấm Hủy trong thanh sửa chữ.');
             if(this.pendingTextCommit && !await this.pendingTextCommit) throw new Error('Chưa áp dụng được thay đổi chữ.');
             historyAtSave=this.historyIndex;
 
@@ -3116,7 +3116,7 @@ class PDFOrganizer {
             // Download requests cannot prove that the browser wrote the file.
             // Keep edit history and PDF in memory so a blocked download is retryable.
             this.lastExportedHistoryIndex = historyAtSave;
-            this.showSuccess(filename, true);
+            this.showSuccess(filename);
         } catch (e) {
             modal.classList.add('active');
             const message = e?.message || String(e);
@@ -3129,7 +3129,7 @@ class PDFOrganizer {
         }
     }
 
-    showSuccess(filename, isDownload = false) {
+    showSuccess(filename) {
         if (typeof toast === 'function') {
             toast('PDF đã tạo. Nếu chưa thấy tệp, bấm “↓ Tải PDF” trên thanh công cụ.');
         }
