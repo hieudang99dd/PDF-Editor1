@@ -256,9 +256,14 @@ class PDFOrganizer {
                     </div>
                     <p id="po-save-help" style="font-size:12px;color:var(--po-text-muted);line-height:1.5;margin:8px 0;">Tệp sẽ được tải xuống theo cài đặt của trình duyệt, không cần cấp quyền truy cập thư mục.</p>
                     <p id="po-save-preview-path" role="status" aria-live="polite" style="font-size:12px;color:var(--po-text-muted);overflow-wrap:anywhere;background:var(--po-surface,#f1f5f9);padding:8px;border-radius:6px;"></p>
+                    <div id="po-save-ready" class="po-save-ready" role="status" aria-live="polite" hidden>
+                        <strong>PDF đã được tạo thành công.</strong>
+                        <span>Nhấn Tải PDF để lưu về máy. Nếu Chrome không tải, kiểm tra danh sách tải xuống rồi nhấn lại.</span>
+                    </div>
                     <div class="po-modal-footer">
-                        <button class="po-tool-btn" id="po-save-cancel" type="button">Hủy</button>
-                        <button class="po-primary-btn" id="po-save-confirm" type="button">Tạo PDF &amp; tải xuống</button>
+                        <button class="po-tool-btn" id="po-save-cancel" type="button">Đóng</button>
+                        <button class="po-primary-btn" id="po-save-confirm" type="button">Tạo PDF</button>
+                        <a id="po-save-download-link" class="po-primary-btn" download hidden>↓ Tải PDF</a>
                     </div>
                 </div>
             </div>
@@ -2740,20 +2745,16 @@ class PDFOrganizer {
         }
         retry.href = url;
         retry.download = filename;
+        retry.setAttribute('aria-label', 'Tải tệp PDF đã tạo: ' + filename);
         retry.textContent = '↓ Tải PDF';
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        try {
-            a.click();
-        } catch (error) {
-            console.warn('Tải tự động bị chặn. Hãy bấm nút Tải PDF:', error);
-        } finally {
-            a.remove();
-            // Keep the Blob URL alive for a manual retry until the next save/reset.
+        const modalLink = document.getElementById('po-save-download-link');
+        if (modalLink) {
+            modalLink.href = url;
+            modalLink.download = filename;
+            modalLink.hidden = false;
         }
+        // Do not simulate a click. Download must be initiated directly by
+        // a user gesture on an actual anchor after asynchronous PDF creation.
     }
 
     async showSaveModal(exportSelected = false) {
@@ -2770,6 +2771,11 @@ class PDFOrganizer {
             name = name + '_v1';
         }
         
+        const modalLink = document.getElementById('po-save-download-link');
+        modalLink.hidden = true;
+        modalLink.removeAttribute('href');
+        document.getElementById('po-save-ready').hidden = true;
+        document.getElementById('po-save-confirm').hidden = false;
         document.getElementById('po-save-filename').value = name + '.pdf';
         this.updatePathPreview();
         document.getElementById('po-save-modal').classList.add('active');
@@ -3118,6 +3124,9 @@ class PDFOrganizer {
             // Download requests cannot prove that the browser wrote the file.
             // Keep edit history and PDF in memory so a blocked download is retryable.
             this.lastExportedHistoryIndex = historyAtSave;
+            document.getElementById('po-save-confirm').hidden = true;
+            document.getElementById('po-save-ready').hidden = false;
+            modal.classList.add('active');
             this.showSuccess(filename);
         } catch (e) {
             modal.classList.add('active');
@@ -3133,7 +3142,7 @@ class PDFOrganizer {
 
     showSuccess(filename) {
         if (typeof toast === 'function') {
-            toast('PDF đã tạo. Nếu chưa thấy tệp, bấm “↓ Tải PDF” trên thanh công cụ.');
+            toast('Đã tạo PDF. Nhấn “↓ Tải PDF” để tải về máy.');
         }
         this.baseFilename = filename.replace(/\.pdf$/i, '');
     }
