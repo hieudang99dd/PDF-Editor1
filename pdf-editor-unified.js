@@ -79,6 +79,14 @@
   if(action){
    if(current!=='crop'||action.disabled)return;
    const cmd=action.id==='crop-host-apply'?'apply':action.id==='crop-host-review'?'review':'export';
+   if(cmd==='export'){
+    // Run synchronously during the real user click. postMessage -> .click() in
+    // the iframe loses user activation and can cause the browser to block PDF downloads.
+    try{
+     const nativeExport=viewer().contentDocument?.getElementById('export');
+     if(nativeExport&&!nativeExport.disabled){nativeExport.click();return;}
+    }catch(_){/* Cross-origin or not ready: use the legacy bridge. */}
+   }
    viewer().contentWindow.postMessage({type:'pdf-editor:crop-command',action:cmd},location.origin);
    return;
   }
