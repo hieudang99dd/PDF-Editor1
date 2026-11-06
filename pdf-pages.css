@@ -47,7 +47,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,.pm-card:focus-vis
 .pm-bottom{background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:11px 18px;gap:12px;flex-shrink:0;min-height:62px}
 .pm-left{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.pm-left span{color:var(--muted);font-size:11px}
 .pm-footer-right{display:flex;align-items:center;gap:11px;min-width:0}.pm-footer-right #status{font-size:12px;color:var(--muted);max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pm-footer-right progress{width:90px;accent-color:var(--accent)}
-.pm-result{position:absolute;z-index:40;bottom:80px;left:50%;transform:translateX(-50%);max-width:calc(100% - 24px);width:620px;display:flex;gap:14px;justify-content:space-between;align-items:center;background:#13283b;color:#fff;border-radius:13px;padding:15px 20px;box-shadow:0 12px 40px #0004}
+.pm-result{position:relative;z-index:1;bottom:auto;left:auto;transform:none;max-width:none;width:auto;flex:0 0 auto;display:flex;gap:14px;justify-content:space-between;align-items:center;background:#13283b;color:#fff;border-radius:10px;padding:11px 16px;margin:7px 12px;box-shadow:0 3px 14px #0002}
 .pm-result[hidden]{display:none}.pm-result strong{color:#8befdd}.pm-result p{color:#c5d4e6;font-size:12px;margin:3px 0}
 .pm-result button{background:#34485f;color:#fff;border-color:#4c627e}.pm-result button.pm-primary{background:var(--accent);border-color:var(--accent)}.pm-result>div:last-child{display:flex;gap:5px;flex-wrap:wrap}
 .pm-scroll.dragging-over{outline:3px dashed var(--accent);outline-offset:-8px}
@@ -72,3 +72,19 @@ html.pm-embedded .pm-layout-bar{min-height:46px}
 html.pm-embedded .pm-result[hidden]{display:none!important}
 html.pm-embedded .pm-footer-right #status{max-width:min(350px,28vw)}
 @media(max-width:700px){html.pm-embedded .pm-header{min-height:60px}html.pm-embedded .pm-header-actions{flex-wrap:wrap}html.pm-embedded .pm-tools{padding:7px}}
+
+/* Result actions are inside the document layout, never a floating mask over pages. */
+.pm-app{min-height:0;max-height:100dvh}
+.pm-workspace{flex:1 1 0%;min-height:0}
+.pm-result{overflow-wrap:anywhere;max-height:min(180px,30dvh);overflow-y:auto}
+.pm-result>div:first-child{min-width:0}
+.pm-result>div:last-child{flex:0 0 auto}
+@media(max-width:700px){
+ .pm-header{min-width:0;gap:7px}
+ .pm-header-actions{max-width:100%;min-width:0;flex-wrap:wrap}
+ .pm-layout-actions{max-width:100%;min-width:0}
+ .pm-result{flex-wrap:wrap;margin:6px;padding:9px;gap:7px}
+ .pm-result>div:last-child{flex:1 1 100%}
+ .pm-result>div:last-child button{flex:1;min-width:0;white-space:normal}
+ .pm-footer-right #status{max-width:100%!important;white-space:normal}
+}
