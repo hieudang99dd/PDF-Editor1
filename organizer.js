@@ -263,6 +263,7 @@ class PDFOrganizer {
                     <div class="po-modal-footer">
                         <button class="po-tool-btn" id="po-save-cancel" type="button">Đóng</button>
                         <button class="po-primary-btn" id="po-save-confirm" type="button">Tạo PDF</button>
+                        <a id="po-save-open-link" class="po-tool-btn" href="#" target="_blank" rel="noopener noreferrer" hidden>↗ Mở PDF</a>
                         <a id="po-save-download-link" class="po-primary-btn" download hidden>↓ Tải PDF</a>
                     </div>
                 </div>
@@ -2753,6 +2754,11 @@ class PDFOrganizer {
             modalLink.download = filename;
             modalLink.hidden = false;
         }
+        const openLink = document.getElementById('po-save-open-link');
+        if (openLink) {
+            openLink.href = url;
+            openLink.hidden = false;
+        }
         // Do not simulate a click. Download must be initiated directly by
         // a user gesture on an actual anchor after asynchronous PDF creation.
     }
@@ -2774,6 +2780,9 @@ class PDFOrganizer {
         const modalLink = document.getElementById('po-save-download-link');
         modalLink.hidden = true;
         modalLink.removeAttribute('href');
+        const openLink = document.getElementById('po-save-open-link');
+        openLink.hidden = true;
+        openLink.removeAttribute('href');
         document.getElementById('po-save-ready').hidden = true;
         document.getElementById('po-save-confirm').hidden = false;
         document.getElementById('po-save-filename').value = name + '.pdf';
