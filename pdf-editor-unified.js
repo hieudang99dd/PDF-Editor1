@@ -20,7 +20,7 @@
  const viewer=()=>document.getElementById('unified-frame');
  const home=()=>document.getElementById('home');
  const legacy=()=>document.getElementById('ws');
- const getUrl=key=>new URL('./'+ROUTES[key][0]+(key==='crop'?'?embedded=1&ui=20261019-crop-ui2':key==='pages'?'?embedded=1&ui=20261106-download-fallback1':''),location.href).href;
+ const getUrl=key=>new URL('./'+ROUTES[key][0]+(key==='crop'?'?embedded=1&ui=20261106-occlusionfix1':key==='pages'?'?embedded=1&ui=20261106-occlusionfix1':''),location.href).href;
  function clearFrameLayout(){
   frameLayoutEpoch++;
   if(frameResizeObserver){frameResizeObserver.disconnect();frameResizeObserver=null;}
@@ -65,7 +65,7 @@
      max-width:100%;overflow-x:hidden;
     }
     html.pdfeditor-embedded-shell body>header{display:none!important}
-    html.pdfeditor-embedded-shell body>main{max-width:100%}
+    html.pdfeditor-embedded-shell body>main{min-width:0}
     @media(min-width:851px){
      html.pdfeditor-embedded-shell .workspace{
       height:clamp(480px,45vw,740px);min-height:480px;
