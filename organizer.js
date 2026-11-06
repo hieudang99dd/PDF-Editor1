@@ -246,38 +246,19 @@ class PDFOrganizer {
                 <div class="po-progress-bar"><div class="po-progress-fill" id="po-progress"></div></div>
             </div>
             
-            <!-- Save Modal -->
+            <!-- Download-only PDF export: never requests filesystem or system-folder access. -->
             <div class="po-modal-overlay" id="po-save-modal">
-                <div class="po-modal">
-                    <h3 class="po-modal-title">Lưu tài liệu thông minh</h3>
+                <div class="po-modal" style="max-width:440px;">
+                    <h3 class="po-modal-title">Xuất tài liệu PDF</h3>
                     <div class="po-form-group">
-                        <label class="po-form-label" for="po-save-mode">Cách lưu</label>
-                        <select id="po-save-mode" class="po-form-input">
-                            <option value="picker">Chọn vị trí và tên file khi lưu</option>
-                            <option value="directory">Lưu vào thư mục đã chọn</option>
-                            <option value="download">Tải xuống theo cài đặt trình duyệt</option>
-                        </select>
-                        <p id="po-save-help" style="font-size:12px; color:var(--po-text-muted); margin:6px 0 0;"></p>
+                        <label class="po-form-label" for="po-save-filename">Tên tệp PDF</label>
+                        <input type="text" id="po-save-filename" class="po-form-input" autocomplete="off" spellcheck="false">
                     </div>
-                    <div class="po-form-group">
-                        <label class="po-form-label">Thư mục lưu</label>
-                        <div class="po-input-group">
-                            <input type="text" id="po-save-dir" class="po-form-input" readonly placeholder="Chưa chọn thư mục (Lưu tải xuống mặc định)">
-                            <button class="po-tool-btn" id="po-save-pick-dir" style="border:1px solid var(--po-border)">Chọn thư mục</button>
-                            <button class="po-tool-btn" id="po-save-clear-dir">Bỏ chọn</button>
-                        </div>
-                    </div>
-                    <div class="po-form-group">
-                        <label class="po-form-label">Tên file</label>
-                        <input type="text" id="po-save-filename" class="po-form-input">
-                    </div>
-                    <div class="po-form-group">
-                        <label class="po-form-label">Vị trí lưu dự kiến</label>
-                        <div id="po-save-preview-path" style="font-size:12px; color:var(--po-text-muted); word-break:break-all; background:#f1f5f9; padding:8px; border-radius:4px;">Tải xuống thư mục mặc định của trình duyệt</div>
-                    </div>
+                    <p id="po-save-help" style="font-size:12px;color:var(--po-text-muted);line-height:1.5;margin:8px 0;">Tệp sẽ được tải xuống theo cài đặt của trình duyệt, không cần cấp quyền truy cập thư mục.</p>
+                    <p id="po-save-preview-path" role="status" aria-live="polite" style="font-size:12px;color:var(--po-text-muted);overflow-wrap:anywhere;background:var(--po-surface,#f1f5f9);padding:8px;border-radius:6px;"></p>
                     <div class="po-modal-footer">
-                        <button class="po-tool-btn" id="po-save-cancel">Hủy</button>
-                        <button class="po-primary-btn" id="po-save-confirm">Lưu file</button>
+                        <button class="po-tool-btn" id="po-save-cancel" type="button">Hủy</button>
+                        <button class="po-primary-btn" id="po-save-confirm" type="button">Tạo PDF &amp; tải xuống</button>
                     </div>
                 </div>
             </div>
@@ -457,18 +438,9 @@ class PDFOrganizer {
                 this.renderGrid();
             });
         }
-        const saveMode = document.getElementById('po-save-mode');
-        const canPickFile = window.isSecureContext && typeof window.showSaveFilePicker === 'function';
-        const canPickDirectory = window.isSecureContext && typeof window.showDirectoryPicker === 'function';
-        saveMode.querySelector('[value="picker"]').disabled = !canPickFile;
-        saveMode.querySelector('[value="directory"]').disabled = !canPickDirectory;
-        saveMode.value = 'download';
-        saveMode.onchange = () => this.updatePathPreview();
-        document.getElementById('po-save-pick-dir').disabled = !canPickDirectory;
         this.updatePathPreview();
 
-        
-        const tb = document.getElementById('po-format-toolbar');
+                const tb = document.getElementById('po-format-toolbar');
         tb.addEventListener('mousedown',e=>{
             e.stopPropagation();
             // Keep the caret in the editor for toolbar buttons; inputs retain normal keyboard focus.
@@ -683,36 +655,7 @@ class PDFOrganizer {
         document.getElementById('po-save-cancel').onclick = () => document.getElementById('po-save-modal').classList.remove('active');
         document.getElementById('po-save-confirm').onclick = () => this.executeSave();
         
-        const btnPickDir = document.getElementById('po-save-pick-dir');
-        btnPickDir.onclick = async () => {
-            if (this.isSaving || this.isChoosingDirectory) return;
-            this.isChoosingDirectory = true;
-            btnPickDir.disabled = true;
-            document.getElementById('po-save-confirm').disabled = true;
-            try {
-                const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                this.dirHandle = handle;
-                document.getElementById('po-save-dir').value = handle.name;
-                document.getElementById('po-save-mode').value = 'directory';
-                this.updatePathPreview();
-                await this.checkOverwriteAndSuggest();
-            } catch (e) {
-                if (e.name !== 'AbortError') {
-                    alert('Không thể chọn thư mục: ' + e.message + '\nBạn có thể chọn cách tải xuống theo cài đặt trình duyệt.');
-                }
-            } finally {
-                this.isChoosingDirectory = false;
-                btnPickDir.disabled = false;
-                document.getElementById('po-save-confirm').disabled = false;
-            }
-        };
-        document.getElementById('po-save-clear-dir').onclick = () => {
-            this.dirHandle = null;
-            document.getElementById('po-save-dir').value = '';
-            saveMode.value = 'download';
-            this.updatePathPreview();
-        };
-        const fileInput = document.getElementById('po-save-filename');
+                const fileInput = document.getElementById('po-save-filename');
         if (fileInput) {
             fileInput.oninput = () => this.updatePathPreview();
         }
@@ -2776,57 +2719,11 @@ class PDFOrganizer {
 
     updatePathPreview() {
         const fname = document.getElementById('po-save-filename').value.trim() || 'organized.pdf';
-        const mode = document.getElementById('po-save-mode').value;
-        const pv = document.getElementById('po-save-preview-path');
-        const help = document.getElementById('po-save-help');
-        document.getElementById('po-save-clear-dir').disabled = !this.dirHandle;
-        if (mode === 'directory') {
-            pv.textContent = this.dirHandle ? this.dirHandle.name + ' / ' + fname : 'Vui lòng chọn thư mục trước khi lưu.';
-            help.textContent = 'File sẽ được ghi trực tiếp vào thư mục đã chọn. Tên trùng sẽ được thêm phiên bản mới.';
-        } else if (mode === 'picker') {
-            pv.textContent = 'Chọn vị trí trong hộp thoại Lưu dưới dạng: ' + fname;
-            help.textContent = 'Hộp thoại chọn nơi lưu sẽ mở ngay khi bạn bấm Lưu file.';
-        } else {
-            pv.textContent = 'Tải xuống theo cài đặt trình duyệt: ' + fname;
-            help.textContent = 'PDF sẽ được tạo để tải xuống. Nếu trình duyệt chặn tự tải, dùng nút “Tải PDF” trên thanh công cụ sau khi xử lý.';
-        }
+        document.getElementById('po-save-preview-path').textContent =
+            'Tên tệp sẽ tải: ' + (/\\.pdf$/i.test(fname) ? fname : fname + '.pdf');
     }
 
-    async checkOverwriteAndSuggest() {
-        if (!this.dirHandle) return;
-        const original = this.getSaveFilename();
-        let fname = original;
-        let base = fname.replace(/\.pdf$/i, '');
-        while (true) {
-            try {
-                await this.dirHandle.getFileHandle(fname);
-            } catch (e) {
-                // Only a missing file is safe; permission and disk errors must be reported.
-                if (e.name === 'NotFoundError') break;
-                if (e.name !== 'TypeMismatchError') throw e;
-            }
-            const match = base.match(/_v(\d+)$/);
-            base = match ? base.replace(/_v\d+$/, '') + '_v' + (Number(match[1]) + 1) : base + '_v1';
-            fname = base + '.pdf';
-        }
-        document.getElementById('po-save-filename').value = fname;
-        this.updatePathPreview();
-        if (fname !== original && typeof toast === 'function') toast('Tên đã tồn tại. Dùng tên mới: ' + fname);
-        return fname;
-    }
-
-    async writeSaveFile(handle, blob) {
-        const writable = await handle.createWritable();
-        try {
-            await writable.write(blob);
-            await writable.close();
-        } catch (e) {
-            try { await writable.abort(); } catch (_) { /* The stream may already be closed. */ }
-            throw e;
-        }
-    }
-
-    downloadSaveBlob(blob, filename) {
+        downloadSaveBlob(blob, filename) {
         // Keep a real, user-clickable link. Scripted download after asynchronous
         // PDF processing may be blocked by browser download permissions.
         if (this.latestDownloadUrl) URL.revokeObjectURL(this.latestDownloadUrl);
@@ -2879,7 +2776,7 @@ class PDFOrganizer {
     }
 
     async executeSave() {
-        if (this.isSaving || this.isChoosingDirectory) return;
+        if (this.isSaving) return;
         const exportSelected = this.exportSelectedMode;
         const targetPages = exportSelected ? this.pages.filter(p => p.selected) : this.pages;
         if (targetPages.length === 0) return;
@@ -2890,26 +2787,9 @@ class PDFOrganizer {
         let historyAtSave = this.historyIndex;
         saveButton.disabled = true;
         try {
-            let filename = this.getSaveFilename();
-            const mode = document.getElementById('po-save-mode').value;
-            let fileHandle = null;
-            if (mode === 'picker') {
-                // Must run directly from the click, before PDF processing consumes user activation.
-                fileHandle = await window.showSaveFilePicker({
-                    suggestedName: filename,
-                    types: [{ description: 'Tài liệu PDF', accept: { 'application/pdf': ['.pdf'] } }]
-                });
-                filename = fileHandle.name || filename;
-            } else if (mode === 'directory') {
-                if (!this.dirHandle) throw new Error('Vui lòng chọn thư mục lưu.');
-                if (typeof this.dirHandle.requestPermission === 'function') {
-                    const permission = await this.dirHandle.requestPermission({ mode: 'readwrite' });
-                    if (permission !== 'granted') throw new Error('Chưa được cấp quyền ghi vào thư mục đã chọn.');
-                }
-                filename = await this.checkOverwriteAndSuggest();
-            }
+            const filename = this.getSaveFilename();
 
-            if(this.activeEditDiv && !await this.commitEdit(this.activeEditDiv)) throw new Error('Vùng chữ đang sửa chưa hợp lệ. Hãy sửa nội dung hoặc bấm Hủy trong thanh sửa chữ.');
+                        if(this.activeEditDiv && !await this.commitEdit(this.activeEditDiv)) throw new Error('Vùng chữ đang sửa chưa hợp lệ. Hãy sửa nội dung hoặc bấm Hủy trong thanh sửa chữ.');
             if(this.pendingTextCommit && !await this.pendingTextCommit) throw new Error('Chưa áp dụng được thay đổi chữ.');
             historyAtSave=this.historyIndex;
 
@@ -3232,35 +3112,16 @@ class PDFOrganizer {
             const pdfBytes = await finalDoc.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             
-            if (mode === 'directory') {
-                // Recheck after processing in case another save created this name meanwhile.
-                filename = await this.checkOverwriteAndSuggest();
-                fileHandle = await this.dirHandle.getFileHandle(filename, { create: true });
-            }
-            if (fileHandle) {
-                await this.writeSaveFile(fileHandle, blob);
-                if (this.latestDownloadUrl) {
-                    URL.revokeObjectURL(this.latestDownloadUrl);
-                    this.latestDownloadUrl = null;
-                }
-                document.getElementById('po-download-manual')?.remove();
-            } else {
-                this.downloadSaveBlob(blob, filename);
-            }
-            if (!exportSelected) this.savedHistoryIndex = historyAtSave;
-            this.showSuccess(filename, mode === 'download');
+            this.downloadSaveBlob(blob, filename);
+            // Download requests cannot prove that the browser wrote the file.
+            // Keep edit history and PDF in memory so a blocked download is retryable.
+            this.lastExportedHistoryIndex = historyAtSave;
+            this.showSuccess(filename, true);
         } catch (e) {
-            // Cancelling a native picker must never start a fallback download.
             modal.classList.add('active');
-            if (e.name !== 'AbortError') {
-                if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
-                    document.getElementById('po-save-mode').value = 'download';
-                    this.updatePathPreview();
-                    alert('Trình duyệt từ chối quyền chọn nơi lưu. Đã chuyển sang chế độ Tải xuống. Bấm Lưu file lần nữa để xuất PDF.');
-                } else {
-                    alert('Không thể lưu PDF: ' + e.message + '\nBạn có thể thử lại hoặc chọn cách tải xuống theo cài đặt trình duyệt.');
-                }
-            }
+            const message = e?.message || String(e);
+            if (typeof toast === 'function') toast('Không thể tạo PDF: ' + message);
+            else alert('Không thể tạo PDF: ' + message);
         } finally {
             this.hideLoading();
             this.isSaving = false;
@@ -3270,7 +3131,7 @@ class PDFOrganizer {
 
     showSuccess(filename, isDownload = false) {
         if (typeof toast === 'function') {
-            toast(isDownload ? 'PDF đã sẵn sàng. Nếu chưa tải được, bấm “↓ Tải PDF”.' : 'Lưu file thành công!');
+            toast('PDF đã tạo. Nếu chưa thấy tệp, bấm “↓ Tải PDF” trên thanh công cụ.');
         }
         this.baseFilename = filename.replace(/\.pdf$/i, '');
     }
