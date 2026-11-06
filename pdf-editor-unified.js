@@ -2,7 +2,7 @@
 (() => {
  'use strict';
  const ROUTES=Object.freeze({
-  text:['text-editor.html','Sửa Text PDF'],
+  text:['studio/edit-pdf-text.html','Sửa Text PDF'],
   pages:['pages.html','Quản lý trang PDF'],
   crop:['crop.html','Cắt lề PDF'],
   convert:['convert.html','Chuyển đổi định dạng'],
