@@ -462,7 +462,7 @@ class PDFOrganizer {
         const canPickDirectory = window.isSecureContext && typeof window.showDirectoryPicker === 'function';
         saveMode.querySelector('[value="picker"]').disabled = !canPickFile;
         saveMode.querySelector('[value="directory"]').disabled = !canPickDirectory;
-        saveMode.value = canPickFile ? 'picker' : 'download';
+        saveMode.value = 'download';
         saveMode.onchange = () => this.updatePathPreview();
         document.getElementById('po-save-pick-dir').disabled = !canPickDirectory;
         this.updatePathPreview();
@@ -709,7 +709,7 @@ class PDFOrganizer {
         document.getElementById('po-save-clear-dir').onclick = () => {
             this.dirHandle = null;
             document.getElementById('po-save-dir').value = '';
-            saveMode.value = canPickFile ? 'picker' : 'download';
+            saveMode.value = 'download';
             this.updatePathPreview();
         };
         const fileInput = document.getElementById('po-save-filename');
@@ -2788,7 +2788,7 @@ class PDFOrganizer {
             help.textContent = 'Hộp thoại chọn nơi lưu sẽ mở ngay khi bạn bấm Lưu file.';
         } else {
             pv.textContent = 'Tải xuống theo cài đặt trình duyệt: ' + fname;
-            help.textContent = 'Muốn chọn nơi lưu mỗi lần, bật “Hỏi vị trí lưu từng tệp trước khi tải xuống” trong cài đặt tải xuống của trình duyệt.';
+            help.textContent = 'PDF sẽ được tạo để tải xuống. Nếu trình duyệt chặn tự tải, dùng nút “Tải PDF” trên thanh công cụ sau khi xử lý.';
         }
     }
 
@@ -2827,17 +2827,35 @@ class PDFOrganizer {
     }
 
     downloadSaveBlob(blob, filename) {
+        // Keep a real, user-clickable link. Scripted download after asynchronous
+        // PDF processing may be blocked by browser download permissions.
+        if (this.latestDownloadUrl) URL.revokeObjectURL(this.latestDownloadUrl);
         const url = URL.createObjectURL(blob);
+        this.latestDownloadUrl = url;
+        let retry = document.getElementById('po-download-manual');
+        if (!retry) {
+            retry = document.createElement('a');
+            retry.id = 'po-download-manual';
+            retry.className = 'po-primary-btn';
+            retry.style.cssText = 'display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap;';
+            retry.title = 'Nếu trình duyệt chặn tải tự động, bấm vào đây để tải PDF';
+            document.getElementById('po-save').insertAdjacentElement('afterend', retry);
+        }
+        retry.href = url;
+        retry.download = filename;
+        retry.textContent = '↓ Tải PDF';
+
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
         try {
             a.click();
+        } catch (error) {
+            console.warn('Tải tự động bị chặn. Hãy bấm nút Tải PDF:', error);
         } finally {
             a.remove();
-            // Keep the Blob alive while the browser starts the download (especially large PDFs).
-            setTimeout(() => URL.revokeObjectURL(url), 60000);
+            // Keep the Blob URL alive for a manual retry until the next save/reset.
         }
     }
 
@@ -3221,6 +3239,11 @@ class PDFOrganizer {
             }
             if (fileHandle) {
                 await this.writeSaveFile(fileHandle, blob);
+                if (this.latestDownloadUrl) {
+                    URL.revokeObjectURL(this.latestDownloadUrl);
+                    this.latestDownloadUrl = null;
+                }
+                document.getElementById('po-download-manual')?.remove();
             } else {
                 this.downloadSaveBlob(blob, filename);
             }
@@ -3230,7 +3253,13 @@ class PDFOrganizer {
             // Cancelling a native picker must never start a fallback download.
             modal.classList.add('active');
             if (e.name !== 'AbortError') {
-                alert('Không thể lưu PDF: ' + e.message + '\nBạn có thể thử lại hoặc chọn cách tải xuống theo cài đặt trình duyệt.');
+                if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+                    document.getElementById('po-save-mode').value = 'download';
+                    this.updatePathPreview();
+                    alert('Trình duyệt từ chối quyền chọn nơi lưu. Đã chuyển sang chế độ Tải xuống. Bấm Lưu file lần nữa để xuất PDF.');
+                } else {
+                    alert('Không thể lưu PDF: ' + e.message + '\nBạn có thể thử lại hoặc chọn cách tải xuống theo cài đặt trình duyệt.');
+                }
             }
         } finally {
             this.hideLoading();
@@ -3241,12 +3270,16 @@ class PDFOrganizer {
 
     showSuccess(filename, isDownload = false) {
         if (typeof toast === 'function') {
-            toast(isDownload ? 'Đã gửi file tới trình duyệt để tải xuống.' : 'Lưu file thành công!');
+            toast(isDownload ? 'PDF đã sẵn sàng. Nếu chưa tải được, bấm “↓ Tải PDF”.' : 'Lưu file thành công!');
         }
         this.baseFilename = filename.replace(/\.pdf$/i, '');
     }
 
     destroy() {
+        if (this.latestDownloadUrl) {
+            URL.revokeObjectURL(this.latestDownloadUrl);
+            this.latestDownloadUrl = null;
+        }
         if (this.abort) this.abort.abort();
         this.nativeTextClient?.destroy();
         this.nativeTextCache?.clear();
