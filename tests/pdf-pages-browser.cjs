@@ -74,6 +74,8 @@ async function run(){
   assert.equal(await page.locator('#apply').isVisible(),false,'No duplicate Apply step in Page Manager');
   const downloading=page.waitForEvent('download');
   await page.locator('#export').click();
+  await page.locator('#download-retry:visible').waitFor({timeout:60000});
+  await page.locator('#download-retry').click();
   await(await downloading).saveAs(path.join(out,'organized.pdf'));
   const bytes=fs.readFileSync(path.join(out,'organized.pdf'));
   const pdf=await PDFLib.PDFDocument.load(bytes);
@@ -88,6 +90,8 @@ async function run(){
   await page.locator('#toggle-split').click();
   const getZip=page.waitForEvent('download');
   await page.locator('#export').click();
+  await page.locator('#download-retry:visible').waitFor({timeout:60000});
+  await page.locator('#download-retry').click();
   await(await getZip).saveAs(path.join(out,'split.zip'));
   const zipped=require('../jszip.min.js');
   const archive=await zipped.loadAsync(fs.readFileSync(path.join(out,'split.zip')));
@@ -112,6 +116,8 @@ async function run(){
   assert.equal(await page.locator('#export').isEnabled(),true);
   const dl=page.waitForEvent('download');
   await page.locator('#export').click();
+  await page.locator('#download-retry:visible').waitFor({timeout:60000});
+  await page.locator('#download-retry').click();
   await(await dl).saveAs(path.join(out,'signed.pdf'));
   assert.deepEqual(fs.readFileSync(path.join(out,'signed.pdf')),signedBytes);
   assert.deepEqual(errors,[]);
