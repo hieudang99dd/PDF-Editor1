@@ -21,8 +21,8 @@ test('PDF export never requests access to Chrome system folders',()=>{
   assert.doesNotMatch(organizer,/this\.savedHistoryIndex\s*=\s*historyAtSave/);
 });
 test('Website and editor fallback load versioned PDF save engine',()=>{
-  assert.match(home,/organizer\.js\?v=20261106-save-click1/);
-  assert.match(backup,/organizer\.js\?v=20261106-save-click1/);
+  assert.match(home,/organizer\.js\?v=20261106-save-click2/);
+  assert.match(backup,/organizer\.js\?v=20261106-save-click2/);
 });
 
 test('PDF filename validation preserves Vietnamese and rejects unsafe Windows names',()=>{
