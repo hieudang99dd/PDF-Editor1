@@ -20,7 +20,7 @@ test('Main editor uses a two-stage PDF export with no file-system access',()=>{
  assert.doesNotMatch(block,/\.click\(\)/);
  assert.match(block,/modalLink\.hidden = false/);
  assert.match(css,/#po-save-modal \[hidden\]/);
- assert.match(html,/organizer\.js\?v=20261106-save-click1/);
+ assert.match(html,/organizer\.js\?v=20261106-save-click2/);
 });
 
 test('Page manager produces PDF/ZIP but requires explicit click on output link',()=>{
