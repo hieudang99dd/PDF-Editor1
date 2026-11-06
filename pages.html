@@ -18,6 +18,7 @@
 <!-- Kept only as an internal compatibility hook; Page Manager exports current edits directly. -->
 <button id="apply" type="button" disabled hidden aria-hidden="true">Áp dụng nội bộ</button>
 <button id="export" class="pm-primary" disabled type="button">↓ Xuất PDF</button>
+<a id="download-retry" class="pm-primary" download hidden style="display:none;text-decoration:none;white-space:nowrap" title="Nếu trình duyệt chặn tải tự động, bấm vào đây để tải lại PDF đã tạo">↓ Tải lại</a>
 </div>
 </header>
 <div class="pm-tools" aria-label="Thanh công cụ dàn trang">
@@ -74,6 +75,6 @@
 <script src="./pdf-lib.min.js"></script>
 <script src="./pdf.min.js"></script>
 <script src="./jszip.min.js"></script>
-<script type="module" src="./pdf-pages.mjs?v=20261019-pages-clean1"></script>
+<script type="module" src="./pdf-pages.mjs?v=20261106-download-fallback1"></script>
 <script defer src="./pdf-editor-workspace.js?v=20261019-suite1"></script>
 </body></html>
