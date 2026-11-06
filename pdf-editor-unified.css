@@ -92,7 +92,8 @@
 #unified-ws[data-tool=region] .unified-reload{
   color:#ebf0f7;background:#253143;border-color:#45556b;
 }
-#unified-ws[data-tool=region] .unified-note{display:none!important}
+#unified-ws[data-tool=region] .unified-note,
+#unified-ws[data-tool=region] .unified-toolbar{display:none!important}
 #unified-ws[data-tool=region] .unified-framebox{
   position:relative;flex:1 1 0%;min-height:0!important;height:auto!important;
   overflow:hidden;background:#0c111b;
