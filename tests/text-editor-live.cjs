@@ -79,9 +79,10 @@ async function main(){
   await page.waitForFunction(()=>window.organizerInstance.pages[0]?.textEdits?.length===1 &&
      !window.organizerInstance.activeEditDiv,{timeout:120000});
   await page.locator('#po-save').click();
-  await page.locator('#po-save-mode').selectOption('download');
-  const promise=page.waitForEvent('download',{timeout:120000});
   await page.locator('#po-save-confirm').click();
+  await page.locator('#po-save-download-link:visible').waitFor({timeout:120000});
+  const promise=page.waitForEvent('download',{timeout:120000});
+  await page.locator('#po-save-download-link').click();
   const download=await promise;
   const saved=path.join(out,'output.pdf');
   await download.saveAs(saved);
