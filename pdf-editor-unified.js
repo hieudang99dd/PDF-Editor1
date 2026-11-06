@@ -13,12 +13,84 @@
  });
  const hash=()=>/^#workspace=([a-z]+)$/.exec(location.hash)?.[1]||null;
  let current=null;
+ let frameResizeObserver=null;
+ let frameLayoutEpoch=0;
+ const AUTO_HEIGHT_ROUTES=new Set(['convert','ocr','sign','inspect','crop']);
  const root=()=>document.getElementById('unified-ws');
  const viewer=()=>document.getElementById('unified-frame');
  const home=()=>document.getElementById('home');
  const legacy=()=>document.getElementById('ws');
  const getUrl=key=>new URL('./'+ROUTES[key][0]+(key==='crop'?'?embedded=1&ui=20261019-crop-ui2':key==='pages'?'?embedded=1&ui=20261106-download-fallback1':''),location.href).href;
+ function clearFrameLayout(){
+  frameLayoutEpoch++;
+  if(frameResizeObserver){frameResizeObserver.disconnect();frameResizeObserver=null;}
+ }
+ function syncAutoFrameHeight(epoch=frameLayoutEpoch){
+  if(epoch!==frameLayoutEpoch||!isOpen()||!AUTO_HEIGHT_ROUTES.has(current))return;
+  const frame=viewer();
+  let doc;
+  try{doc=frame.contentDocument;}catch(_){return;}
+  if(!doc?.body)return;
+  const measured=Math.ceil(Math.max(
+   doc.body.scrollHeight||0,
+   doc.documentElement.scrollHeight||0,
+   doc.body.getBoundingClientRect().height||0
+  ));
+  if(!Number.isFinite(measured)||measured<100)return;
+  const desired=Math.max(480,Math.min(24000,measured+16));
+  if(Math.abs(frame.getBoundingClientRect().height-desired)>8)frame.style.height=desired+'px';
+ }
+ function installFrameLayout(){
+  clearFrameLayout();
+  if(!isOpen()||!AUTO_HEIGHT_ROUTES.has(current))return;
+  const frame=viewer();
+  let doc;
+  try{doc=frame.contentDocument;}catch(_){return;}
+  if(!doc?.body)return;
+  // Remove only duplicate header and avoid viewport-based panel-height feedback.
+  // Keep child engine, controls and preview state entirely inside its iframe.
+  doc.documentElement.classList.add('pdfeditor-embedded-shell');
+  let style=doc.getElementById('pdfeditor-embed-layout');
+  if(!style){
+   style=doc.createElement('style');
+   style.id='pdfeditor-embed-layout';
+   style.textContent=`
+    html.pdfeditor-embedded-shell,html.pdfeditor-embedded-shell body{
+     max-width:100%;overflow-x:hidden;
+    }
+    html.pdfeditor-embedded-shell body>header{display:none!important}
+    html.pdfeditor-embedded-shell body>main{max-width:100%}
+    @media(min-width:851px){
+     html.pdfeditor-embedded-shell .workspace{
+      height:clamp(480px,45vw,740px);min-height:480px;
+     }
+    }
+    @media(min-width:1001px){
+     html.pdfeditor-embedded-shell .sign-workspace{
+      height:clamp(540px,51vw,800px);min-height:540px;
+     }
+    }
+    @media(max-width:850px){
+     html.pdfeditor-embedded-shell .workspace,
+     html.pdfeditor-embedded-shell .sign-workspace{height:auto}
+    }
+   `;
+   doc.head.appendChild(style);
+  }
+  const epoch=frameLayoutEpoch;
+  const schedule=()=>{
+   if(epoch!==frameLayoutEpoch)return;
+   window.requestAnimationFrame(()=>syncAutoFrameHeight(epoch));
+  };
+  if(typeof ResizeObserver==='function'){
+   frameResizeObserver=new ResizeObserver(schedule);
+   frameResizeObserver.observe(doc.body);
+  }
+  schedule();
+  doc.fonts?.ready?.then(schedule)?.catch(()=>{});
+ }
  function showHome(){
+  clearFrameLayout();
   root().hidden=true;
   root().removeAttribute('data-tool');
   document.getElementById('unified-crop-bar').hidden=true;
@@ -47,6 +119,7 @@
    btn.setAttribute('aria-pressed',String(btn.dataset.pdfRoute===route));
   });
   current=route;
+  clearFrameLayout();
   const frame=viewer();
   frame.title=ROUTES[route][1]+' — PDF EDITOR';
   frame.style.height='';
@@ -128,10 +201,12 @@
  function init(){
   if(!root())return;
   syncShellHeight();
-  window.addEventListener('resize',syncShellHeight);
+  window.addEventListener('resize',()=>{syncShellHeight();syncAutoFrameHeight();});
   document.addEventListener('click',click,true); // capture before legacy catalog dispatch
   window.addEventListener('message',frameMessage);
   viewer().addEventListener('load',()=>{
+   if(!isOpen())return;
+   installFrameLayout();
    document.getElementById('unified-loading').textContent='';
   });
   restore();
